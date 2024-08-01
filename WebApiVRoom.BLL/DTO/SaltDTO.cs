@@ -8,8 +8,8 @@ namespace WebApiVRoom.BLL.DTO
 {
     public class SaltDTO
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string salt { get; set; }
-        public int userId { get; set; }
+        public long userId { get; set; }
     }
 }

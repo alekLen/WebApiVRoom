@@ -44,7 +44,7 @@ namespace WebApiVRoom.DAL.Repositories
 
             }
         }
-        public async Task<User> Get(int id)
+        public async Task<User> Get(long id)
         {
             return await db.Users.FirstOrDefaultAsync(m => m.Id == id);
         }

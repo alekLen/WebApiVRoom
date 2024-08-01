@@ -8,8 +8,8 @@ namespace WebApiVRoom.DAL.Entities
 {
     public class Salt
     {
-        public int Id { get; set; }
-        public string salt { get; set; }
+        public long Id { get; set; }
+        public string salt { get; set; } = string.Empty;
         public User user { get; set; }
     }
 }

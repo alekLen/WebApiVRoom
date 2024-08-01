@@ -21,8 +21,9 @@ namespace WebApiVRoom.Controllers
         
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(int id)
+        public async Task<ActionResult<UserDTO>> GetUser(long id)
         {
+           
             var user = await _userService.GetUser(id);
             if (user == null)
             {
@@ -60,7 +61,7 @@ namespace WebApiVRoom.Controllers
             return Ok(user);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<UserDTO>> DeleteUser(int id)
+        public async Task<ActionResult<UserDTO>> DeleteUser(long id)
         {
             if (!ModelState.IsValid)
             {

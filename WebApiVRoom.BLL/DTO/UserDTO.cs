@@ -8,10 +8,10 @@ namespace WebApiVRoom.BLL.DTO
 {
     public class UserDTO
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
         public string? Password { get; set; }
         public string email { get; set; }
-        public string Age { get; set; }
+        public int Age { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> Get(int id);
+        Task<User> Get(long id);
         Task AddItem(User s);
         Task<User> GetUser(string name);
         Task<User> GetEmail(string email);

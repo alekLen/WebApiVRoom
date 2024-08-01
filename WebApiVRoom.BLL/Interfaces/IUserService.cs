@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<UserDTO>> GetUsers(string n);
         Task AddUser(UserDTO u);
         Task UpdateUser(UserDTO user);
-        Task<UserDTO> GetUser(int id);
+        Task<UserDTO> GetUser(long id);
         Task<bool> CheckEmail(string s);
         Task<bool> GetLogins(string s);
         Task CreateUser(UserDTO u);

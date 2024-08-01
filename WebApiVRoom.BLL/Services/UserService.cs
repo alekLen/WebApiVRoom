@@ -68,11 +68,11 @@ namespace WebApiVRoom.BLL.Services
             await Database.Users.Update(user);
             await Database.Save();
         }
-        public async Task<UserDTO> GetUser(int id)
+        public async Task<UserDTO> GetUser(long id)
         {
             var u = await Database.Users.Get(id);
             if (u == null)
-                throw new ValidationException("Wrong !", "");
+                return null;
             return UserToUserDTO(u);
         }
         public UserDTO UserToUserDTO(User u)
