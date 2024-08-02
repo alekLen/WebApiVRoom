@@ -4,6 +4,7 @@ using WebApiVRoom.DAL.EF;
 using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
+using WebApiVRoom.DAL.Repositories;
 
 namespace WebApiVRoom.Controllers
 {
@@ -18,12 +19,12 @@ namespace WebApiVRoom.Controllers
         {
             _userService = userService;
         }
-        
+
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(long id)
+        public async Task<ActionResult<UserDTO>> GetUser(int id)
         {
-           
+
             var user = await _userService.GetUser(id);
             if (user == null)
             {
@@ -44,8 +45,8 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            await _userService.UpdateUser(user);
-           
+            //await _userService.UpdateUser(user);
+
             return Ok(user);
         }
         [HttpPost]
@@ -56,12 +57,12 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _userService.AddUser(user);
+            //await _userService.AddUser(user);
 
             return Ok(user);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult<UserDTO>> DeleteUser(long id)
+        public async Task<ActionResult<UserDTO>> DeleteUser(int id)
         {
             if (!ModelState.IsValid)
             {
@@ -78,5 +79,9 @@ namespace WebApiVRoom.Controllers
 
             return Ok(user);
         }
+
+
     }
+
+   
 }

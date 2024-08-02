@@ -22,7 +22,7 @@ namespace WebApiVRoom.DAL.EF
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Salt> Salts { get; set; }
+       
     }
 }
 

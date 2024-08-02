@@ -10,7 +10,6 @@ string? connection = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ISaltService, SaltService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

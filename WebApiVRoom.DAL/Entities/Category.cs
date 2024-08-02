@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebApiVRoom.BLL.DTO
+namespace WebApiVRoom.DAL.Entities
 {
-    public class SaltDTO
+    public class Category
     {
         public long Id { get; set; }
-        public string salt { get; set; }
-        public long userId { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.EF;
 using WebApiVRoom.DAL.Interfaces;
+using System.Runtime.InteropServices;
+using System.Text.Json;
 
 
 namespace WebApiVRoom.DAL.Repositories
@@ -18,44 +20,83 @@ namespace WebApiVRoom.DAL.Repositories
         public UserRepository(VRoomContext context)
         {
             this.db = context;
-        }
-        public async Task<User> GetUser(string name)
-        {
-            return await db.Users.FirstOrDefaultAsync(m => m.Name == name);
-        }
-        public async Task<User> GetEmail(string email)
-        {
-            return await db.Users.FirstOrDefaultAsync(m => m.email == email);
-        }
-        public async Task<List<User>> GetUsers(string n)
-        {
-            return await db.Users.Where(user => user.Name != n).ToListAsync();
-        }
-        public async Task AddItem(User user)
-        {
-            await db.AddAsync(user);
-        }
-        public async Task Update(User user)
-        {
-            var u = await db.Users.FindAsync(user.Id);
-            if (u != null)
-            {
-                db.Users.Update(u);
-
-            }
-        }
-        public async Task<User> Get(long id)
+        }     
+      
+        public async Task<User> Get(int id)
         {
             return await db.Users.FirstOrDefaultAsync(m => m.Id == id);
         }
-        public async Task<bool> CheckEmail(string s)
-        {
-            return await db.Users.AllAsync(u => u.email == s);
-        }
-        public async Task<bool> GetLogins(string s)
-        {
-            return await db.Users.AllAsync(u => u.Name != s);
-
-        }
+      
     }
+
+
+    //public class UserRepository : IUserRepository
+    //{
+    //    private readonly HttpClient _httpClient;
+    //    private const string ClerkApiBaseUrl = "https://api.clerk.dev/v1";
+    //    private const string ApiKey = "Ваш_Ключ_API"; // Замените на ваш реальный ключ API Clerk
+
+    //    public UserRepository(HttpClient httpClient)
+    //    {
+    //        _httpClient = httpClient;
+    //        _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {ApiKey}");
+    //    }
+
+    //    // Получение пользователя по ID
+    //    public async Task<String> GetUserByIdAsync(string userId)
+    //    {
+    //        var response = await _httpClient.GetAsync($"{ClerkApiBaseUrl}/users/{userId}");
+    //        response.EnsureSuccessStatusCode();
+    //        return await response.Content.ReadAsStringAsync();
+
+    //    }
+    //    public async Task<User> GetUserByIdAsync2(string userId)
+    //    {
+    //        var response = await _httpClient.GetAsync($"{ClerkApiBaseUrl}/users/{userId}");
+    //        response.EnsureSuccessStatusCode();
+
+    //        var user = JsonSerializer.Deserialize<User>(await response.Content.ReadAsStringAsync());
+    //        return user;
+    //    }
+
+    //    // Получение всех пользователей
+    //    public async Task<string> GetAllUsersAsync()
+    //    {
+    //        var response = await _httpClient.GetAsync($"{ClerkApiBaseUrl}/users");
+    //        response.EnsureSuccessStatusCode();
+    //        return await response.Content.ReadAsStringAsync();
+    //    }
+
+    //    // Создание нового пользователя
+    //    public async Task<string> CreateUserAsync(string email, string password)
+    //    {
+    //        var newUser = new
+    //        {
+    //            email_address = email,
+    //            password = password
+    //        };
+
+    //        var content = new StringContent(JsonSerializer.Serialize(newUser), Encoding.UTF8, "application/json");
+    //        var response = await _httpClient.PostAsync($"{ClerkApiBaseUrl}/users", content);
+    //        response.EnsureSuccessStatusCode();
+    //        return await response.Content.ReadAsStringAsync();
+    //    }
+
+    //    // Обновление данных пользователя
+    //    public async Task<string> UpdateUserAsync(string userId, object updateData)
+    //    {
+    //        var content = new StringContent(JsonSerializer.Serialize(updateData), Encoding.UTF8, "application/json");
+    //        var response = await _httpClient.PatchAsync($"{ClerkApiBaseUrl}/users/{userId}", content);
+    //        response.EnsureSuccessStatusCode();
+    //        return await response.Content.ReadAsStringAsync();
+    //    }
+
+    //    // Удаление пользователя
+    //    public async Task DeleteUserAsync(string userId)
+    //    {
+    //        var response = await _httpClient.DeleteAsync($"{ClerkApiBaseUrl}/users/{userId}");
+    //        response.EnsureSuccessStatusCode();
+    //    }
+    //}
+
 }

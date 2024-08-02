@@ -8,7 +8,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface IUnitOfWork
     {
-        ISaltRepository Salts { get; }
+      
         IUserRepository Users { get; }
         Task Save();
     }

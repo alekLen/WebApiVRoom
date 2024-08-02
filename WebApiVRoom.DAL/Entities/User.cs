@@ -8,10 +8,14 @@ namespace WebApiVRoom.DAL.Entities
 {
     public class User
     {
-        public long Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string email { get; set; } = string.Empty;
-        public int Age { get; set; }
+        public int Id { get; set; }
+        public int Clerk_Id { get; set; }
+        public ChannelSettings ChannelSettings { get; set; }
+        public bool IsPremium { get; set; } 
+        public int SubscriptionCount { get; set; }
+        public List<Subscription> Subscriptions { get; set; }=new List<Subscription>();
+        public List<PlayList> PlayLists { get; set; }= new List<PlayList>();
+        public List<HistoryOfBrowsing> HistoryOfBrowsing { get; set;} = new List<HistoryOfBrowsing>();
+
     }
 }

@@ -13,22 +13,13 @@ namespace WebApiVRoom.DAL.Repositories
     {
         private VRoomContext db;
 
-        private SaltRepository saltRepository;
         private UserRepository userRepository;
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
         }
 
-        public ISaltRepository Salts
-        {
-            get
-            {
-                if (saltRepository == null)
-                    saltRepository = new SaltRepository(db);
-                return saltRepository;
-            }
-        }
+       
         public IUserRepository Users
         {
             get
