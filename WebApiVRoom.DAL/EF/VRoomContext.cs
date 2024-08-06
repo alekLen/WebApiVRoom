@@ -21,8 +21,11 @@ namespace WebApiVRoom.DAL.EF
             }
         }
 
+
         public DbSet<User> Users { get; set; }
-       
+        public DbSet<ChannelSettings> ChannelSettings { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CommentPost> CommentPosts { get; set; }
     }
 }
 

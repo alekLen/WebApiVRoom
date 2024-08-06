@@ -19,17 +19,43 @@ namespace WebApiVRoom.DAL.Repositories
 
         public UserRepository(VRoomContext context)
         {
-            this.db = context;
-        }     
-      
-        public async Task<User> Get(int id)
-        {
-            return await db.Users.FirstOrDefaultAsync(m => m.Id == id);
+            db = context;
         }
-      
-    }
 
+        public async Task<User> GetById(int id)
+        {
+            return await db.Users.Include(u => u.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
+        }
 
-    
+        public async Task<User> GetByClerk_Id(string clerk_id)
+        {
+            return await db.Users.Include(u => u.ChannelSettings).FirstOrDefaultAsync(m => m.Clerk_Id == clerk_id);
+        }
 
+        public async Task Add(User user)
+        {
+            
+              await  db.Users.AddAsync(user);
+            
+        }
+
+        public async Task Update(User user)
+        {
+            var u = await db.Users.FindAsync(user.Id);
+            if (u != null)
+            {
+                db.Users.Update(u);
+            }
+        }
+
+        public async Task Delete(int Id)
+        {
+            var u = await db.Users.FindAsync(Id);
+            if (u != null)
+            {
+                db.Users.Remove(u);
+            }
+        }
+
+    }    
 }

@@ -10,7 +10,7 @@ namespace WebApiVRoom.DAL.Entities
     {
         public int Id { get; set; }
         public User Subscriber { get; set; }
-        public ChannelSettings Channel { get; set; }
+        public ChannelSettings ChannelSettings { get; set; }
         public DateTime Date {  get; set; }
     }
 }

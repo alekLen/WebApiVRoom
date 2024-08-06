@@ -10,6 +10,8 @@ namespace WebApiVRoom.DAL.Interfaces
     {
       
         IUserRepository Users { get; }
+        ICategoryRepository Categories { get; }
+        ICommentPostRepository CommentPosts { get; }
         Task Save();
     }
 }

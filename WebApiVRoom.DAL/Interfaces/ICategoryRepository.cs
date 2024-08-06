@@ -7,13 +7,12 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface IUserRepository
+    public interface ICategoryRepository
     {
-        Task<User> GetById(int id);
-        Task<User> GetByClerk_Id(string clerk_id);
-        Task Add(User user);
-        Task Update(User user); 
+        Task<Category> GetById(int id);
+        Task<Category> GetByName(string name);
+        Task Add(Category category);
+        Task Update(Category category);
         Task Delete(int id);
-
     }
 }

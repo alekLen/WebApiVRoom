@@ -10,5 +10,6 @@ namespace WebApiVRoom.DAL.Entities
     {
         public long Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public List<ChannelSettings> ChannelSettingss { get; set; } = new List<ChannelSettings>();
     }
 }

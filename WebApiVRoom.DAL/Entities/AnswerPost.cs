@@ -6,17 +6,15 @@ using System.Threading.Tasks;
 
 namespace WebApiVRoom.DAL.Entities
 {
-    public class CommentsPost
+    public class AnswerPost
     {
         public int Id { get; set; }
         public User User { get; set; }
-        public Video Video { get; set; }
-        public string Comment { get; set; }
-        public DateTime Date { get; set; }
+        public CommentPost CommentPost { get; set; }
+        public string Text { get; set; }
+        public DateTime AnswerDate { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-        public User Answer { get; set; }
-        public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
     }
 }
