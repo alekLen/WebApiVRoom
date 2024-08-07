@@ -19,6 +19,11 @@ namespace WebApiVRoom.DAL.Repositories
             db = context;
         }
 
+        public async Task<IEnumerable<Category>> GetAll()
+        {
+            return await db.Categories.ToListAsync();
+        }
+
         public async Task<Category> GetById(int id)
         {
             return await db.Categories.FirstOrDefaultAsync(m => m.Id == id); 

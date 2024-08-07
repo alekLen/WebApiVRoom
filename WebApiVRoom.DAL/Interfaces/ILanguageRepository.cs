@@ -9,6 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface ILanguageRepository
     {
+        Task<IEnumerable<Language>> GetAll();
         Task<Language> GetById(int id);
         Task<Language> GetByName(string name);
         Task Add(Language lang);

@@ -21,7 +21,11 @@ namespace WebApiVRoom.DAL.Repositories
         {
             db = context;
         }
-
+        public async Task<IEnumerable<User>> GetAll()
+        {
+            return await db.Users.Include(u => u.ChannelSettings).ToListAsync();
+        }
+        
         public async Task<User> GetById(int id)
         {
             return await db.Users.Include(u => u.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);

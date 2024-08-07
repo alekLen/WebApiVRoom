@@ -9,6 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface ICategoryRepository
     {
+        Task<IEnumerable<Category>> GetAll();
         Task<Category> GetById(int id);
         Task<Category> GetByName(string name);
         Task Add(Category category);

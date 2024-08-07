@@ -17,6 +17,9 @@ namespace WebApiVRoom.DAL.Repositories
         private UserRepository userRepository;
         private CategoryRepository categoryRepository;
         private CommentPostRepository commentPostRepository;
+        private CountryRepository countryRepository;
+        private LanguageRepository languageRepository;
+
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
@@ -48,6 +51,24 @@ namespace WebApiVRoom.DAL.Repositories
                 if (commentPostRepository == null)
                     commentPostRepository = new CommentPostRepository(db);
                 return commentPostRepository;
+            }
+        }
+        public ICountryRepository Countries
+        {
+            get
+            {
+                if (countryRepository == null)
+                    countryRepository = new CountryRepository(db);
+                return countryRepository;
+            }
+        }
+        public ILanguageRepository Languages
+        {
+            get
+            {
+                if (languageRepository == null)
+                    languageRepository = new LanguageRepository(db);
+                return languageRepository;
             }
         }
         public async Task Save()

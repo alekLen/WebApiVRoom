@@ -14,6 +14,14 @@ namespace WebApiVRoom.DAL.Repositories
     {
         private VRoomContext db;
 
+        public LanguageRepository(VRoomContext context)
+        {
+            db = context;
+        }
+        public async Task<IEnumerable<Language>> GetAll()
+        {
+            return await db.Languages.ToListAsync();
+        }
         public async Task Add(Language lang)
         {
             await db.Languages.AddAsync(lang);

@@ -14,6 +14,14 @@ namespace WebApiVRoom.DAL.Repositories
     {
         private VRoomContext db;
 
+        public CountryRepository(VRoomContext context)
+        {
+            db = context;
+        }
+        public async Task<IEnumerable<Country>> GetAll()
+        {
+            return await db.Countries.ToListAsync();
+        }
         public async Task Add(Country country)
         {
             await db.Countries.AddAsync(country);
@@ -36,6 +44,10 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<Country> GetByName(string name)
         {
             return await db.Countries.FirstOrDefaultAsync(m => m.Name == name);
+        }
+        public async Task<Country> GetByCountryCode(string code)
+        {
+            return await db.Countries.FirstOrDefaultAsync(m => m.CountryCode == code);
         }
 
         public async Task Update(Country country)

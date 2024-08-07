@@ -74,22 +74,22 @@ namespace WebApiVRoom.BLL.Services
 
         }
 
-        //private async Language FindLanguage(string language)
-        //{
-        //    Language languageNew = await Database.LanguageRepository.FindByName(language);
-        //    if (languageNew != null)
-        //        return languageNew;
-        //    else
-        //        return await Database.LanguageRepository.Add(language);
-        //}
+        private async Language FindLanguage(string language)
+        {
+            Language languageNew = await Database.LanguageRepository.FindByName(language);
+            if (languageNew != null)
+                return languageNew;
+            else
+                return await Database.LanguageRepository.Add(language);
+        }
 
-        //private async Country FindCountry(string country, string countryCode)
-        //{
-        //    Language languageNew = await Database.CountryRepository.FindByName(country);
-        //    if (languageNew != null)
-        //        return languageNew;
-        //    else
-        //        return await Database.CountryRepository.Add(country, countryCode);
-        //}
+        private async Country FindCountry(string country, string countryCode)
+        {
+            Language languageNew = await Database.CountryRepository.FindByName(country);
+            if (languageNew != null)
+                return languageNew;
+            else
+                return await Database.CountryRepository.Add(country, countryCode);
+        }
     }
 }
