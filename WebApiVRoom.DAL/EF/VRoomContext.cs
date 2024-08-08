@@ -28,6 +28,9 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<CommentPost> CommentPosts { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Language> Languages { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<Post> Posts { get; set; }
     }
 }
 
