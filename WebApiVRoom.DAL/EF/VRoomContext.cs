@@ -31,6 +31,9 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<AnswerVideo> AnswerVideos { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Language> Languages { get; set; }
+        public DbSet<HistoryOfBrowsing> HistoryOfBrowsings { get; set; }
+        public DbSet<PlayList> PlayLists { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Post> Posts { get; set; }
