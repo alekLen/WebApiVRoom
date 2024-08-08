@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace WebApiVRoom.DAL.Interfaces
 {
     public interface IUnitOfWork
-    {
-      
+    {      
         IUserRepository Users { get; }
         ICategoryRepository Categories { get; }
         ICommentPostRepository CommentPosts { get; }
@@ -17,6 +16,13 @@ namespace WebApiVRoom.DAL.Interfaces
         ICommentVideoRepository CommentVideos { get; }
         ICountryRepository Countries { get; }
         ILanguageRepository Languages { get; }
-        Task Save();
+        IChannelSettingsRepository ChannelSettings { get; }
+        IHistoryOfBrowsingRepository HistoryOfBrowsings { get; }
+        INotificationRepository Notifications { get; }
+        IPlayListRepository PlayLists { get; }
+        IPostRepository Posts { get; }
+        ISubscriptionRepository Subscriptions { get; }
+        ITagRepository Tags { get; }
+        IVideoRepository Videos { get; }
     }
 }

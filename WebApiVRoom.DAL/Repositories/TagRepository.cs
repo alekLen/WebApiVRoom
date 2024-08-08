@@ -55,7 +55,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<Tag> GetByName(string name)
         {
-            return await db.Tags.FirstOrDefaultAsync(m => m.Text == name);
+            return await db.Tags.FirstOrDefaultAsync(m => m.Name == name);
         }
 
         public async Task Update(Tag tag)

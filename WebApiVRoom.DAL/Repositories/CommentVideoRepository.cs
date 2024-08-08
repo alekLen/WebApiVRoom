@@ -26,7 +26,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cv => cv.AnswerVideo)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
-        public async Task<CommentVideo> GetByPost(int videoId)
+        public async Task<CommentVideo> GetByVideo(int videoId)
         {
             return await db.CommentVideos
                   .Include(cp => cp.User)

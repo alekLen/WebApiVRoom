@@ -7,7 +7,7 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
- public interface IAnswerPostRepository
+    public interface IAnswerPostRepository
     {
         Task<AnswerPost> GetById(int id);
         Task<AnswerPost> GetByComment(int comId);

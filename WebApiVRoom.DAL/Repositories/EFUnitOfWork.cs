@@ -22,6 +22,14 @@ namespace WebApiVRoom.DAL.Repositories
         private CommentVideoRepository commentVideoRepository;
         private CountryRepository countryRepository;
         private LanguageRepository languageRepository;
+        private ChannelSettingsRepository channelSettingsRepository;
+        private HistoryOfBrowsingRepository historyOfBrowsingRepository;
+        private NotificationRepository notificationRepository;
+        private PlayListRepository playListRepository;
+        private PostRepository postRepository;
+        private SubscriptionRepository subscriptionRepository;
+        private TagRepository tagRepository;
+        private VideoRepository videoRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
@@ -101,9 +109,77 @@ namespace WebApiVRoom.DAL.Repositories
                 return languageRepository;
             }
         }
-        public async Task Save()
+        public IChannelSettingsRepository ChannelSettings
         {
-            await db.SaveChangesAsync();
+            get
+            {
+                if (channelSettingsRepository == null)
+                    channelSettingsRepository = new ChannelSettingsRepository(db);
+                return channelSettingsRepository;
+            }
+        }
+        public IHistoryOfBrowsingRepository HistoryOfBrowsings
+        {
+            get
+            {
+                if (historyOfBrowsingRepository == null)
+                    historyOfBrowsingRepository = new HistoryOfBrowsingRepository(db);
+                return historyOfBrowsingRepository;
+            }
+        }
+        public INotificationRepository Notifications
+        {
+            get
+            {
+                if (notificationRepository == null)
+                    notificationRepository = new NotificationRepository(db);
+                return notificationRepository;
+            }
+        }
+        public IPlayListRepository PlayLists
+        {
+            get
+            {
+                if (playListRepository == null)
+                    playListRepository = new PlayListRepository(db);
+                return playListRepository;
+            }
+        }
+        public IPostRepository Posts
+        {
+            get
+            {
+                if (postRepository == null)
+                    postRepository = new PostRepository(db);
+                return postRepository;
+            }
+        }
+        public ISubscriptionRepository Subscriptions
+        {
+            get
+            {
+                if (subscriptionRepository == null)
+                    subscriptionRepository = new SubscriptionRepository(db);
+                return subscriptionRepository;
+            }
+        }
+        public ITagRepository Tags
+        {
+            get
+            {
+                if (tagRepository == null)
+                    tagRepository = new TagRepository(db);
+                return tagRepository;
+            }
+        }
+        public IVideoRepository Videos
+        {
+            get
+            {
+                if (videoRepository == null)
+                    videoRepository = new VideoRepository(db);
+                return videoRepository;
+            }
         }
     }
 }

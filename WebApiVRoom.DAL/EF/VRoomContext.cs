@@ -37,6 +37,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Video> Videos { get; set; }
     }
 }
 
