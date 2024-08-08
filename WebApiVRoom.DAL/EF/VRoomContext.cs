@@ -26,6 +26,9 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<ChannelSettings> ChannelSettings { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CommentPost> CommentPosts { get; set; }
+        public DbSet<CommentVideo> CommentVideos { get; set; }
+        public DbSet<AnswerPost> AnswerPosts { get; set; }
+        public DbSet<AnswerVideo> AnswerVideos { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }

@@ -17,6 +17,9 @@ namespace WebApiVRoom.DAL.Repositories
         private UserRepository userRepository;
         private CategoryRepository categoryRepository;
         private CommentPostRepository commentPostRepository;
+        private AnswerPostRepository answerPostRepository;
+        private AnswerVideoRepository answerVideoRepository;
+        private CommentVideoRepository commentVideoRepository;
         private CountryRepository countryRepository;
         private LanguageRepository languageRepository;
 
@@ -51,6 +54,33 @@ namespace WebApiVRoom.DAL.Repositories
                 if (commentPostRepository == null)
                     commentPostRepository = new CommentPostRepository(db);
                 return commentPostRepository;
+            }
+        }
+        public ICommentVideoRepository CommentVideos
+        {
+            get
+            {
+                if (commentVideoRepository == null)
+                    commentVideoRepository = new CommentVideoRepository(db);
+                return commentVideoRepository;
+            }
+        }
+        public IAnswerPostRepository AnswerPosts
+        {
+            get
+            {
+                if (answerPostRepository == null)
+                    answerPostRepository = new AnswerPostRepository(db);
+                return answerPostRepository;
+            }
+        }
+        public IAnswerVideoRepository AnswerVideos
+        {
+            get
+            {
+                if (answerVideoRepository == null)
+                    answerVideoRepository = new AnswerVideoRepository(db);
+                return answerVideoRepository;
             }
         }
         public ICountryRepository Countries

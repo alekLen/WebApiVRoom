@@ -12,6 +12,9 @@ namespace WebApiVRoom.DAL.Interfaces
         IUserRepository Users { get; }
         ICategoryRepository Categories { get; }
         ICommentPostRepository CommentPosts { get; }
+        IAnswerPostRepository AnswerPosts { get; }
+        IAnswerVideoRepository AnswerVideos { get; }
+        ICommentVideoRepository CommentVideos { get; }
         ICountryRepository Countries { get; }
         ILanguageRepository Languages { get; }
         Task Save();
