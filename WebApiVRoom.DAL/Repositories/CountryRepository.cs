@@ -24,15 +24,25 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task Add(Country country)
         {
+            if (country == null)
+            {
+                throw new ArgumentNullException(nameof(country));
+            }
             await db.Countries.AddAsync(country);
+            await db.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
             var u = await db.Countries.FindAsync(id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Countries.Remove(u);
+                await db.SaveChangesAsync();
             }
         }
 
@@ -53,9 +63,14 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task Update(Country country)
         {
             var u = await db.Countries.FindAsync(country.Id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Countries.Update(u);
+                await db.SaveChangesAsync();
             }
         }
     }

@@ -24,15 +24,25 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task Add(Language lang)
         {
+            if (lang == null)
+            {
+                throw new ArgumentNullException(nameof(lang));
+            }
             await db.Languages.AddAsync(lang);
+            await db.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
             var u = await db.Languages.FindAsync(id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Languages.Remove(u);
+                await db.SaveChangesAsync();
             }
         }
 
@@ -49,9 +59,14 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task Update(Language lang)
         {
             var u = await db.Languages.FindAsync(lang.Id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Languages.Update(u);
+                await db.SaveChangesAsync();
             }
         }
     }

@@ -38,9 +38,13 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task Add(User user)
         {
-            
-              await  db.Users.AddAsync(user);
-            
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            await  db.Users.AddAsync(user);
+            await db.SaveChangesAsync();
+
         }
 
         public async Task Update(User user)
@@ -49,7 +53,10 @@ namespace WebApiVRoom.DAL.Repositories
             if (u != null)
             {
                 db.Users.Update(u);
+                await db.SaveChangesAsync();
             }
+            else
+                throw new ArgumentNullException(nameof(u));
         }
 
         public async Task Delete(int Id)
@@ -58,7 +65,10 @@ namespace WebApiVRoom.DAL.Repositories
             if (u != null)
             {
                 db.Users.Remove(u);
+                await db.SaveChangesAsync();
             }
+            else
+                throw new ArgumentNullException(nameof(u));
         }
 
     }    

@@ -36,26 +36,39 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task Add(Category category)
         {
-
+            if (category == null)
+            {
+                throw new ArgumentNullException(nameof(category));
+            }
             await db.Categories.AddAsync(category);
-
+            await db.SaveChangesAsync();
         }
 
         public async Task Update(Category category)
         {
             var u = await db.Categories.FindAsync(category.Id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Categories.Update(u);
+                await db.SaveChangesAsync();
             }
         }
 
         public async Task Delete(int Id)
         {
             var u = await db.Categories.FindAsync(Id);
-            if (u != null)
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
             {
                 db.Categories.Remove(u);
+                await db.SaveChangesAsync();
             }
         }
     }

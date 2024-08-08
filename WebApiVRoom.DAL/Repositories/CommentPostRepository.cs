@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,9 +62,12 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task Add(CommentPost commentPost)
         {
-
+            if (commentPost == null)
+            {
+                throw new ArgumentNullException(nameof(commentPost));
+            }
             await db.CommentPosts.AddAsync(commentPost);
-
+            await db.SaveChangesAsync();
         }
 
         public async Task Update(CommentPost commentPost)
@@ -72,6 +76,7 @@ namespace WebApiVRoom.DAL.Repositories
             if (u != null)
             {
                 db.CommentPosts.Update(u);
+                await db.SaveChangesAsync();
             }
         }
 
@@ -81,6 +86,7 @@ namespace WebApiVRoom.DAL.Repositories
             if (u != null)
             {
                 db.CommentPosts.Remove(u);
+                await db.SaveChangesAsync();
             }
         }
     }

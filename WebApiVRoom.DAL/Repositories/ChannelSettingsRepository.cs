@@ -41,12 +41,21 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<ChannelSettings> GetById(int id)
         {
-            return await db.ChannelSettings.FindAsync(id);
+            return await db.ChannelSettings
+                .Include(cp => cp.Owner)
+                .Include(cp => cp.Language)
+                .Include(cp => cp.Country)
+                .FirstOrDefaultAsync(ch => ch.Id == id);
+
         }
 
         public async Task<IEnumerable<ChannelSettings>> GetAll()
         {
-            return await db.ChannelSettings.ToListAsync();
+            return await db.ChannelSettings
+                .Include(cp => cp.Owner)
+                .Include(cp => cp.Language)
+                .Include(cp => cp.Country)
+                .ToListAsync();
         }
 
         public async Task Delete(int id)
@@ -64,8 +73,11 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<IEnumerable<ChannelSettings>> FindByOwner(int ownerId)
         {
             return await db.ChannelSettings
-                           .Where(cs => cs.Owner.Id == ownerId)
-                           .ToListAsync();
+                .Include(cp => cp.Owner)
+                .Include(cp => cp.Language)
+                .Include(cp => cp.Country)
+                .Where(cs => cs.Owner.Id == ownerId)
+                .ToListAsync();
         }
     }
 }
