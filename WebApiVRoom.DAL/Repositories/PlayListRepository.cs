@@ -19,29 +19,60 @@ namespace WebApiVRoom.DAL.Repositories
             _context = context;
         }
 
-        public void Add(PlayList playList)
+        public async Task Add(PlayList playList)
         {
-            _context.PlayLists.Add(playList);
+           await _context.PlayLists.AddAsync(playList);
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(PlayList playList)
+        public async Task<PlayList> GetById(int id)
         {
-            _context.PlayLists.Remove(playList);
+            return await _context.PlayLists
+                 .Include(m => m.User)
+                .Include(m => m.Videos)
+                .FirstOrDefaultAsync(m => m.Id==id);
+        }
+        public async Task<IEnumerable<PlayList>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.PlayLists
+                .Include(m => m.User)
+                .Include(m => m.Videos)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<PlayList>> GetAll()
+        {
+            return await _context.PlayLists
+                .Include(m => m.User)
+                .Include(m => m.Videos)
+                .ToListAsync();
         }
 
-        public async Task<PlayList> GetPlayListByIdAsync(long id)
-        {
-            return await _context.PlayLists.FindAsync(id);
-        }
-
-        public async Task<IEnumerable<PlayList>> GetPlayListsAsync()
-        {
-            return await _context.PlayLists.ToListAsync();
-        }
-
-        public void Update(PlayList playList)
+        public async Task Update(PlayList playList)
         {
             _context.PlayLists.Update(playList);
+            await _context.SaveChangesAsync();
+        }
+        public async Task Delete(int id)
+        {
+            var u = await _context.PlayLists.FindAsync(id);
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
+            {
+                _context.PlayLists.Remove(u);
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task<PlayList> GetByUser(int userId)
+        {
+            return await _context.PlayLists
+                  .Include(m => m.User)
+                  .Include(m => m.Videos)
+                  .FirstOrDefaultAsync(m => m.User.Id == userId);
         }
     }
 }

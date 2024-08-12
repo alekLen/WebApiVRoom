@@ -2,13 +2,8 @@
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface IChannelSettingsRepository
+    public interface IChannelSettingsRepository: ISetGetRepository<ChannelSettings>
     {
-        Task Add(ChannelSettings ch);
-        Task Update(ChannelSettings ch);
-        Task<ChannelSettings> GetById(int id);
-        Task<IEnumerable<ChannelSettings>> GetAll();
-        Task Delete(int id);
         Task<IEnumerable<ChannelSettings>> FindByOwner(int ownerId);
     }
 }

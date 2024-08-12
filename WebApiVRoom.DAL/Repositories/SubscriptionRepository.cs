@@ -49,6 +49,15 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).ToListAsync();
         }
 
+        public async Task<IEnumerable<Subscription>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.Subscriptions
+                .Include(m => m.Subscriber)
+                .Include(m => m.ChannelSettings)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<Subscription> GetById(int id)
         {
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
@@ -59,6 +68,10 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.ChannelSettings.ChannelName == channel_name);
         }
 
+        public async Task<Subscription> GetByUser(User user)
+        {
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Subscriber == user);
+        }
         public async Task Update(Subscription sub)
         {
             var u = await db.Subscriptions.FindAsync(sub.Id);

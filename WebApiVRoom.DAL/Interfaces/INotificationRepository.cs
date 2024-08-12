@@ -2,12 +2,9 @@
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface INotificationRepository
+    public interface INotificationRepository: ISetGetRepository<Notification>
     {
-        void Create(Notification item);
-        void Delete(int id);
-        Notification Get(int id);
-        IEnumerable<Notification> GetAll();
-        void Update(Notification item);
+        Task<Notification> GetByUser(User user);
+        Task<Notification> GetByDate(DateTime daye);
     }
 }

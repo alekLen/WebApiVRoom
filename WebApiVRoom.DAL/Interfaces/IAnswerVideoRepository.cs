@@ -7,14 +7,10 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface IAnswerVideoRepository
+    public interface IAnswerVideoRepository: ISetGetRepository<AnswerVideo>
     {
-        Task<AnswerVideo> GetById(int id);
         Task<AnswerVideo> GetByComment(int comId);
         Task<AnswerVideo> GetByUser(int userId);
         Task<AnswerVideo> GetByDate(DateTime date);
-        Task Add(AnswerVideo answerVideo);
-        Task Update(AnswerVideo answerVideo);
-        Task Delete(int Id);
     }
 }

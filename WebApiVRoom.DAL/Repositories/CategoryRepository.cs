@@ -71,5 +71,12 @@ namespace WebApiVRoom.DAL.Repositories
                 await db.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<Category>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.Categories
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

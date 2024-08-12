@@ -17,27 +17,67 @@ namespace WebApiVRoom.DAL.Repositories
         {
             db = context;
         }
-        public void Create(Notification item)
+        public async Task Add(Notification item)
         {
             db.Notifications.Add(item);
+            await db.SaveChangesAsync();
         }
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            Notification item = db.Notifications.Find(id);
-            if (item != null)
+            Notification item = await db.Notifications.FindAsync(id);
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
+            else
+            {
                 db.Notifications.Remove(item);
+            }
+            await db.SaveChangesAsync();
         }
-        public Notification Get(int id)
+        public async Task<Notification> GetById(int id)
         {
-            return db.Notifications.Find(id);
+            return await db.Notifications
+                .Include(m=>m.User)
+                .FirstOrDefaultAsync(m=>m.Id==id);
         }
-        public IEnumerable<Notification> GetAll()
+        public async Task<IEnumerable<Notification>> GetAll()
         {
-            return db.Notifications;
+            return await db.Notifications.Include(m => m.User).ToListAsync(); 
         }
-        public void Update(Notification item)
+        public async Task Update(Notification item)
         {
-            db.Entry(item).State = EntityState.Modified;
+            var u = await db.Notifications.FindAsync(item.Id);
+            if (u == null)
+            {
+                throw new ArgumentNullException(nameof(u));
+            }
+            else
+            {
+                db.Notifications.Update(u);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<Notification> GetByUser(User user)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.User.Id == user.Id);
+        }
+        public async Task<Notification> GetByDate(DateTime date)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.Date == date);
+        }
+        public async Task<IEnumerable<Notification>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }

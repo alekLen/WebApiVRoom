@@ -7,13 +7,9 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface ILanguageRepository
+    public interface ILanguageRepository: ISetGetRepository<Language>
     {
-        Task<IEnumerable<Language>> GetAll();
-        Task<Language> GetById(int id);
         Task<Language> GetByName(string name);
-        Task Add(Language lang);
-        Task Update(Language lang);
-        Task Delete(int id);
+     
     }
 }

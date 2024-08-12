@@ -19,6 +19,14 @@ namespace WebApiVRoom.DAL.Repositories
             db = context;
         }
 
+        public async Task<IEnumerable<CommentPost>> GetAll()
+        {
+            return await db.CommentPosts
+                .Include(cv => cv.User)
+                .Include(cv => cv.Post)
+                .Include(cv => cv.AnswerPost)
+                .ToListAsync();
+        }
         public async Task<CommentPost> GetById(int id)
         {
             return await db.CommentPosts
@@ -88,6 +96,16 @@ namespace WebApiVRoom.DAL.Repositories
                 db.CommentPosts.Remove(u);
                 await db.SaveChangesAsync();
             }
+        }
+        public async Task<IEnumerable<CommentPost>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.CommentPosts
+                  .Include(cp => cp.User)
+                  .Include(cp => cp.Post)
+                  .Include(cp => cp.AnswerPost)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
         }
     }
 }

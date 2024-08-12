@@ -79,5 +79,15 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(cs => cs.Owner.Id == ownerId)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<ChannelSettings>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.ChannelSettings
+                .Include(cp => cp.Owner)
+                .Include(cp => cp.Language)
+                .Include(cp => cp.Country)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

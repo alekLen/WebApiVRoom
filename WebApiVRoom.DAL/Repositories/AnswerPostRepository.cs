@@ -77,5 +77,21 @@ namespace WebApiVRoom.DAL.Repositories
                 await db.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<AnswerPost>> GetAll()
+        {
+            return await db.AnswerPosts
+                   .Include(ap => ap.User)
+                   .Include(ap => ap.CommentPost)
+                   .ToListAsync();
+        }
+        public async Task<IEnumerable<AnswerPost>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.AnswerPosts
+                   .Include(ap => ap.User)
+                   .Include(ap => ap.CommentPost)
+                   .Skip((pageNumber - 1) * pageSize)
+                   .Take(pageSize)
+                   .ToListAsync();
+        }
     }
 }

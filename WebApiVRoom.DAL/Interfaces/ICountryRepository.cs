@@ -7,14 +7,9 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface ICountryRepository
+    public interface ICountryRepository: ISetGetRepository<Country>
     {
-        Task<Country> GetById(int id);
-        Task<IEnumerable<Country>> GetAll();
         Task<Country> GetByName(string name);
         Task<Country> GetByCountryCode(string code);
-        Task Add(Country country);
-        Task Update(Country country);
-        Task Delete(int id);
     }
 }

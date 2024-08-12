@@ -7,13 +7,8 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface ISubscriptionRepository
+    public interface ISubscriptionRepository: ISetGetRepository<Subscription>
     {
-        Task<IEnumerable<Subscription>> GetAll();
-        Task<Subscription> GetById(int id);
         Task<Subscription> GetByChannelName(string channel_name);
-        Task Add(Subscription sub);
-        Task Update(Subscription sub);
-        Task Delete(int id);
     }
 }

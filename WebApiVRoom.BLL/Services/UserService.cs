@@ -50,7 +50,7 @@ namespace WebApiVRoom.BLL.Services
                 Clerk_Id = clerk_id
             };
             await Database.Users.Add(user);
-            await Database.Save();
+           
 
             Language langNew = new();
             Country countryNew = new();
@@ -70,26 +70,26 @@ namespace WebApiVRoom.BLL.Services
             };
 
             await Database.ChannelSettings.Add(channelSettings);
-            await Database.Save();
+           
 
         }
 
-        private async Language FindLanguage(string language)
-        {
-            Language languageNew = await Database.LanguageRepository.FindByName(language);
-            if (languageNew != null)
-                return languageNew;
-            else
-                return await Database.LanguageRepository.Add(language);
-        }
+        //private async Language FindLanguage(string language)
+        //{
+        //    Language languageNew = await Database.LanguageRepository.FindByName(language);
+        //    if (languageNew != null)
+        //        return languageNew;
+        //    else
+        //        return await Database.LanguageRepository.Add(language);
+        //}
 
-        private async Country FindCountry(string country, string countryCode)
-        {
-            Language languageNew = await Database.CountryRepository.FindByName(country);
-            if (languageNew != null)
-                return languageNew;
-            else
-                return await Database.CountryRepository.Add(country, countryCode);
-        }
+        //private async Country FindCountry(string country, string countryCode)
+        //{
+        //    Language languageNew = await Database.CountryRepository.FindByName(country);
+        //    if (languageNew != null)
+        //        return languageNew;
+        //    else
+        //        return await Database.CountryRepository.Add(country, countryCode);
+        //}
     }
 }

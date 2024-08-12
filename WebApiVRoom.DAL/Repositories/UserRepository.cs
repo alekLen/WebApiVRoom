@@ -70,6 +70,13 @@ namespace WebApiVRoom.DAL.Repositories
             else
                 throw new ArgumentNullException(nameof(u));
         }
-
+        public async Task<IEnumerable<User>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.Users
+                .Include(v => v.ChannelSettings)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }    
 }

@@ -18,9 +18,10 @@ namespace WebApiVRoom.DAL.Repositories
             _context = context;
         }
 
-        public async Task<Video> Get(int id)
+        public async Task<Video> GetById(int id)
         {
             var video = await _context.Videos
+                .Include(v => v.ChannelSettings)
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
@@ -34,9 +35,10 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
-        public async Task<List<Video>> GetAll()
+        public async Task<IEnumerable<Video>> GetAll()
         {
             return await _context.Videos
+                .Include(v => v.ChannelSettings)
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
@@ -45,6 +47,19 @@ namespace WebApiVRoom.DAL.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.PlayLists)
+                .Include(v => v.CommentVideos)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task Add(Video video)
         {
             ValidateVideo(video);
@@ -61,15 +76,17 @@ namespace WebApiVRoom.DAL.Repositories
 
             ValidateVideo(video);
 
-            _context.Entry(existingVideo).CurrentValues.SetValues(video);
+            //_context.Entry(existingVideo).CurrentValues.SetValues(video);
 
-            existingVideo.Categories = video.Categories;
-            existingVideo.Tags = video.Tags;
-            existingVideo.HistoryOfBrowsings = video.HistoryOfBrowsings;
-            existingVideo.PlayLists = video.PlayLists;
-            existingVideo.CommentVideos = video.CommentVideos;
+            //existingVideo.Categories = video.Categories;
+            //existingVideo.Tags = video.Tags;
+            //existingVideo.HistoryOfBrowsings = video.HistoryOfBrowsings;
+            //existingVideo.PlayLists = video.PlayLists;
+            //existingVideo.CommentVideos = video.CommentVideos;
 
-            _context.Videos.Update(existingVideo);
+            //_context.Videos.Update(existingVideo);
+
+            _context.Videos.Update(video);
             await _context.SaveChangesAsync();
         }
 
@@ -86,6 +103,7 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<Video> GetByTitle(string title)
         {
             var video = await _context.Videos
+                .Include(v => v.ChannelSettings)
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)

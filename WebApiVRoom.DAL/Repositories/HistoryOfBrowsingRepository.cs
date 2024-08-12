@@ -54,21 +54,34 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<HistoryOfBrowsing> GetById(int id)
         {
-            return await db.HistoryOfBrowsings.FindAsync(id);
+            return await db.HistoryOfBrowsings
+                 .Include(m => m.User)
+                .Include(m => m.Video)
+                .FirstOrDefaultAsync(m =>m.Id==id);
         }
 
         public async Task<IEnumerable<HistoryOfBrowsing>> GetAll()
         {
-            return await db.HistoryOfBrowsings.ToListAsync();
+            return await db.HistoryOfBrowsings
+                .Include(m => m.User)
+                .Include(m => m.Video)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<HistoryOfBrowsing>> GetByUserId(int userId)
         {
-            return await db.HistoryOfBrowsings
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video)
                            .Where(h => h.User.Id == userId)
                            .ToListAsync();
         }
 
-        
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.HistoryOfBrowsings
+                .Include(m => m.User).Include(m => m.Video)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

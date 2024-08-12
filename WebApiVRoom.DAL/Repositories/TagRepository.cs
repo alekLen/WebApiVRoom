@@ -48,6 +48,13 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Tags.ToListAsync();
         }
 
+        public async Task<IEnumerable<Tag>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            return await db.Tags
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<Tag> GetById(int id)
         {
             return await db.Tags.FirstOrDefaultAsync(m => m.Id == id);
