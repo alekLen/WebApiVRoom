@@ -50,14 +50,14 @@ namespace WebApiVRoom.Controllers
             return Ok(user);
         }
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(UserDTO user)
+        public async Task<ActionResult<UserDTO>> PostUser(string clerk_id, string language, string country, string countryCode)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            //await _userService.AddUser(user);
+           UserDTO user = await _userService.AddUser(clerk_id, language,country, countryCode);
 
             return Ok(user);
         }

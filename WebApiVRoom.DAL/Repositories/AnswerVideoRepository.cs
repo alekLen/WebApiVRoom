@@ -22,21 +22,18 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
                    .FirstOrDefaultAsync(User => User.Id == id);
         }
         public async Task<AnswerVideo> GetByComment(int comId)
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
-                  .FirstOrDefaultAsync(m => m.CommentVideo.Id == comId);
+                  .FirstOrDefaultAsync(m => m.CommentVideo_Id == comId);
         }
         public async Task<AnswerVideo> GetByUser(int userId)
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
                   .FirstOrDefaultAsync(m => m.User.Id == userId);
         }
 
@@ -45,7 +42,6 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
                   .FirstOrDefaultAsync(m => m.AnswerDate == date);
         }
         public async Task Add(AnswerVideo answerVideo)
@@ -81,14 +77,12 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
                    .ToListAsync();
         }
         public async Task<IEnumerable<AnswerVideo>> GetAllPaginated(int pageNumber, int pageSize)
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentVideo)
                    .Skip((pageNumber - 1) * pageSize)
                    .Take(pageSize)
                    .ToListAsync();

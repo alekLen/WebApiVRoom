@@ -23,17 +23,17 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task<IEnumerable<User>> GetAll()
         {
-            return await db.Users.Include(u => u.ChannelSettings).ToListAsync();
+            return await db.Users.ToListAsync();
         }
         
         public async Task<User> GetById(int id)
         {
-            return await db.Users.Include(u => u.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
+            return await db.Users.FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<User> GetByClerk_Id(string clerk_id)
         {
-            return await db.Users.Include(u => u.ChannelSettings).FirstOrDefaultAsync(m => m.Clerk_Id == clerk_id);
+            return await db.Users.FirstOrDefaultAsync(m => m.Clerk_Id == clerk_id);
         }
 
         public async Task Add(User user)
@@ -73,7 +73,6 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<IEnumerable<User>> GetAllPaginated(int pageNumber, int pageSize)
         {
             return await db.Users
-                .Include(v => v.ChannelSettings)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

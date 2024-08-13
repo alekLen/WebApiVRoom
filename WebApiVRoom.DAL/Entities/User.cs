@@ -10,7 +10,7 @@ namespace WebApiVRoom.DAL.Entities
     {
         public int Id { get; set; }
         public string Clerk_Id { get; set; } = string.Empty;
-        public ChannelSettings? ChannelSettings { get; set; }
+        public int ChannelSettings_Id { get; set; }
         public bool IsPremium { get; set; } = false;
         public int SubscriptionCount { get; set; } = 0;
         public List<Subscription> Subscriptions { get; set; } =new List<Subscription>();

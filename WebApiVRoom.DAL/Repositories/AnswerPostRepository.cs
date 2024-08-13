@@ -22,21 +22,18 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerPosts
                    .Include(ap=>ap.User)
-                   .Include(ap=>ap.CommentPost)
                    .FirstOrDefaultAsync(User => User.Id == id);
         }
         public async Task<AnswerPost> GetByComment(int comId)
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentPost)
-                  .FirstOrDefaultAsync(m => m.CommentPost.Id == comId);
+                  .FirstOrDefaultAsync(m => m.CommentPost_Id == comId);
         }
         public async Task<AnswerPost> GetByUser(int userId)
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentPost)
                   .FirstOrDefaultAsync(m => m.User.Id == userId);
         }
       
@@ -45,7 +42,6 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentPost)
                   .FirstOrDefaultAsync(m => m.AnswerDate == date);
         }
         public async Task Add(AnswerPost answerPost)
@@ -81,14 +77,12 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentPost)
                    .ToListAsync();
         }
         public async Task<IEnumerable<AnswerPost>> GetAllPaginated(int pageNumber, int pageSize)
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                   .Include(ap => ap.CommentPost)
                    .Skip((pageNumber - 1) * pageSize)
                    .Take(pageSize)
                    .ToListAsync();

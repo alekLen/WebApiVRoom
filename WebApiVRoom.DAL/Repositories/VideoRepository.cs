@@ -25,7 +25,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.PlayLists)
+                //.Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
@@ -42,7 +42,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.PlayLists)
+               // .Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .ToListAsync();
         }
@@ -54,7 +54,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.PlayLists)
+                //.Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -107,7 +107,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.PlayLists)
+               // .Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .FirstOrDefaultAsync(v => v.Tittle == title);
 

@@ -10,7 +10,7 @@ namespace WebApiVRoom.DAL.Entities
     {
         public int Id { get; set; }
         public User User { get; set; }
-        public CommentPost CommentPost { get; set; }
+        public int CommentPost_Id { get; set; }
         public string Text { get; set; }
         public DateTime AnswerDate { get; set; }
         public int LikeCount { get; set; }
