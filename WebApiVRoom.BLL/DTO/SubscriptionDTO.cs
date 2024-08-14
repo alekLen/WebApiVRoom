@@ -10,7 +10,7 @@ namespace WebApiVRoom.BLL.DTO
     public class SubscriptionDTO
     {
         public int Id { get; set; }
-        public int SubscriberId { get; set; }
+        public int SubscriberId { get; set; }//user
         public int ChannelSettingId { get; set; }
         public DateTime Date { get; set; }
     }
