@@ -12,7 +12,7 @@ namespace WebApiVRoom.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        //private readonly VRoomContext _context;
+
         private IUserService _userService;
 
         public UserController(IUserService userService)
@@ -32,8 +32,8 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
-        [HttpPut]
-        public async Task<ActionResult<UserDTO>> PutUser(UserDTO u)
+        [HttpPut("update")]
+        public async Task<ActionResult<UserDTO>> UpdateUser(UserDTO u)
         {
             if (!ModelState.IsValid)
             {
@@ -45,12 +45,12 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            //await _userService.UpdateUser(user);
+            UserDTO usernew=await _userService.UpdateUser(u);
 
-            return Ok(user);
+            return Ok(usernew);
         }
-        [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(string clerk_id, string language, string country, string countryCode)
+        [HttpPost("add/{clerk_id},{language},{country},{countryCode}")]
+        public async Task<ActionResult<UserDTO>> AddUser(string clerk_id, string language, string country, string countryCode)
         {
             if (!ModelState.IsValid)
             {
@@ -75,12 +75,22 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            //_userService.DeleteUser(user);
+            await _userService.DeleteUser(id);
 
             return Ok(user);
         }
 
+        [HttpGet("getbyclerkid/{clerk_id}")]
+        public async Task<ActionResult<UserDTO>> ByClerkId(string clerk_id)
+        {
 
+            var user = await _userService.GetUserByClerkId(clerk_id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(user);
+        }
     }
 
    

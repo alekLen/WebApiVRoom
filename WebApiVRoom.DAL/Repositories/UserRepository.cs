@@ -52,7 +52,7 @@ namespace WebApiVRoom.DAL.Repositories
             var u = await db.Users.FindAsync(user.Id);
             if (u != null)
             {
-                db.Users.Update(u);
+                db.Users.Update(user);
                 await db.SaveChangesAsync();
             }
             else
