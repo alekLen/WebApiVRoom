@@ -24,6 +24,29 @@ namespace WebApiVRoom.BLL.Services
             Database = uow;
         }
 
-      
+        public Task<UserDTO> GetUser(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDTO> AddUser(string clerk_id, string language, string country, string countryCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDTO> GetUserByClerkId(string clerkId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDTO> UpdateUser(UserDTO userDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserDTO> DeleteUser(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
