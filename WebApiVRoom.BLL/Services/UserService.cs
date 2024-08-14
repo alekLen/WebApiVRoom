@@ -44,6 +44,7 @@ namespace WebApiVRoom.BLL.Services
         }
         public User UserDTOToUser(UserDTO userDto,User user)
         {
+            user.Id = userDto.Id;
             user.Clerk_Id = userDto.Clerk_Id;
             user.ChannelSettings_Id = userDto.ChannelSettings_Id;
             user.IsPremium = userDto.IsPremium;
@@ -144,6 +145,42 @@ namespace WebApiVRoom.BLL.Services
             return userDto;
         }
 
+        public async Task<IEnumerable<UserDTO>> GetAllUsersPaginated(int pageNumber, int pageSize)
+        {
+            try
+            {
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<User, UserDTO>()
+                        .ForMember(dest => dest.Clerk_Id, opt => opt.MapFrom(src => src.Clerk_Id))
+                        .ForMember(dest => dest.ChannelSettings_Id, opt => opt.MapFrom(src => src.ChannelSettings_Id))
+                        .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium))
+                        .ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount));
+                });
 
+                var mapper = new Mapper(config);
+                return mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(await Database.Users.GetAllPaginated(pageNumber, pageSize));
+            }
+            catch { return null; }
+        }
+
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        {
+            try
+            {
+                var config = new MapperConfiguration(cfg =>
+                {
+                    cfg.CreateMap<User, UserDTO>()
+                        .ForMember(dest => dest.Clerk_Id, opt => opt.MapFrom(src => src.Clerk_Id))
+                        .ForMember(dest => dest.ChannelSettings_Id, opt => opt.MapFrom(src => src.ChannelSettings_Id))
+                        .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium))
+                        .ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount));
+                });
+
+                var mapper = new Mapper(config);
+                return mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(await Database.Users.GetAll());
+            }
+            catch { return null; }
+        }
     }
 }
