@@ -44,7 +44,7 @@ namespace WebApiVRoom.BLL.Services
                 post.CommentPosts = list;
 
                 await Database.Posts.Add(post);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Posts.Delete(id);
-                await Database.Save();
+                
             }
             catch { }
         }
@@ -191,7 +191,7 @@ namespace WebApiVRoom.BLL.Services
                 post.CommentPosts = list;
 
                 await Database.Posts.Update(post);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {

@@ -39,7 +39,7 @@ namespace WebApiVRoom.BLL.Services
 
 
                 await Database.Subscriptions.Add(subscription);
-                await Database.Save();
+                
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Subscriptions.Delete(id);
-                await Database.Save();
+                
             }
             catch { }
         }
@@ -148,7 +148,7 @@ namespace WebApiVRoom.BLL.Services
                 subscription.SubscriberId = subscriber.Id;
 
                 await Database.Subscriptions.Update(subscription);
-                await Database.Save();
+              
             }
             catch (Exception ex)
             {

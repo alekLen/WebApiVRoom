@@ -88,5 +88,28 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
+
+        public async Task<ChannelSettingsDTO> DeleteChannelSettings(int id)
+        {
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.GetById(id);
+
+                if (channelSettings == null)
+                {
+                    return null; // Либо выбросить исключение, если нужно
+                }
+
+                await Database.ChannelSettings.Delete(channelSettings.Id);
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                return null;
+            }
+        }
     }
 }

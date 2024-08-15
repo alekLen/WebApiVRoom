@@ -25,6 +25,5 @@ namespace WebApiVRoom.DAL.Interfaces
         ITagRepository Tags { get; }
         IVideoRepository Videos { get; }
 
-        Task Save();
     }
 }

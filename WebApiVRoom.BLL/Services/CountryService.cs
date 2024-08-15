@@ -38,7 +38,7 @@ namespace WebApiVRoom.BLL.Services
                 country.ChannelSettingss = list;
 
                 await Database.Countries.Add(country);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Countries.Delete(id);
-                await Database.Save();
+               
             }
             catch { }
         }
@@ -136,7 +136,7 @@ namespace WebApiVRoom.BLL.Services
                 country.ChannelSettingss = list;
 
                 await Database.Countries.Update(country);
-                await Database.Save();
+                
             }
             catch (Exception ex)
             {

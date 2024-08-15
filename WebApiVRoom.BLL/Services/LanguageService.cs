@@ -39,7 +39,7 @@ namespace WebApiVRoom.BLL.Services
                 language.ChannelSettingss = list;
 
                 await Database.Languages.Add(language);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Languages.Delete(id);
-                await Database.Save();
+                
             }
             catch { }
         }
@@ -150,7 +150,7 @@ namespace WebApiVRoom.BLL.Services
                 language.ChannelSettingss = list;
 
                 await Database.Languages.Update(language);
-                await Database.Save();
+                
             }
             catch (Exception ex)
             {

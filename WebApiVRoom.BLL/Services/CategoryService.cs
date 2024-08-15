@@ -39,7 +39,6 @@ namespace WebApiVRoom.BLL.Services
                 category.Videos = list;
 
                 await Database.Categories.Add(category);
-                await Database.Save();
             }
             catch (Exception ex)
             {
@@ -51,7 +50,6 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Categories.Delete(id);
-                await Database.Save();
             }
             catch { }
         }
@@ -150,7 +148,6 @@ namespace WebApiVRoom.BLL.Services
                 category.Videos = list;
 
                 await Database.Categories.Update(category);
-                await Database.Save();
             }
             catch (Exception ex)
             {
