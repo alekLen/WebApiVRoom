@@ -74,5 +74,12 @@ namespace WebApiVRoom.DAL.Repositories
                   .Include(m => m.Videos)
                   .FirstOrDefaultAsync(m => m.User.Id == userId);
         }
+
+        public async Task<List<PlayList>> GetByIds(List<int> ids)
+        {
+            return await _context.PlayLists
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }

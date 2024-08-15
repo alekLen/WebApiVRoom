@@ -18,6 +18,9 @@ namespace WebApiVRoom.BLL.DTO
         public int Language_Id { get; set; }
         public int Country_Id { get; set; }
         public bool Notification { get; set; } = false;
-       
+        public List<int> Videos { get; set; } = new List<int>();
+        public List<int> Posts { get; set; } = new List<int>();
+        public List<int> Subscriptions { get; set; } = new List<int>();
+
     }
 }

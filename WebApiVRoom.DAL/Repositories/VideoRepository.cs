@@ -174,5 +174,12 @@ namespace WebApiVRoom.DAL.Repositories
             if (video.UploadDate == default)
                 video.UploadDate = DateTime.UtcNow; 
         }
+
+        public async Task<List<Video>> GetByIds(List<int> ids)
+        {
+            return await _context.Videos
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }

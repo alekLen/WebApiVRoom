@@ -13,6 +13,8 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<CommentVideo> GetByUser(int userId);
         Task<CommentVideo> GetByAnswer(int answerId);
         Task<CommentVideo> GetByDate(DateTime date);
-    
+        Task<List<CommentVideo>> GetByIds(List<int> ids);
+
+
     }
 }

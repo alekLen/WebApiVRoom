@@ -105,5 +105,11 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<List<CommentVideo>> GetByIds(List<int> ids)
+        {
+            return await db.CommentVideos
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }

@@ -83,5 +83,12 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<List<HistoryOfBrowsing>> GetByIds(List<int> ids)
+        {
+            return await db.HistoryOfBrowsings
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }

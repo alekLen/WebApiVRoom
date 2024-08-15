@@ -11,5 +11,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<Post> GetByText(string text);
         Task<Post> GetByChannelName(string channelName);
+        Task<List<Post>> GetByIds(List<int> ids);
     }
 }

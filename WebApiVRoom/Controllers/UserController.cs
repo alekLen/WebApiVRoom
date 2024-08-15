@@ -49,18 +49,32 @@ namespace WebApiVRoom.Controllers
 
             return Ok(usernew);
         }
-        [HttpPost("add/{clerk_id},{language},{country},{countryCode}")]
-        public async Task<ActionResult<UserDTO>> AddUser(string clerk_id, string language, string country, string countryCode)
+        //[HttpPost("add/{clerk_id},{language},{country},{countryCode}")]
+        //public async Task<ActionResult<UserDTO>> AddUser(string clerk_id, string language, string country, string countryCode)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //   UserDTO user = await _userService.AddUser(clerk_id, language,country, countryCode);
+
+        //    return Ok(user);
+        //}
+
+        [HttpPost("add")]
+        public async Task<ActionResult<UserDTO>> AddUser([FromBody] AddUserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-           UserDTO user = await _userService.AddUser(clerk_id, language,country, countryCode);
+            UserDTO user = await _userService.AddUser(request);
 
             return Ok(user);
         }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<UserDTO>> DeleteUser(int id)
         {

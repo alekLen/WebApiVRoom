@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,66 +18,75 @@ namespace WebApiVRoom.BLL.Services
         {
             Database = uow;
         }
+      
+        public static IMapper InitializeChannelSettingsMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ChannelSettings, ChannelSettingsDTO>()
+                    .ForMember(dest => dest.Owner_Id, opt => opt.MapFrom(src => src.Owner.Id))
+                    .ForMember(dest => dest.Language_Id, opt => opt.MapFrom(src => src.Language.Id))
+                    .ForMember(dest => dest.Country_Id, opt => opt.MapFrom(src => src.Country.Id))
+                    .ForMember(dest => dest.Videos, opt => opt.MapFrom(src => src.Videos.Select(v => v.Id).ToList()))
+                    .ForMember(dest => dest.Posts, opt => opt.MapFrom(src => src.Posts.Select(p => p.Id).ToList()))
+                    .ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()));
+            });
+
+            return new Mapper(config);
+        }
 
         public async Task<ChannelSettingsDTO> GetChannelSettings(int id)
         {
-            var u = await Database.ChannelSettings.GetById(id);
-            if (u == null)
-                return null;
-            return ChannelSettingsToChannelSettingsDTO(u);
-        }
-        public ChannelSettingsDTO ChannelSettingsToChannelSettingsDTO(ChannelSettings ch)
-        {
-            return new ChannelSettingsDTO
+            try
             {
-                Id = ch.Id,
-                ChannelName = ch.ChannelName,
-                DateJoined = ch.DateJoined,
-                Description = ch.Description,
-                ChannelBanner = ch.ChannelBanner,
-                Owner_Id = ch.Owner.Id,
-                Language_Id = ch.Language.Id,
-                Country_Id = ch.Country.Id,
-                Notification = ch.Notification 
-            };
-        }
-        public ChannelSettings ChannelSettingsDTOToChannelSettings(ChannelSettingsDTO chDto, ChannelSettings ch)
-        {
-            ch.Id = chDto.Id;
-            ch.ChannelName = chDto.ChannelName;
-            ch.DateJoined = chDto.DateJoined;
-            ch.Description = chDto.Description;
-            ch.ChannelBanner = chDto.ChannelBanner;
-            ch.Owner.Id = chDto.Owner_Id;
-            ch.Language.Id = chDto.Language_Id;
-            ch.Country.Id = chDto.Country_Id;
-            ch.Notification = chDto.Notification;
+                var channelSettings = await Database.ChannelSettings.GetById(id);
 
-            return ch;
+                if (channelSettings == null)
+                {
+                    return null; 
+                }
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public async Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto)
         {
-            ChannelSettings ch = await Database.ChannelSettings.GetById(chDto.Id);
-            if (ch == null)
-                throw new KeyNotFoundException("Video not found");
-            ChannelSettings chUpd = ChannelSettingsDTOToChannelSettings(chDto, ch);
-            await Database.ChannelSettings.Update(chUpd);
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.GetById(chDto.Id);
 
-            ChannelSettingsDTO chDto2 = ChannelSettingsToChannelSettingsDTO(chUpd);
-            return chDto2;
-        }
+                if (channelSettings == null)
+                {
+                    return null;
+                }
+                channelSettings.ChannelName = chDto.ChannelName;
+                channelSettings.DateJoined = chDto.DateJoined;
+                channelSettings.Description = chDto.Description;
+                channelSettings.ChannelBanner = chDto.ChannelBanner;
+                channelSettings.Notification = chDto.Notification;
 
-        public async Task<ChannelSettingsDTO> DeleteChannelSettings(int id)
-        {
-            ChannelSettings ch = await Database.ChannelSettings.GetById(id);
-            if (ch == null)
-                throw new KeyNotFoundException("Video not found");
+                channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);
+                channelSettings.Language = await Database.Languages.GetById(chDto.Language_Id);
+                channelSettings.Country = await Database.Countries.GetById(chDto.Country_Id);
+                channelSettings.Videos = await Database.Videos.GetByIds(chDto.Videos);
+                channelSettings.Posts = await Database.Posts.GetByIds(chDto.Posts);
+                channelSettings.Subscriptions = await Database.Subscriptions.GetByIds(chDto.Subscriptions);
 
-            await Database.ChannelSettings.Delete(id);
+                await Database.ChannelSettings.Update(channelSettings);
 
-            ChannelSettingsDTO chDto = ChannelSettingsToChannelSettingsDTO(ch);
-            return chDto;
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

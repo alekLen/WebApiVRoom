@@ -68,9 +68,9 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.ChannelSettings.ChannelName == channel_name);
         }
 
-        public async Task<Subscription> GetByUser(User user)
+        public async Task<Subscription> GetByUser(int userId)
         {
-            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Subscriber == user);
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Subscriber.Id == userId);
         }
         public async Task Update(Subscription sub)
         {
@@ -85,5 +85,12 @@ namespace WebApiVRoom.DAL.Repositories
                 await db.SaveChangesAsync();
             }
         }
+        public async Task<List<Subscription>> GetByIds(List<int> ids)
+        {
+            return await db.Subscriptions
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
+
     }
 }
