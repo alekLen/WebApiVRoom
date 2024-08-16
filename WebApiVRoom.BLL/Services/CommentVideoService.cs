@@ -55,7 +55,7 @@ namespace WebApiVRoom.BLL.Services
         {
             var commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
             await Database.CommentVideos.Add(commentVideo);
-            await Database.Save();
+            
         }
 
         public async Task UpdateCommentVideo(CommentVideoDTO commentVideoDTO)
@@ -66,7 +66,7 @@ namespace WebApiVRoom.BLL.Services
 
             Mapper.Map(commentVideoDTO, commentVideo);  
             await Database.CommentVideos.Update(commentVideo);
-            await Database.Save();
+            
         }
 
         public async Task DeleteCommentVideo(int id)
@@ -76,7 +76,7 @@ namespace WebApiVRoom.BLL.Services
                 throw new ValidationException("Comment not found!", "");
 
             await Database.CommentVideos.Delete(id);
-            await Database.Save();
+            
         }
     }
 }
