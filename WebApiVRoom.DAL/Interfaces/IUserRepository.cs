@@ -10,5 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface IUserRepository : ISetGetRepository<User>
     {
         Task<User> GetByClerk_Id(string clerk_id);
+        Task<User> GetById(int? userId);
     }
 }
