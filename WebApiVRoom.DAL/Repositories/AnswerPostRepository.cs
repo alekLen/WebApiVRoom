@@ -79,14 +79,6 @@ namespace WebApiVRoom.DAL.Repositories
                    .Include(ap => ap.User)
                    .ToListAsync();
         }
-        public async Task<IEnumerable<AnswerPost>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await db.AnswerPosts
-                   .Include(ap => ap.User)
-                   .Skip((pageNumber - 1) * pageSize)
-                   .Take(pageSize)
-                   .ToListAsync();
-        }
 
         public async Task<List<AnswerPost>> GetByIds(List<int> ids)
         {

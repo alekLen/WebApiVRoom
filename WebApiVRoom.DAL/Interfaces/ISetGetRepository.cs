@@ -10,7 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface ISetGetRepository<T> where T : class
     {
         Task<IEnumerable<T>> GetAll();
-        Task<IEnumerable<T>> GetAllPaginated(int pageNumber, int pageSize);
         Task<T> GetById(int id);
         Task Add(T t);
         Task Update(T t);

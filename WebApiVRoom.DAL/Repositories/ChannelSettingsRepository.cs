@@ -70,24 +70,15 @@ namespace WebApiVRoom.DAL.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ChannelSettings>> FindByOwner(int ownerId)
+        public async Task<ChannelSettings> FindByOwner(int ownerId)
         {
             return await db.ChannelSettings
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
-                .Where(cs => cs.Owner.Id == ownerId)
-                .ToListAsync();
+                .FirstOrDefaultAsync(cs => cs.Owner.Id == ownerId);
+               
         }
-        public async Task<IEnumerable<ChannelSettings>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await db.ChannelSettings
-                .Include(cp => cp.Owner)
-                .Include(cp => cp.Language)
-                .Include(cp => cp.Country)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
+       
     }
 }

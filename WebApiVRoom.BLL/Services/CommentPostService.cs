@@ -45,7 +45,9 @@ namespace WebApiVRoom.BLL.Services
                 var commentPost = _mapper.Map<CommentPostDTO, CommentPost>(commentPostDTO);
 
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
-                commentPost.User = await Database.Users.GetById(commentPostDTO.UserId);
+
+                if(commentPost.UserId != null)    
+                    commentPost.User = await Database.Users.GetById((int)commentPostDTO.UserId);
 
                 if (commentPostDTO.AnswerPostId.HasValue)
                 {
@@ -128,7 +130,8 @@ namespace WebApiVRoom.BLL.Services
                 commentPost = _mapper.Map(commentPostDTO, commentPost);
 
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
-                commentPost.User = await Database.Users.GetById(commentPostDTO.UserId);
+                if (commentPost.UserId != null)
+                    commentPost.User = await Database.Users.GetById((int)commentPostDTO.UserId);
 
                 if (commentPostDTO.AnswerPostId.HasValue)
                 {

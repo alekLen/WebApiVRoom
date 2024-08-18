@@ -49,28 +49,29 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).ToListAsync();
         }
 
-        public async Task<IEnumerable<Subscription>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await db.Subscriptions
-                .Include(m => m.Subscriber)
-                .Include(m => m.ChannelSettings)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
         public async Task<Subscription> GetById(int id)
         {
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task<Subscription> GetByChannelName(string channel_name)
+        public async Task<List<Subscription>> GetByChannelId(int channel_Id)
         {
-            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.ChannelSettings.ChannelName == channel_name);
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings)
+                .Where(m => m.ChannelSettings.Id == channel_Id).ToListAsync();
         }
 
-        public async Task<Subscription> GetByUser(int userId)
+        public async Task<List<Subscription>> GetByUser(int userId)
         {
-            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Subscriber.Id == userId);
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).Where(m => m.Subscriber.Id == userId).ToListAsync();
+        }
+        public async Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize,int userId)
+        {
+            return await db.Subscriptions.Include(m => m.Subscriber)
+                .Include(m => m.ChannelSettings)
+                .Where(m => m.Subscriber.Id == userId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+               .ToListAsync();
         }
         public async Task Update(Subscription sub)
         {

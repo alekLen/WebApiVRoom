@@ -21,6 +21,17 @@ namespace WebApiVRoom.BLL.Services
         {
             Database = database;
         }
+
+        public static IMapper InitializeMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Subscription, SubscriptionDTO>()
+                    .ForMember(dest => dest.ChannelSettingId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
+                    .ForMember(dest => dest.SubscriberId, opt => opt.MapFrom(src => src.Subscriber.Id));
+            });
+            return new Mapper(config);
+        }
         public async Task AddSubscription(SubscriptionDTO subscriptionDTO)
         {
             try
@@ -56,35 +67,13 @@ namespace WebApiVRoom.BLL.Services
             catch { }
         }
 
-        public async Task<IEnumerable<SubscriptionDTO>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            try
-            {
-                var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.CreateMap<Subscription, SubscriptionDTO>()
-                         .ForMember(dest => dest.ChannelSettingId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                        .ForMember(dest => dest.SubscriberId, opt => opt.MapFrom(src => src.Subscriber.Id));
-                });
-
-                var mapper = new Mapper(config);
-                return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(await Database.Subscriptions.GetAllPaginated(pageNumber, pageSize));
-            }
-            catch { return null; }
-        }
+      
 
         public async Task<IEnumerable<SubscriptionDTO>> GetAllSubscriptions()
         {
             try
             {
-                var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.CreateMap<Subscription, SubscriptionDTO>()
-                        .ForMember(dest => dest.ChannelSettingId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                        .ForMember(dest => dest.SubscriberId, opt => opt.MapFrom(src => src.Subscriber.Id));
-                });
-
-                var mapper = new Mapper(config);
+                IMapper mapper= InitializeMapper();
                 return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(await Database.Subscriptions.GetAll());
             }
             catch { return null; }
@@ -110,27 +99,34 @@ namespace WebApiVRoom.BLL.Services
             return subscription;
         }
 
-        public async Task<SubscriptionDTO> GetSubscriptionByChannelName(string name)
+        //public async Task<SubscriptionDTO> GetSubscriptionByChannelName(string name)
+        //{
+        //    var a = await Database.Subscriptions.GetByChannelName(name);
+        //    var channelSettings = await Database.ChannelSettings.GetById(a.ChannelSettings.Id);
+        //    var subscriber = await Database.Users.GetById(a.SubscriberId.Value);
+
+        //    if (a == null)
+        //        throw new ValidationException("Wrong country!", "");
+
+        //    SubscriptionDTO subscription = new SubscriptionDTO();
+        //    subscription.Id = a.Id;
+        //    subscription.Date = a.Date;
+
+        //    subscription.ChannelSettingId = channelSettings.Id;
+
+        //    subscription.SubscriberId = subscriber.Id;
+
+        //    return subscription;
+        //}
+
+        public async Task<List<SubscriptionDTO>> GetSubscriptionByChannelId(int channelId)
         {
-            var a = await Database.Subscriptions.GetByChannelName(name);
-            var channelSettings = await Database.ChannelSettings.GetById(a.ChannelSettings.Id);
-            var subscriber = await Database.Users.GetById(a.SubscriberId.Value);
+            var a = await Database.Subscriptions.GetByChannelId(channelId);
 
-            if (a == null)
-                throw new ValidationException("Wrong country!", "");
-
-            SubscriptionDTO subscription = new SubscriptionDTO();
-            subscription.Id = a.Id;
-            subscription.Date = a.Date;
-
-            subscription.ChannelSettingId = channelSettings.Id;
-
-            subscription.SubscriberId = subscriber.Id;
-
-            return subscription;
+            var mapper = InitializeMapper();
+            return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(a).ToList();
+           
         }
-
-
         public async Task UpdateSubscription(SubscriptionDTO subscriptionDTO)
         {
             Subscription subscription = await Database.Subscriptions.GetById(subscriptionDTO.Id);

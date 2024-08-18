@@ -10,7 +10,8 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface IPostRepository: ISetGetRepository<Post>
     {
         Task<Post> GetByText(string text);
-        Task<Post> GetByChannelName(string channelName);
+        Task<IEnumerable<Post>> GetByChannelId(int channelSettingsId);
+        Task<IEnumerable<Post>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelSettingsId);
         Task<List<Post>> GetByIds(List<int> ids);
     }
 }

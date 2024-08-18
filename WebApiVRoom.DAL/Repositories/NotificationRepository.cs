@@ -59,25 +59,20 @@ namespace WebApiVRoom.DAL.Repositories
             }
         }
 
-        public async Task<Notification> GetByUser(User user)
+        public async Task<IEnumerable<Notification>> GetByUser(User user)
         {
             return await db.Notifications
                 .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.User.Id == user.Id);
-        }
-        public async Task<Notification> GetByDate(DateTime date)
-        {
-            return await db.Notifications
-                .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.Date == date);
-        }
-        public async Task<IEnumerable<Notification>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await db.Notifications
-                .Include(m => m.User)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Where(m => m.User.Id == user.Id)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<Notification>> GetByDate(DateTime date)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .Where(m => m.Date == date)
+                 .ToListAsync();
+        }
+       
     }
 }

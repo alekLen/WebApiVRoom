@@ -11,5 +11,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<Country> GetByName(string name);
         Task<Country> GetByCountryCode(string code);
+        Task<IEnumerable<Country>> GetAllPaginated(int pageNumber, int pageSize);
     }
 }
