@@ -11,16 +11,13 @@ namespace WebApiVRoom.BLL.Interfaces
     public interface ISubscriptionService
     {
         Task<SubscriptionDTO> GetSubscription(int id);
-        Task<List<SubscriptionDTO>> GetSubscriptionByChannelId(int channel_Id);
+        Task<List<SubscriptionDTO>> GetSubscriptionsByChannelId(int channel_Id);
         Task<IEnumerable<SubscriptionDTO>> GetAllSubscriptions();
-        Task AddSubscription(SubscriptionDTO subscriptionDTO);
-        Task UpdateSubscription(SubscriptionDTO subscriptionDTO);
-        Task DeleteSubscription(int id);
+        Task<SubscriptionDTO> AddSubscription(SubscriptionDTO subscriptionDTO);
+        Task<SubscriptionDTO> UpdateSubscription(SubscriptionDTO subscriptionDTO);
+        Task<SubscriptionDTO> DeleteSubscription(int id);
+        Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserId(int id);
+        Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserIdPaginated(int pageNumber, int pageSize, int id);
 
-
-      
-        Task<List<Subscription>> GetByUser(int userId);
-        Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize, int userId);
-        Task<List<Subscription>> GetByIds(List<int> ids);
     }
 }

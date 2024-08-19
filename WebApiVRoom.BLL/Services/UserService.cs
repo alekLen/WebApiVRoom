@@ -199,9 +199,9 @@ namespace WebApiVRoom.BLL.Services
             await Database.Users.Delete(id);
 
             var mapper = InitializeMapper();
-            var updatedUserDto = mapper.Map<User, UserDTO>(user);
+            var deletedUserDto = mapper.Map<User, UserDTO>(user);
 
-            return updatedUserDto;
+            return deletedUserDto;
         }
 
       

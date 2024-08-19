@@ -77,12 +77,12 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<CommentPostDTO>> GetAllPaginated(int pageNumber, int pageSize)
+        public async Task<List<CommentPostDTO>> GetCommentPostsByPost(int postId)
         {
             try
             {
-                var commentPosts = await Database.CommentPosts.GetAllPaginated(pageNumber, pageSize);
-                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPosts);
+                var commentPosts = await Database.CommentPosts.GetByPost(postId);
+                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPosts).ToList();
             }
             catch (Exception ex)
             {
@@ -90,12 +90,12 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<CommentPostDTO>> GetAllCommentPostsPaginated(int pageNumber, int pageSize)
+        public async Task<List<CommentPostDTO>> GetByPostPaginated(int pageNumber, int pageSize, int postId)
         {
             try
             {
-                var commentPosts = await Database.CommentPosts.GetAllPaginated(pageNumber, pageSize);
-                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPosts);
+                var commentPosts = await Database.CommentPosts.GetByPostPaginated(pageNumber, pageSize,postId);
+                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPosts).ToList();
             }
             catch (Exception ex)
             {

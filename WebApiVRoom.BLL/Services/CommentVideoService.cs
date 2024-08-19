@@ -21,10 +21,10 @@ namespace WebApiVRoom.BLL.Services
             Database = uow;
             Mapper = mapper;
         }
-        public async Task<IEnumerable<CommentVideoDTO>> GetAllCommentVideos()
+        public async Task<List<CommentVideoDTO>> GetAllCommentVideos()
         {
             var commentVideos = await Database.CommentVideos.GetAll();
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
         }
 
         public async Task<CommentVideoDTO> GetCommentVideoById(int id)
@@ -36,19 +36,19 @@ namespace WebApiVRoom.BLL.Services
             return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
         }
 
-        public async Task<CommentVideoDTO> GetCommentVideoByVideo(int videoId)
+        public async Task<List<CommentVideoDTO>> GetCommentsVideoByVideo(int videoId)
         {
             var commentVideo = await Database.CommentVideos.GetByVideo(videoId);
             if (commentVideo == null)
                 throw new ValidationException("Comment not found for the specified video!", "");
 
-            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
         }
 
-        public async Task<IEnumerable<CommentVideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
+        public async Task<List<CommentVideoDTO>> GetByVideoPaginated(int pageNumber, int pageSize, int videoId)
         {
-            var commentVideos = await Database.CommentVideos.GetAllPaginated(pageNumber, pageSize);
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos);
+            var commentVideos = await Database.CommentVideos.GetByVideoPaginated(pageNumber, pageSize,  videoId);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
         }
 
         public async Task AddCommentVideo(CommentVideoDTO commentVideoDTO)

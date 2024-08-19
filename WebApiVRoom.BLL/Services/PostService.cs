@@ -20,7 +20,19 @@ namespace WebApiVRoom.BLL.Services
         {
             Database = database;
         }
+        public static IMapper InitializeMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Post, PostDTO>()
+                       .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
+                       .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
+                       .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select
+                       (ch => new CommentPost { Id = ch.Id })));
 
+            });
+            return new Mapper(config);
+        }
         public async Task AddPost(PostDTO postDTO)
         {
             try
@@ -61,37 +73,20 @@ namespace WebApiVRoom.BLL.Services
             catch { }
         }
 
-        public async Task<IEnumerable<PostDTO>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            try
-            {
-                var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.CreateMap<Post, PostDTO>()
-                        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                         .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                        .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select(ch => new CommentPost { Id = ch.Id })));
-                });
-
-                var mapper = new Mapper(config);
-                return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(await Database.Posts.GetAllPaginated(pageNumber, pageSize));
-            }
-            catch { return null; }
-        }
 
         public async Task<IEnumerable<PostDTO>> GetAllPosts()
         {
             try
             {
-                var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.CreateMap<Post, PostDTO>()
-                        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                        .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select(ch => new CommentPost { Id = ch.Id })));
-                });
+                //var config = new MapperConfiguration(cfg =>
+                //{
+                //    cfg.CreateMap<Post, PostDTO>()
+                //        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
+                //        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
+                //        .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select(ch => new CommentPost { Id = ch.Id })));
+                //});
 
-                var mapper = new Mapper(config);
+                IMapper mapper = InitializeMapper();
                 return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(await Database.Posts.GetAll());
             }
             catch { return null; }
@@ -120,29 +115,43 @@ namespace WebApiVRoom.BLL.Services
             return post;
         }
 
-        public async Task<PostDTO> GetPostByChannelName(string name)
+        //public async Task<PostDTO> GetPostByChannelName(string name)
+        //{
+        //    var a = await Database.Posts.GetByChannelName(name);
+
+        //    if (a == null)
+        //        throw new ValidationException("Wrong country!", "");
+
+        //    PostDTO post = new PostDTO();
+        //    post.Id = a.Id;
+        //    post.Text = a.Text;
+
+        //    var channelSettings = await Database.ChannelSettings.GetById(a.Id);
+        //    post.ChannelSettingsId = channelSettings.Id;
+
+        //    post.CommentPostsId = new List<int>();
+        //    foreach (CommentPost comment in a.CommentPosts)
+        //    {
+        //        post.CommentPostsId.Add(comment.Id);
+        //    }
+
+        //    return post;
+        //}
+
+        public async Task<List<PostDTO>> GetPostByChannellId(int chId)
         {
-            var a = await Database.Posts.GetByChannelName(name);
+            var a = await Database.Posts.GetByChannellId(chId);
 
-            if (a == null)
-                throw new ValidationException("Wrong country!", "");
-
-            PostDTO post = new PostDTO();
-            post.Id = a.Id;
-            post.Text = a.Text;
-
-            var channelSettings = await Database.ChannelSettings.GetById(a.Id);
-            post.ChannelSettingsId = channelSettings.Id;
-
-            post.CommentPostsId = new List<int>();
-            foreach (CommentPost comment in a.CommentPosts)
-            {
-                post.CommentPostsId.Add(comment.Id);
-            }
-
-            return post;
+            IMapper mapper = InitializeMapper();
+            return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(a).ToList();
         }
+        public async Task<List<PostDTO>> GetPostByChannellIdPaginated(int pageNumber, int pageSize, int chId)
+        {
+            var a = await Database.Posts.GetByChannellIdPaginated(pageNumber,  pageSize,chId);
 
+            IMapper mapper = InitializeMapper();
+            return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(a).ToList();
+        }
         public async Task<PostDTO> GetPostByText(string text)
         {
             var a = await Database.Posts.GetByText(text);

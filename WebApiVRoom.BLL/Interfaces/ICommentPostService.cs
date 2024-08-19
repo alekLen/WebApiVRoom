@@ -7,9 +7,10 @@ namespace WebApiVRoom.BLL.Interfaces
     {
         Task AddCommentPost(CommentPostDTO commentPostDTO);            
         Task DeleteCommentPost(int id);                                
-        Task<IEnumerable<CommentPostDTO>> GetAllPaginated(int pageNumber, int pageSize); 
-        Task<IEnumerable<CommentPostDTO>> GetAllCommentPostsPaginated(int pageNumber, int pageSize); 
         Task<CommentPostDTO> GetCommentPost(int id);                  
         Task UpdateCommentPost(CommentPostDTO commentPostDTO);
+
+        Task<List<CommentPostDTO>> GetCommentPostsByPost(int postId);
+        Task<List<CommentPostDTO>> GetByPostPaginated(int pageNumber, int pageSize, int postId);
     }
 }

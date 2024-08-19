@@ -59,12 +59,12 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.Posts.Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Text == text);
         }
 
-        public async Task<IEnumerable<Post>> GetByChannelId(int channelSettingsId)
+        public async Task<IEnumerable<Post>> GetByChannellId(int channelSettingsId)
         {
             return await db.Posts.Include(m => m.ChannelSettings).Where(m => m.ChannelSettings.Id == channelSettingsId)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<Post>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelSettingsId)
+        public async Task<IEnumerable<Post>> GetByChannellIdPaginated(int pageNumber, int pageSize, int channelSettingsId)
         {
             return await db.Posts
                 .Include(m => m.ChannelSettings)

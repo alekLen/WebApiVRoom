@@ -32,7 +32,7 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
-        public async Task AddSubscription(SubscriptionDTO subscriptionDTO)
+        public async Task<SubscriptionDTO> AddSubscription(SubscriptionDTO subscriptionDTO)
         {
             try
             {
@@ -50,22 +50,28 @@ namespace WebApiVRoom.BLL.Services
 
 
                 await Database.Subscriptions.Add(subscription);
-                
+
+                var mapper = InitializeMapper();
+                var adedSubscriptionDto = mapper.Map<Subscription, SubscriptionDTO>(subscription);
+
+                return adedSubscriptionDto;
+
             }
             catch (Exception ex)
             {
+                throw ex;
             }
         }
 
-        public async Task DeleteSubscription(int id)
-        {
-            try
-            {
-                await Database.Subscriptions.Delete(id);
+        //public async Task DeleteSubscription(int id)
+        //{
+        //    try
+        //    {
+        //        await Database.Subscriptions.Delete(id);
                 
-            }
-            catch { }
-        }
+        //    }
+        //    catch { }
+        //}
 
       
 
@@ -119,7 +125,7 @@ namespace WebApiVRoom.BLL.Services
         //    return subscription;
         //}
 
-        public async Task<List<SubscriptionDTO>> GetSubscriptionByChannelId(int channelId)
+        public async Task<List<SubscriptionDTO>> GetSubscriptionsByChannelId(int channelId)
         {
             var a = await Database.Subscriptions.GetByChannelId(channelId);
 
@@ -127,7 +133,7 @@ namespace WebApiVRoom.BLL.Services
             return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(a).ToList();
            
         }
-        public async Task UpdateSubscription(SubscriptionDTO subscriptionDTO)
+        public async Task<SubscriptionDTO> UpdateSubscription(SubscriptionDTO subscriptionDTO)
         {
             Subscription subscription = await Database.Subscriptions.GetById(subscriptionDTO.Id);
             var channelSettings = await Database.ChannelSettings.GetById((subscriptionDTO.ChannelSettingId));
@@ -144,11 +150,51 @@ namespace WebApiVRoom.BLL.Services
                 subscription.SubscriberId = subscriber.Id;
 
                 await Database.Subscriptions.Update(subscription);
-              
+
+                var mapper = InitializeMapper();
+                var updetedSubscriptionDto = mapper.Map<Subscription, SubscriptionDTO>(subscription);
+
+                return updetedSubscriptionDto;
+
             }
             catch (Exception ex)
             {
+                throw ex;
             }
+        }
+        public async Task<SubscriptionDTO> DeleteSubscription(int id)
+        {
+            Subscription sub = await Database.Subscriptions.GetById(id);
+            if (sub == null)
+                throw new KeyNotFoundException("Video not found");
+
+            await Database.Subscriptions.Delete(id);
+
+            var mapper = InitializeMapper();
+            var deletedSubscriptionDto = mapper.Map<Subscription, SubscriptionDTO>(sub);
+
+            return deletedSubscriptionDto;
+        }
+
+        public async Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserId(int id)
+        {
+            try
+            {
+                var subs= await Database.Subscriptions.GetByUser(id);
+                IMapper mapper = InitializeMapper();
+                return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(subs);
+            }
+            catch { return null; }
+        }
+        public async Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserIdPaginated(int pageNumber, int pageSize, int id)
+        {
+            try
+            {
+                var subs = await Database.Subscriptions.GetByUserPaginated(pageNumber, pageSize, id);
+                IMapper mapper = InitializeMapper();
+                return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(subs);
+            }
+            catch { return null; }
         }
     }
 }
