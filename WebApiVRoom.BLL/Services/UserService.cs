@@ -51,9 +51,9 @@ namespace WebApiVRoom.BLL.Services
                 return null;
 
             var mapper = InitializeMapper();
-            var updatedUserDto = mapper.Map<User, UserDTO>(user);
+            var UserDto = mapper.Map<User, UserDTO>(user);
 
-            return updatedUserDto;
+            return UserDto;
         }
 
 
