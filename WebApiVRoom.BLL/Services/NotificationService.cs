@@ -111,11 +111,11 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        public async Task<List<NotificationDTO>> GetByUser(NotificationDTO n)
+        public async Task<List<NotificationDTO>> GetByUser(int userId)
         {
             try
             {
-                User user = await Database.Users.GetById(n.UserId);
+                User user = await Database.Users.GetById(userId);
                 if (user != null)
                 {
                     var hb = await Database.Notifications.GetByUser(user);

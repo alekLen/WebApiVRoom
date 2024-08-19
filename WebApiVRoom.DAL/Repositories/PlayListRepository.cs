@@ -68,7 +68,16 @@ namespace WebApiVRoom.DAL.Repositories
                   .ToListAsync();
         }
 
-
+        public async Task<List<PlayList>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        {
+            return await _context.PlayLists
+                  .Include(m => m.User)
+                  .Include(m => m.Videos)
+                  .Where(m => m.User.Id == userId)
+                  .Skip((pageNumber - 1) * pageSize)
+                  .Take(pageSize)
+                  .ToListAsync();
+        }
         public async Task<List<PlayList>> GetByIds(List<int> ids)
         {
             return await _context.PlayLists
