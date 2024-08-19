@@ -7,10 +7,10 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.BLL.DTO
 {
-    public class CommentVideoDTO
+    public sealed class CommentVideoDTO
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
+        public int? UserId { get; set; }                      
         public int VideoId { get; set; }
         public string Comment { get; set; }
         public DateTime Date { get; set; }

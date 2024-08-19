@@ -10,5 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface ICategoryRepository: ISetGetRepository<Category>
     {
         Task<Category> GetByName(string name);
+        Task<IEnumerable<Category>> GetAllPaginated(int pageNumber, int pageSize);
     }
 }

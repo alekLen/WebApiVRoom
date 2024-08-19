@@ -33,38 +33,45 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cv => cv.AnswerVideo)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
-        public async Task<CommentVideo> GetByVideo(int videoId)
+        public async Task<IEnumerable<CommentVideo>> GetByVideo(int videoId)
         {
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
                   .Include(cp => cp.AnswerVideo)
-                  .FirstOrDefaultAsync(m => m.Video.Id == videoId);
+                  .Where(m => m.Video.Id == videoId)
+                  .ToListAsync();
         }
-        public async Task<CommentVideo> GetByUser(int userId)
+        public async Task<IEnumerable<CommentVideo>> GetByVideoPaginated(int pageNumber, int pageSize,int videoId)
         {
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
                   .Include(cp => cp.AnswerVideo)
-                  .FirstOrDefaultAsync(m => m.User.Id == userId);
+                  .Where(m => m.Video.Id == videoId)
+                  .Skip((pageNumber - 1) * pageSize)
+                  .Take(pageSize)
+                  .ToListAsync();
         }
-        public async Task<CommentVideo> GetByAnswer(int answerId)
+        public async Task<IEnumerable<CommentVideo>> GetByUser(int userId)
         {
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
                   .Include(cp => cp.AnswerVideo)
-                  .FirstOrDefaultAsync(m => m.AnswerVideo.Id == answerId);
+                  .Where(m => m.User.Id == userId)
+                  .ToListAsync();
         }
 
-        public async Task<CommentVideo> GetByDate(DateTime date)
+
+        public async Task<IEnumerable<CommentVideo>> GetByDate(DateTime date)
         {
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
                   .Include(cp => cp.AnswerVideo)
-                  .FirstOrDefaultAsync(m => m.Date == date);
+                  .Where(m => m.Date == date)
+                  .ToListAsync();
         }
         public async Task Add(CommentVideo commentVideo)
         {
@@ -95,16 +102,7 @@ namespace WebApiVRoom.DAL.Repositories
                 await db.SaveChangesAsync();
             }
         }
-        public async Task<IEnumerable<CommentVideo>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await db.CommentVideos
-                .Include(cp => cp.User)
-                  .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
+     
         public async Task<List<CommentVideo>> GetByIds(List<int> ids)
         {
             return await db.CommentVideos

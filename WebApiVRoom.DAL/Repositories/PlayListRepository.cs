@@ -32,15 +32,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(m => m.Videos)
                 .FirstOrDefaultAsync(m => m.Id==id);
         }
-        public async Task<IEnumerable<PlayList>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            return await _context.PlayLists
-                .Include(m => m.User)
-                .Include(m => m.Videos)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
+ 
         public async Task<IEnumerable<PlayList>> GetAll()
         {
             return await _context.PlayLists
@@ -67,13 +59,15 @@ namespace WebApiVRoom.DAL.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<PlayList> GetByUser(int userId)
+        public async Task<List<PlayList>>GetByUser(int userId)
         {
             return await _context.PlayLists
                   .Include(m => m.User)
                   .Include(m => m.Videos)
-                  .FirstOrDefaultAsync(m => m.User.Id == userId);
+                  .Where(m => m.User.Id == userId)
+                  .ToListAsync();
         }
+
 
         public async Task<List<PlayList>> GetByIds(List<int> ids)
         {
