@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<CategoryDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<CategoryDTO> GetCategoryByName(string name);
         Task AddCategory(CategoryDTO categoryDTO);
-        Task UpdateCategory(CategoryDTO categoryDTO);
+        Task<CategoryDTO> UpdateCategory(CategoryDTO categoryDTO);
         Task DeleteCategory(int id);
     }
 }

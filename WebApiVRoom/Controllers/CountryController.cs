@@ -63,7 +63,7 @@ namespace WebApiVRoom.Controllers
 
         // GET: CountryController/Create
         [HttpPost("add")]
-        public async Task<ActionResult<UserDTO>> AddCountry(CountryDTO countryDTO)
+        public async Task<ActionResult<CountryDTO>> AddCountry(CountryDTO countryDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -97,7 +97,7 @@ namespace WebApiVRoom.Controllers
 
         // GET: CountryController/Delete/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<CountryDTO>> DeleteDelete(int id)
+        public async Task<ActionResult<CountryDTO>> DeleteCountry(int id)
         {
             if (!ModelState.IsValid)
             {
