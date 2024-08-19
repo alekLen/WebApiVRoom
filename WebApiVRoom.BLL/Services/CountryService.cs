@@ -28,6 +28,7 @@ namespace WebApiVRoom.BLL.Services
 
                 country.Id = countryDTO.Id;
                 country.Name = countryDTO.Name;
+                country.CountryCode = countryDTO.CountryCode;
                 List<ChannelSettings> list = new();
 
                 foreach (int id in countryDTO.ChannelSettingsId)
@@ -64,6 +65,7 @@ namespace WebApiVRoom.BLL.Services
 
             CountryDTO country = new CountryDTO();
             country.Id = a.Id;
+            country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
             country.ChannelSettingsId = new List<int>();
@@ -85,6 +87,7 @@ namespace WebApiVRoom.BLL.Services
 
             CountryDTO country = new CountryDTO();
             country.Id = a.Id;
+            country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
             country.ChannelSettingsId = new List<int>();
@@ -106,6 +109,7 @@ namespace WebApiVRoom.BLL.Services
 
             CountryDTO country = new CountryDTO();
             country.Id = a.Id;
+            country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
             country.ChannelSettingsId = new List<int>();
@@ -118,7 +122,7 @@ namespace WebApiVRoom.BLL.Services
             return country;
         }
 
-        public async Task UpdateCountry(CountryDTO countryDTO)
+        public async Task<CountryDTO> UpdateCountry(CountryDTO countryDTO)
         {
             Country country = await Database.Countries.GetById(countryDTO.Id);
 
@@ -126,6 +130,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 country.Id = countryDTO.Id;
                 country.Name = countryDTO.Name;
+                country.CountryCode = countryDTO.CountryCode;
                 List<ChannelSettings> list = new();
 
                 foreach (int id in countryDTO.ChannelSettingsId)
@@ -136,10 +141,13 @@ namespace WebApiVRoom.BLL.Services
                 country.ChannelSettingss = list;
 
                 await Database.Countries.Update(country);
+
+                return countryDTO;
                 
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
 

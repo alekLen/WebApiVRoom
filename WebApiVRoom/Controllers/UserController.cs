@@ -19,9 +19,9 @@ namespace WebApiVRoom.Controllers
         {
             _userService = userService;
         }
+        
 
-
-        [HttpGet("{id}")]
+            [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser(int id)
         {
 
