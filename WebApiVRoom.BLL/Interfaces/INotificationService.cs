@@ -17,5 +17,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<NotificationDTO> Delete(int id);
         Task<List<NotificationDTO>> GetByUser(int userId);
         Task<List<NotificationDTO>> GetByDate(DateTime date);
+        Task<List<NotificationDTO>> GetByDateRange(DateTime startDate, DateTime endDate);
     }
 }

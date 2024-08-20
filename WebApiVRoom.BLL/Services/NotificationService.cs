@@ -146,5 +146,20 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
+        public async Task<List<NotificationDTO>> GetByDateRange(DateTime startDate,DateTime endDate)
+        {
+            try
+            {
+                var hb = await Database.Notifications.GetByDateRange(startDate, endDate);
+                if (hb == null)
+                    return null;
+
+                var mapper = InitializeMapper();
+                var HistoryOfBrowsingDto = mapper.Map<IEnumerable<Notification>, IEnumerable<NotificationDTO>>(hb);
+
+                return HistoryOfBrowsingDto.ToList();
+            }
+            catch (Exception ex) { throw ex; }
+        }
     }
 }

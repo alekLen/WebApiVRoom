@@ -6,5 +6,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<IEnumerable<Notification>> GetByUser(User user);
         Task<IEnumerable<Notification>> GetByDate(DateTime daye);
+        Task<IEnumerable<Notification>> GetByDateRange(DateTime startDate, DateTime endDate);
     }
 }

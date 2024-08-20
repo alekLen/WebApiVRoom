@@ -73,6 +73,12 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(m => m.Date == date)
                  .ToListAsync();
         }
-       
+        public async Task<IEnumerable<Notification>> GetByDateRange(DateTime startDate, DateTime endDate)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .Where(v => v.Date >= startDate && v.Date <= endDate)
+                .ToListAsync();
+        }
     }
 }
