@@ -82,23 +82,23 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<List<HistoryOfBrowsingDTO>>> ByUserId(int user_id)
         {
 
-            List<HistoryOfBrowsingDTO> answer = await _hbService.GetByUserId(user_id);
-            if (answer == null)
+            List<HistoryOfBrowsingDTO> list = await _hbService.GetByUserId(user_id);
+            if (list == null)
             {
                 return NotFound();
             }
-            return new ObjectResult(answer);
+            return new ObjectResult(list);
         }
         [HttpGet("getbyuseridpaginated")]
         public async Task<ActionResult<List<HistoryOfBrowsingDTO>>> ByUserPaginated([FromBody] GetPginatedRequest request)
         {
 
-            List<HistoryOfBrowsingDTO> answer = await _hbService.GetByUserIdPaginated(request.pageNumber, request.pageSize, request.Id);
-            if (answer == null)
+            List<HistoryOfBrowsingDTO> list = await _hbService.GetByUserIdPaginated(request.pageNumber, request.pageSize, request.Id);
+            if (list == null)
             {
                 return NotFound();
             }
-            return new ObjectResult(answer);
+            return new ObjectResult(list);
         }
     }
 }
