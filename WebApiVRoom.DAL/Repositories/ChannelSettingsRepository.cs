@@ -45,6 +45,9 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
+                .Include(cp => cp.Videos)
+                .Include(cp => cp.Posts)
+                .Include(cp => cp.Subscriptions)
                 .FirstOrDefaultAsync(ch => ch.Id == id);
 
         }
@@ -55,6 +58,9 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
+                .Include(cp => cp.Videos)
+                .Include(cp => cp.Posts)
+                .Include(cp => cp.Subscriptions)
                 .ToListAsync();
         }
 
@@ -76,6 +82,9 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
+                .Include(cp => cp.Videos)
+                .Include(cp => cp.Posts)
+                .Include(cp => cp.Subscriptions)
                 .FirstOrDefaultAsync(cs => cs.Owner.Id == ownerId);
                
         }

@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
 
 namespace WebApiVRoom.BLL.Services
 {
-    public class ChannelSettingsService
+    public class ChannelSettingsService : IChannelSettingsService
     {
         IUnitOfWork Database { get; set; }
 
@@ -27,6 +28,11 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.Owner_Id, opt => opt.MapFrom(src => src.Owner.Id))
                     .ForMember(dest => dest.Language_Id, opt => opt.MapFrom(src => src.Language.Id))
                     .ForMember(dest => dest.Country_Id, opt => opt.MapFrom(src => src.Country.Id))
+                    .ForMember(dest => dest.ChannelName, opt => opt.MapFrom(src => src.ChannelName))
+                    .ForMember(dest => dest.DateJoined, opt => opt.MapFrom(src => src.DateJoined))
+                    .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                    .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
+                    .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => src.Notification))
                     .ForMember(dest => dest.Videos, opt => opt.MapFrom(src => src.Videos.Select(v => v.Id).ToList()))
                     .ForMember(dest => dest.Posts, opt => opt.MapFrom(src => src.Posts.Select(p => p.Id).ToList()))
                     .ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()));
@@ -108,6 +114,25 @@ namespace WebApiVRoom.BLL.Services
             catch (Exception ex)
             {
                 // Логирование ошибки
+                return null;
+            }
+        }
+        public async Task<ChannelSettingsDTO> FindByOwner(int ownerId)
+        {
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.FindByOwner(ownerId);
+
+                if (channelSettings == null)
+                {
+                    return null;
+                }
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
                 return null;
             }
         }
