@@ -14,6 +14,17 @@ builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
 builder.Services.AddTransient<ILanguageService, LanguageService>();
 builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
+builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
+builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
+builder.Services.AddTransient<ICommentPostService, CommentPostService>();
+builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
+builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<IPlayListService, PlayListService>();
+builder.Services.AddTransient<IPostService, PostService>();
+builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
+builder.Services.AddTransient<ITagService, TagService>();
+//builder.Services.AddTransient<IVideoService, VideoService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
