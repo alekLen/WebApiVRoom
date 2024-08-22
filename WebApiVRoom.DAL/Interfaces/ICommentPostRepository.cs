@@ -12,6 +12,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<IEnumerable<CommentPost>> GetByPost(int postId);
         Task<IEnumerable<CommentPost>> GetByPostPaginated(int pageNumber, int pageSize, int postId);
         Task<IEnumerable<CommentPost>> GetByUser(int userId);
+        Task<IEnumerable<CommentPost>> GetByUserPaginated(int pageNumber, int pageSize, int postId);
         Task<IEnumerable<CommentPost>> GetByDate(DateTime date);
         Task<List<CommentPost>> GetByIds(List<int> ids);
     }

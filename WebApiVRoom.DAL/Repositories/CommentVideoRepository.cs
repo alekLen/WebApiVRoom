@@ -62,7 +62,17 @@ namespace WebApiVRoom.DAL.Repositories
                   .Where(m => m.User.Id == userId)
                   .ToListAsync();
         }
-
+        public async Task<IEnumerable<CommentVideo>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        {
+            return await db.CommentVideos
+                  .Include(cp => cp.User)
+                  .Include(cp => cp.Video)
+                  .Include(cp => cp.AnswerVideo)
+                  .Where(m => m.User.Id == userId)
+                  .Skip((pageNumber - 1) * pageSize)
+                  .Take(pageSize)
+                  .ToListAsync();
+        }
 
         public async Task<IEnumerable<CommentVideo>> GetByDate(DateTime date)
         {

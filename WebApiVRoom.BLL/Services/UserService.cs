@@ -57,39 +57,19 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        //public async Task<UserDTO> AddUser(string clerk_id, string language, string country, string countryCode)
-        //{
-        //    User user = new()
-        //    {
-        //        Clerk_Id = clerk_id
-        //    };
-        //    await Database.Users.Add(user);
-
-
-        //    Language langNew = await FindLanguage(language);
-        //    Country countryNew = await FindCountry(country, countryCode);
-
-        //    ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
-
-        //    user.ChannelSettings_Id = channelSettings.Id;
-        //    await Database.Users.Update(user);
-
-        //var mapper = InitializeMapper();
-        //var updatedUserDto = mapper.Map<User, UserDTO>(user);
-
-        //    return updatedUserDto;
-        //}
-
-        public async Task<UserDTO> AddUser(AddUserRequest request)
+        public async Task<UserDTO> AddUser(string clerk_id)
         {
             User user = new()
             {
-                Clerk_Id = request.ClerkId
+                Clerk_Id = clerk_id
             };
             await Database.Users.Add(user);
 
-            Language langNew = await FindLanguage(request.Language);
-            Country countryNew = await FindCountry(request.Country, request.CountryCode);
+            //Language langNew = await FindLanguage(language);
+            //  Country countryNew = await FindCountry(country, countryCode);
+
+            Language langNew = new();
+            Country countryNew = new();
 
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
 
@@ -101,6 +81,28 @@ namespace WebApiVRoom.BLL.Services
 
             return updatedUserDto;
         }
+
+        //public async Task<UserDTO> AddUser(AddUserRequest request)
+        //{
+        //    User user = new()
+        //    {
+        //        Clerk_Id = request.ClerkId
+        //    };
+        //    await Database.Users.Add(user);
+
+        //    Language langNew = await FindLanguage(request.Language);
+        //    Country countryNew = await FindCountry(request.Country, request.CountryCode);
+
+        //    ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
+
+        //    user.ChannelSettings_Id = channelSettings.Id;
+        //    await Database.Users.Update(user);
+
+        //    var mapper = InitializeMapper();
+        //    var updatedUserDto = mapper.Map<User, UserDTO>(user);
+
+        //    return updatedUserDto;
+        //}
 
         private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user)
         {

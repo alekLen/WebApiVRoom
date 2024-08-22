@@ -64,8 +64,18 @@ namespace WebApiVRoom.DAL.Repositories
                   .Where(m => m.User.Id == userId)
                   .ToListAsync();   
         }
-      
-     
+        public async Task<IEnumerable<CommentPost>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        {
+            return await db.CommentPosts
+                  .Include(cp => cp.User)
+                  .Include(cp => cp.Post)
+                  .Include(cp => cp.AnswerPost)
+                  .Where(m => m.User.Id == userId)
+                   .Skip((pageNumber - 1) * pageSize)
+                  .Take(pageSize)
+                  .ToListAsync();
+        }
+
         public async Task<IEnumerable<CommentPost>> GetByDate(DateTime date)
         {
             return await db.CommentPosts

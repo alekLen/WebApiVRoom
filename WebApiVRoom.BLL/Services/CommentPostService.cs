@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
@@ -38,7 +39,7 @@ namespace WebApiVRoom.BLL.Services
             _mapper = new Mapper(config);
         }
 
-        public async Task AddCommentPost(CommentPostDTO commentPostDTO)
+        public async Task<CommentPostDTO> AddCommentPost(CommentPostDTO commentPostDTO)
         {
             try
             {
@@ -57,7 +58,8 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Add(commentPost);
-                
+
+                return _mapper.Map<CommentPost, CommentPostDTO>(commentPost);
             }
             catch (Exception ex)
             {
@@ -65,11 +67,12 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task DeleteCommentPost(int id)
+        public async Task<CommentPostDTO> DeleteCommentPost(int id)
         {
             try
             {
                 await Database.CommentPosts.Delete(id);
+                return _mapper.Map<CommentPost, CommentPostDTO>(await Database.CommentPosts.GetById(id));
             }
             catch (Exception ex)
             {
@@ -119,7 +122,7 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task UpdateCommentPost(CommentPostDTO commentPostDTO)
+        public async Task<CommentPostDTO> UpdateCommentPost(CommentPostDTO commentPostDTO)
         {
             try
             {
@@ -141,11 +144,44 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Update(commentPost);
+
+                return _mapper.Map<CommentPost, CommentPostDTO>(commentPost);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<List<CommentPostDTO>> GetByUser(int userId)
+        {
+            try
+            {
+                var commentPost = await Database.CommentPosts.GetByUser(userId);
+                if (commentPost == null)
+                    throw new ValidationException("Comment not found!");
+
+                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPost).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<List<CommentPostDTO>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        {
+            try
+            {
+                var commentPost = await Database.CommentPosts.GetByUserPaginated( pageNumber, pageSize, userId);
+                if (commentPost == null)
+                    throw new ValidationException("Comment not found!");
+
+                return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPost).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 }

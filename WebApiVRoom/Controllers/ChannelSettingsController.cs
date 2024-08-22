@@ -18,7 +18,7 @@ namespace WebApiVRoom.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ChannelSettingsDTO>> GetChannelSettings(int id)
+        public async Task<ActionResult<ChannelSettingsDTO>> GetChannelSettings([FromRoute] int id)
         {
 
             var ch = await _chService.GetChannelSettings(id);
@@ -30,7 +30,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getbyownerid/{ownerId}")]
-        public async Task<ActionResult<ChannelSettingsDTO>> ByOwner(int ownerId)
+        public async Task<ActionResult<ChannelSettingsDTO>> ByOwner([FromRoute] int ownerId)
         {
 
             var ch = await _chService.FindByOwner(ownerId);
@@ -41,7 +41,7 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(ch);
         }
         [HttpPut("update")]
-        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings(ChannelSettingsDTO ch)
+        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings([FromBody] ChannelSettingsDTO ch)
         {
             if (!ModelState.IsValid)
             {
@@ -55,9 +55,24 @@ namespace WebApiVRoom.Controllers
 
             return Ok(chDto);
         }
+        [HttpPut("setlanguage/{clerkid}/{local}")]
+        public async Task<ActionResult<ChannelSettingsDTO>> SetLanguage([FromRoute] string clerkid, [FromRoute] string local)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            ChannelSettingsDTO chDto = await _chService.SetLanguageToChannel(clerkid, local);
+            if (chDto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(chDto);
+        }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ChannelSettingsDTO>> DeleteChannelSettings(int id)
+        public async Task<ActionResult<ChannelSettingsDTO>> DeleteChannelSettings([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {

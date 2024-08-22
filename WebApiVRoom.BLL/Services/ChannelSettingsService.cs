@@ -136,5 +136,27 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
+        public async Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId,string lang)
+        {
+            User user = await Database.Users.GetByClerk_Id(clerkId);
+            if (user == null) { return null; }
+            var channelSettings = await Database.ChannelSettings.FindByOwner(user.Id);
+            if (channelSettings == null)
+            {
+                return null;
+            }
+            Language language=await Database.Languages.GetByName(lang);
+            if (language == null)
+            {
+                language = new Language() { Name=lang};
+
+            }
+            channelSettings.Language = language;
+            await Database.ChannelSettings.Update(channelSettings);
+
+            var mapper = InitializeChannelSettingsMapper();
+            return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+
+        }
     }
 }
