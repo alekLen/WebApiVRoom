@@ -175,7 +175,7 @@ namespace WebApiVRoom.BLL.Services
             return post;
         }
 
-        public async Task UpdatePost(PostDTO postDTO)
+        public async Task<PostDTO> UpdatePost(PostDTO postDTO)
         {
             Post post = await Database.Posts.GetById(((int)postDTO.Id));
             var channelSettings = await Database.ChannelSettings.GetById(((int)postDTO.Id));
@@ -200,10 +200,11 @@ namespace WebApiVRoom.BLL.Services
                 post.CommentPosts = list;
 
                 await Database.Posts.Update(post);
-               
+                return postDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
     }

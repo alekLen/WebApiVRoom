@@ -15,7 +15,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<PostDTO>> GetAllPosts();
         Task<PostDTO> GetPostByText(string text);
         Task AddPost(PostDTO postDTO);
-        Task UpdatePost(PostDTO postDTO);
+        Task<PostDTO> UpdatePost(PostDTO postDTO);
         Task DeletePost(int id);
 
     }

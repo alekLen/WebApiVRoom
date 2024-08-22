@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<TagDTO>> GetAllTags();
         Task<IEnumerable<TagDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task AddTag(TagDTO tagDTO);
-        Task UpdateTag(TagDTO tagDTO);
+        Task<TagDTO> UpdateTag(TagDTO tagDTO);
         Task DeleteTag(int id);
     }
 }
