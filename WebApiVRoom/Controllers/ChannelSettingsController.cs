@@ -29,11 +29,11 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(ch);
         }
 
-        [HttpGet("getbyownerid/{ownerId}")]
-        public async Task<ActionResult<ChannelSettingsDTO>> ByOwner([FromRoute] int ownerId)
+        [HttpGet("getbyownerid/{clerk_id}")]
+        public async Task<ActionResult<ChannelSettingsDTO>> ByOwner([FromRoute] string clerk_id)
         {
 
-            var ch = await _chService.FindByOwner(ownerId);
+            var ch = await _chService.FindByOwner(clerk_id);
             if (ch == null)
             {
                 return NotFound();

@@ -12,7 +12,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<ChannelSettingsDTO> GetChannelSettings(int id);
         Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto);
         Task<ChannelSettingsDTO> DeleteChannelSettings(int id);
-        Task<ChannelSettingsDTO> FindByOwner(int ownerId);
+        Task<ChannelSettingsDTO> FindByOwner(string ownerId);
         Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId, string lang);
     }
 }

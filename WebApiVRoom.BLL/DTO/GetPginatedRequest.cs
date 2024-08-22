@@ -10,6 +10,6 @@ namespace WebApiVRoom.BLL.DTO
     {
         public int pageNumber { get; set; }
         public int pageSize { get; set; }
-        public int Id { get; set; }
+        public string clerk_id { get; set; }
     }
 }

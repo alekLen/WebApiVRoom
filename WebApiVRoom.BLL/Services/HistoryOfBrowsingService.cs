@@ -108,11 +108,13 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        public async Task<List<HistoryOfBrowsingDTO>> GetByUserId(int userId)
+        public async Task<List<HistoryOfBrowsingDTO>> GetByUserId(string clerkId)
         {
             try
             {
-                var hb = await Database.HistoryOfBrowsings.GetByUserId(userId);
+                User user= await Database.Users.GetByClerk_Id(clerkId);
+
+                var hb = await Database.HistoryOfBrowsings.GetByUserId(user.Id);
                 if (hb == null)
                     return null;
 
@@ -123,11 +125,12 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        public async Task<List<HistoryOfBrowsingDTO>> GetByUserIdPaginated(int pageNumber, int pageSize, int userId)
+        public async Task<List<HistoryOfBrowsingDTO>> GetByUserIdPaginated(int pageNumber, int pageSize, string clerkId)
         {
             try
             {
-                var hb = await Database.HistoryOfBrowsings.GetByUserIdPaginated( pageNumber, pageSize, userId);
+                User user = await Database.Users.GetByClerk_Id(clerkId);
+                var hb = await Database.HistoryOfBrowsings.GetByUserIdPaginated( pageNumber, pageSize, user.Id);
                 if (hb == null)
                     return null;
 

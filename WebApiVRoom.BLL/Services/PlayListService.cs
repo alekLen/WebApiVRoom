@@ -143,11 +143,12 @@ namespace WebApiVRoom.BLL.Services
                 throw ex;
             }
         }
-        public async Task<List<PlayListDTO>> GetByUser(int userId)
+        public async Task<List<PlayListDTO>> GetByUser(string clerkId)
         {
             try
             {
-                var pl = await Database.PlayLists.GetByUser(userId);
+                User user=await Database.Users.GetByClerk_Id(clerkId);
+                var pl = await Database.PlayLists.GetByUser(user.Id);
                 if (pl == null)
                     return null;
 
@@ -158,11 +159,12 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        public async  Task<List<PlayListDTO>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        public async  Task<List<PlayListDTO>> GetByUserPaginated(int pageNumber, int pageSize, string clerkId)
         {
             try
             {
-                var pl = await Database.PlayLists.GetByUserPaginated(pageNumber, pageSize, userId);
+                User user = await Database.Users.GetByClerk_Id(clerkId);
+                var pl = await Database.PlayLists.GetByUserPaginated(pageNumber, pageSize, user.Id);
                 if (pl == null)
                     return null;
 

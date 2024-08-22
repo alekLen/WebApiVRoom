@@ -15,7 +15,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<PlayListDTO> Add(PlayListDTO t);
         Task<PlayListDTO> Update(PlayListDTO t);
         Task<PlayListDTO> Delete(int id);
-        Task<List<PlayListDTO>> GetByUser(int userId);
-        Task<List<PlayListDTO>> GetByUserPaginated(int pageNumber, int pageSize, int userId);
+        Task<List<PlayListDTO>> GetByUser(string clerkId);
+        Task<List<PlayListDTO>> GetByUserPaginated(int pageNumber, int pageSize, string clerkId);
     }
 }

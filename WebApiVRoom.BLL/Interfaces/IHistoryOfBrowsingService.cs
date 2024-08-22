@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<HistoryOfBrowsingDTO> Add(HistoryOfBrowsingDTO t);
         Task<HistoryOfBrowsingDTO> Update(HistoryOfBrowsingDTO t);
         Task<HistoryOfBrowsingDTO> Delete(int id);
-        Task<List<HistoryOfBrowsingDTO>> GetByUserId(int userId);
-        Task<List<HistoryOfBrowsingDTO>> GetByUserIdPaginated(int pageNumber, int pageSize, int userId);
+        Task<List<HistoryOfBrowsingDTO>> GetByUserId(string userId);
+        Task<List<HistoryOfBrowsingDTO>> GetByUserIdPaginated(int pageNumber, int pageSize, string userId);
     }
 }

@@ -77,11 +77,11 @@ namespace WebApiVRoom.Controllers
             return Ok(ns);
         }
 
-        [HttpGet("getbyuserid/{user_id}")]
-        public async Task<ActionResult<List<NotificationDTO>>> ByUserId(int user_id)
+        [HttpGet("getbyuserid/{clerk_id}")]
+        public async Task<ActionResult<List<NotificationDTO>>> ByUserId(string clerk_id)
         {
 
-            List<NotificationDTO> nf = await _nService.GetByUser(user_id);
+            List<NotificationDTO> nf = await _nService.GetByUser(clerk_id);
             if (nf == null)
             {
                 return NotFound();

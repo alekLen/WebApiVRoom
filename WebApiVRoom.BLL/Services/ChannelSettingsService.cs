@@ -117,11 +117,12 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
-        public async Task<ChannelSettingsDTO> FindByOwner(int ownerId)
+        public async Task<ChannelSettingsDTO> FindByOwner(string clerk_id)
         {
             try
             {
-                var channelSettings = await Database.ChannelSettings.FindByOwner(ownerId);
+                User owner=await Database.Users.GetByClerk_Id(clerk_id);
+                var channelSettings = await Database.ChannelSettings.FindByOwner(owner.Id);
 
                 if (channelSettings == null)
                 {
