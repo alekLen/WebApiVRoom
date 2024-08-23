@@ -55,7 +55,7 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Add(commentPost);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -68,7 +68,6 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.CommentPosts.Delete(id);
-                await Database.Save();
             }
             catch (Exception ex)
             {
@@ -139,7 +138,7 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Update(commentPost);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {

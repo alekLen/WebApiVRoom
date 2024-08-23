@@ -13,5 +13,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetByTag(string tagName);
         Task<List<Video>> GetShortVideos();
         Task<bool> Exists(int id);
+        Task GetByIdAsync(int videoId);
     }
 }
