@@ -54,7 +54,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                //.Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
@@ -117,11 +116,49 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
+        public async Task<List<Video>> GetBySimilarTitle(string title)
+        {
+            var videos = await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                .Where(v => v.Tittle.Contains(title))
+                .ToListAsync();
+
+
+            return videos;
+        }
+        public async Task<List<Video>> GetBySimilarTitlePaginated(int pageNumber, int pageSize,string title)
+        {
+            var videos = await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                .Where(v => v.Tittle.Contains(title))
+                .ToListAsync();
+
+            return videos;
+        }
         public async Task<List<Video>> GetByCategory(string categoryName)
+        {
+            return await _context.Videos.Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                .Where(v => v.Categories.Any(c => c.Name == categoryName))
+                .ToListAsync();
+        }
+        public async Task<List<Video>> GetByCategoryPaginated(int pageNumber, int pageSize, string categoryName)
         {
             return await _context.Videos
                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
                 .Where(v => v.Categories.Any(c => c.Name == categoryName))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -139,7 +176,14 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.UploadDate >= startDate && v.UploadDate <= endDate)
                 .ToListAsync();
         }
-
+        public async Task<List<Video>> GetVideosByDateRangePaginated(int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
+        {
+            return await _context.Videos
+                .Where(v => v.UploadDate >= startDate && v.UploadDate <= endDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<List<Video>> GetByTag(string tagName)
         {
             return await _context.Videos
@@ -147,11 +191,35 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.Tags.Any(t => t.Name == tagName))
                 .ToListAsync();
         }
+        public async Task<List<Video>> GetByTagPaginated(int pageNumber, int pageSize, string tagName)
+        {
+            return await _context.Videos
+                .Include(v => v.Tags)
+                .Where(v => v.Tags.Any(t => t.Name == tagName))
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
 
         public async Task<List<Video>> GetShortVideos()
         {
             return await _context.Videos
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
                 .Where(v => v.IsShort)
+                .ToListAsync();
+        }
+
+        public async Task<List<Video>> GetShortVideosPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.Videos
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                .Where(v => v.IsShort)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -173,6 +241,13 @@ namespace WebApiVRoom.DAL.Repositories
 
             if (video.UploadDate == default)
                 video.UploadDate = DateTime.UtcNow; 
+        }
+
+        public async Task<List<Video>> GetByIds(List<int> ids)
+        {
+            return await _context.Videos
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
         }
     }
 }

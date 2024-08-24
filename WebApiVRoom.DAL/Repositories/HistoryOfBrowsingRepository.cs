@@ -74,13 +74,20 @@ namespace WebApiVRoom.DAL.Repositories
                            .Where(h => h.User.Id == userId)
                            .ToListAsync();
         }
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetByUserIdPaginated(int pageNumber, int pageSize,int userId)
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video)
+                           .Where(h => h.User.Id == userId)
+                            .Skip((pageNumber - 1) * pageSize)
+                           .Take(pageSize)
+                           .ToListAsync();
+        }
 
-        public async Task<IEnumerable<HistoryOfBrowsing>> GetAllPaginated(int pageNumber, int pageSize)
+
+        public async Task<List<HistoryOfBrowsing>> GetByIds(List<int> ids)
         {
             return await db.HistoryOfBrowsings
-                .Include(m => m.User).Include(m => m.Video)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
+                .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }
     }

@@ -10,5 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface ITagRepository: ISetGetRepository<Tag>
     {
         Task<Tag> GetByName(string name);
+        Task<IEnumerable<Tag>> GetAllPaginated(int pageNumber, int pageSize);
     }
 }

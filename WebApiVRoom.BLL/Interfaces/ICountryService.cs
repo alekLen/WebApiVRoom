@@ -16,7 +16,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<CountryDTO> GetByName(string name);
         Task AddCountry(CountryDTO countryDTO);
         Task<CountryDTO> GetCountryByCountryCode(string code);
-        Task UpdateCountry(CountryDTO countryDTO);
+        Task<CountryDTO> UpdateCountry(CountryDTO countryDTO);
         Task DeleteCountry(int id);
     }
 }

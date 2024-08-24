@@ -10,6 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface ILanguageRepository: ISetGetRepository<Language>
     {
         Task<Language> GetByName(string name);
-     
+        Task<IEnumerable<Language>> GetAllPaginated(int pageNumber, int pageSize);
     }
 }

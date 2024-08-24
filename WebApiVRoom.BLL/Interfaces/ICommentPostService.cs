@@ -5,11 +5,13 @@ namespace WebApiVRoom.BLL.Interfaces
 {
     public interface ICommentPostService
     {
-        Task AddCommentPost(CommentPostDTO commentPostDTO);            
-        Task DeleteCommentPost(int id);                                
-        Task<IEnumerable<CommentPostDTO>> GetAllPaginated(int pageNumber, int pageSize); 
-        Task<IEnumerable<CommentPostDTO>> GetAllCommentPostsPaginated(int pageNumber, int pageSize); 
+        Task<CommentPostDTO> AddCommentPost(CommentPostDTO commentPostDTO);            
+        Task<CommentPostDTO> DeleteCommentPost(int id);                                
         Task<CommentPostDTO> GetCommentPost(int id);                  
-        Task UpdateCommentPost(CommentPostDTO commentPostDTO);
+        Task<CommentPostDTO> UpdateCommentPost(CommentPostDTO commentPostDTO);
+        Task<List<CommentPostDTO>> GetByUser(int userId);
+        Task<List<CommentPostDTO>> GetByUserPaginated(int pageNumber, int pageSize, int userId);
+        Task<List<CommentPostDTO>> GetCommentPostsByPost(int postId);
+        Task<List<CommentPostDTO>> GetByPostPaginated(int pageNumber, int pageSize, int postId);
     }
 }

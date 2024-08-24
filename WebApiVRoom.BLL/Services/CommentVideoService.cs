@@ -21,10 +21,10 @@ namespace WebApiVRoom.BLL.Services
             Database = uow;
             Mapper = mapper;
         }
-        public async Task<IEnumerable<CommentVideoDTO>> GetAllCommentVideos()
+        public async Task<List<CommentVideoDTO>> GetAllCommentVideos()
         {
             var commentVideos = await Database.CommentVideos.GetAll();
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
         }
 
         public async Task<CommentVideoDTO> GetCommentVideoById(int id)
@@ -36,29 +36,29 @@ namespace WebApiVRoom.BLL.Services
             return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
         }
 
-        public async Task<CommentVideoDTO> GetCommentVideoByVideo(int videoId)
+        public async Task<List<CommentVideoDTO>> GetCommentsVideoByVideo(int videoId)
         {
             var commentVideo = await Database.CommentVideos.GetByVideo(videoId);
             if (commentVideo == null)
                 throw new ValidationException("Comment not found for the specified video!", "");
 
-            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
         }
 
-        public async Task<IEnumerable<CommentVideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
+        public async Task<List<CommentVideoDTO>> GetByVideoPaginated(int pageNumber, int pageSize, int videoId)
         {
-            var commentVideos = await Database.CommentVideos.GetAllPaginated(pageNumber, pageSize);
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos);
+            var commentVideos = await Database.CommentVideos.GetByVideoPaginated(pageNumber, pageSize,  videoId);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
         }
 
-        public async Task AddCommentVideo(CommentVideoDTO commentVideoDTO)
+        public async Task<CommentVideoDTO> AddCommentVideo(CommentVideoDTO commentVideoDTO)
         {
             var commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
             await Database.CommentVideos.Add(commentVideo);
-            
+            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
         }
 
-        public async Task UpdateCommentVideo(CommentVideoDTO commentVideoDTO)
+        public async Task<CommentVideoDTO> UpdateCommentVideo(CommentVideoDTO commentVideoDTO)
         {
             var commentVideo = await Database.CommentVideos.GetById(commentVideoDTO.Id);
             if (commentVideo == null)
@@ -66,17 +66,33 @@ namespace WebApiVRoom.BLL.Services
 
             Mapper.Map(commentVideoDTO, commentVideo);  
             await Database.CommentVideos.Update(commentVideo);
-            
+            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+
         }
 
-        public async Task DeleteCommentVideo(int id)
+        public async Task<CommentVideoDTO> DeleteCommentVideo(int id)
         {
             var commentVideo = await Database.CommentVideos.GetById(id);
             if (commentVideo == null)
                 throw new ValidationException("Comment not found!", "");
 
             await Database.CommentVideos.Delete(id);
-            
+            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+        }
+
+        public async Task<List<CommentVideoDTO>> GetByUser(int userId)
+        {
+            var commentVideo = await Database.CommentVideos.GetByUser(userId);
+            if (commentVideo == null)
+                throw new ValidationException("Comment not found for the specified video!", "");
+
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
+        }
+
+        public async Task<List<CommentVideoDTO>> GetByUserPaginated(int pageNumber, int pageSize, int userId)
+        {
+            var commentVideos = await Database.CommentVideos.GetByUserPaginated(pageNumber, pageSize, userId);
+            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
         }
     }
 }

@@ -4,7 +4,8 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface INotificationRepository: ISetGetRepository<Notification>
     {
-        Task<Notification> GetByUser(User user);
-        Task<Notification> GetByDate(DateTime daye);
+        Task<IEnumerable<Notification>> GetByUser(User user);
+        Task<IEnumerable<Notification>> GetByDate(DateTime daye);
+        Task<IEnumerable<Notification>> GetByDateRange(DateTime startDate, DateTime endDate);
     }
 }

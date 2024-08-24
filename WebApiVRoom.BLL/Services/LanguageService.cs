@@ -39,7 +39,7 @@ namespace WebApiVRoom.BLL.Services
                 language.ChannelSettingss = list;
 
                 await Database.Languages.Add(language);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Languages.Delete(id);
-                await Database.Save();
+                
             }
             catch { }
         }
@@ -132,7 +132,7 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        public async Task UpdateLanguage(LanguageDTO languageDTO)
+        public async Task<LanguageDTO> UpdateLanguage(LanguageDTO languageDTO)
         {
             Language language = await Database.Languages.GetById(((int)languageDTO.Id));
 
@@ -150,10 +150,11 @@ namespace WebApiVRoom.BLL.Services
                 language.ChannelSettingss = list;
 
                 await Database.Languages.Update(language);
-                await Database.Save();
+                return languageDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
 

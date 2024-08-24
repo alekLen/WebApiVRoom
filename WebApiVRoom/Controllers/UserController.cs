@@ -12,17 +12,17 @@ namespace WebApiVRoom.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        //private readonly VRoomContext _context;
+
         private IUserService _userService;
 
         public UserController(IUserService userService)
         {
             _userService = userService;
         }
+        
 
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(int id)
+            [HttpGet("{id}")]
+        public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
         {
 
             var user = await _userService.GetUser(id);
@@ -32,8 +32,8 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
-        [HttpPut]
-        public async Task<ActionResult<UserDTO>> PutUser(UserDTO u)
+        [HttpPut("update")]
+        public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO u)
         {
             if (!ModelState.IsValid)
             {
@@ -45,24 +45,38 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            //await _userService.UpdateUser(user);
+            UserDTO usernew=await _userService.UpdateUser(u);
 
-            return Ok(user);
+            return Ok(usernew);
         }
-        [HttpPost]
-        public async Task<ActionResult<UserDTO>> PostUser(string clerk_id, string language, string country, string countryCode)
+        [HttpPost("add/{clerkId}")]
+        public async Task<ActionResult<UserDTO>> AddUser([FromRoute] string clerkId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-           UserDTO user = await _userService.AddUser(clerk_id, language,country, countryCode);
+            UserDTO user = await _userService.AddUser(clerkId);
 
             return Ok(user);
         }
+
+        //[HttpPost("add")]
+        //public async Task<ActionResult<UserDTO>> AddUser([FromBody] AddUserRequest request)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    UserDTO user = await _userService.AddUser(request);
+
+        //    return Ok(user);
+        //}
+
         [HttpDelete("{id}")]
-        public async Task<ActionResult<UserDTO>> DeleteUser(int id)
+        public async Task<ActionResult<UserDTO>> DeleteUser([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
@@ -75,12 +89,22 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            //_userService.DeleteUser(user);
+            await _userService.DeleteUser(id);
 
             return Ok(user);
         }
 
+        [HttpGet("getbyclerkid/{clerkId}")]
+        public async Task<ActionResult<UserDTO>> ByClerkId([FromRoute] string clerkId)
+        {
 
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(user);
+        }
     }
 
    

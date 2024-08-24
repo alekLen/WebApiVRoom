@@ -39,7 +39,6 @@ namespace WebApiVRoom.BLL.Services
                 category.Videos = list;
 
                 await Database.Categories.Add(category);
-                await Database.Save();
             }
             catch (Exception ex)
             {
@@ -51,7 +50,6 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Categories.Delete(id);
-                await Database.Save();
             }
             catch { }
         }
@@ -132,7 +130,7 @@ namespace WebApiVRoom.BLL.Services
             return category;
         }
 
-        public async Task UpdateCategory(CategoryDTO categoryDTO)
+        public async Task<CategoryDTO> UpdateCategory(CategoryDTO categoryDTO)
         {
             Category category = await Database.Categories.GetById(categoryDTO.Id);
 
@@ -150,10 +148,11 @@ namespace WebApiVRoom.BLL.Services
                 category.Videos = list;
 
                 await Database.Categories.Update(category);
-                await Database.Save();
+                return categoryDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
     }

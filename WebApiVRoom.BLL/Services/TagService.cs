@@ -38,7 +38,7 @@ namespace WebApiVRoom.BLL.Services
                 tag.Videos = list;
 
                 await Database.Tags.Add(tag);
-                await Database.Save();
+               
             }
             catch (Exception ex)
             {
@@ -50,7 +50,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await Database.Tags.Delete(id);
-                await Database.Save();
+               
             }
             catch { }
         }
@@ -147,7 +147,7 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await Database.Tags.Update(tag);
-                await Database.Save();
+                
             }
             catch (Exception ex)
             {

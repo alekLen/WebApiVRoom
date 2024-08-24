@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<LanguageDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<LanguageDTO> GetLanguageByName(string name);
         Task AddLanguage(LanguageDTO languageDTO);
-        Task UpdateLanguage(LanguageDTO languageDTO);
+        Task<LanguageDTO> UpdateLanguage(LanguageDTO languageDTO);
         Task DeleteLanguage(int id);
     }
 }
