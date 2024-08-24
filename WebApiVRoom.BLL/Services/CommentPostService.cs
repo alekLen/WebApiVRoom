@@ -55,7 +55,7 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Add(commentPost);
-               
+                
             }
             catch (Exception ex)
             {
@@ -138,7 +138,6 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Update(commentPost);
-               
             }
             catch (Exception ex)
             {
