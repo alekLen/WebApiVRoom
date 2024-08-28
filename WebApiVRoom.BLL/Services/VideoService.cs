@@ -42,14 +42,12 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await _unitOfWork.Videos.Add(video);
-                await _unitOfWork.Save();
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while adding video", ex);
             }
         }
-
 
         public async Task<VideoDTO> GetVideo(int id)
         {
@@ -73,7 +71,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 await _unitOfWork.Videos.Delete(id);
-                await _unitOfWork.Save();
+
             }
             catch (Exception ex)
             {
@@ -115,17 +113,30 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await _unitOfWork.Videos.Update(video);
-                await _unitOfWork.Save();
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while updating video", ex);
             }
         }
+
         public async Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
         {
             var videos = await _unitOfWork.Videos.GetAllPaginated(pageNumber, pageSize);
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
         }
+        public async Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId)
+        {
+            try
+            {
+                var comments = await _unitOfWork.CommentVideos.GetByVideo(videoId);
+                return _mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(comments);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving comments", ex);
+            }
+        }
+
     }
 }

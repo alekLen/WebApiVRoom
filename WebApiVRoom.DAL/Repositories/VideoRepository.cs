@@ -249,5 +249,10 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }
+
+        public Task GetByIdAsync(int videoId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

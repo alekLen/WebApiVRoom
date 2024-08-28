@@ -2,7 +2,7 @@
 
 namespace WebApiVRoom.BLL.Interfaces
 {
-    internal interface IVideoService
+    public interface IVideoService
     {
         Task AddVideo(VideoDTO videoDTO);
         Task DeleteVideo(int id);
@@ -10,5 +10,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<VideoDTO>> GetAllVideos();
         Task<VideoDTO> GetVideo(int id);
         Task UpdateVideo(VideoDTO videoDTO);
+        Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId);
     }
 }
