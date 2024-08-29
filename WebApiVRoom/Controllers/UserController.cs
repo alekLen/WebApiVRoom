@@ -17,9 +17,6 @@ namespace WebApiVRoom.Controllers
     {
 
         private IUserService _userService;
-        //var WEBHOOK_SECRET = Configuration["Clerk:WebhookSecret
-
-       
 
         public UserController(IUserService userService)
         {
@@ -67,14 +64,14 @@ namespace WebApiVRoom.Controllers
             if (request.type == "user.created")
             {
                 UserDTO user = await _userService.AddUser(request.data.id);
-                request = null;
+               
                 return Ok(user);
               
             }
             if (request.type == "user.deleted")
             {
                 UserDTO user = await _userService.Delete(request.data.id);
-                request = null;
+              
                 return Ok(user);
             }
             return BadRequest(ModelState);

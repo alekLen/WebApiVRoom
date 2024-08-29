@@ -7,62 +7,6 @@ using System.Threading.Tasks;
 namespace WebApiVRoom.BLL.DTO
 {
 
-    //public class AddUserRequest : EventArgs
-    //{
-    //    public User data { get; set; }
-    //    public string type { get; set; }
-
-    //    public class User
-    //    {
-    //        public string birthday { get; set; }
-    //        public long created_at { get; set; }
-    //        public List<EmailAddress> email_addresses { get; set; }
-    //        public List<string> external_accounts { get; set; }
-    //        public string external_id { get; set; }
-    //        public string first_name { get; set; }
-    //        public string gender { get; set; }
-    //        public string id { get; set; }
-    //        public string image_url { get; set; }
-    //        public string last_name { get; set; }
-    //        public long last_sign_in_at { get; set; }
-    //        public bool password_enabled { get; set; }
-    //        public List<string> phone_numbers { get; set; }
-    //        public string primary_email_address_id { get; set; }
-    //        public string primary_phone_number_id { get; set; } = null;
-    //        public string primary_web3_wallet_id { get; set; } = null;
-    //        private string private_metadata { get; set; }
-    //        public string profile_image_url { get; set; }
-    //        public Metadata public_metadata { get; set; }
-    //        public bool two_factor_enabled { get; set; }
-    //        public Metadata unsafe_metadata { get; set; }
-    //        public long updated_at { get; set; }
-    //        public string username { get; set; }
-    //        public List<string> web3_wallets { get; set; }
-    //    }
-    //}
-    //public class EmailAddress
-    //{
-    //    public string email_address { get; set; }
-    //    public string id { get; set; }
-    //    public List<object> linked_to { get; set; }
-    //    public Verification verification { get; set; }
-    //}
-
-    //public class Verification
-    //{
-    //    private String status { get; set; }
-    //    private String strategy { get; set; }
-
-
-    //}
-    //public class Metadata
-    //{
-    //}
-
-    //public class Web3Wallet
-    //{
-    //}
-
     public class AddUserRequest : EventArgs
     {
         public User data { get; set; }
@@ -126,16 +70,11 @@ namespace WebApiVRoom.BLL.DTO
         public Verification verification { get; set; }
     }
 
-    public class Verification
-    {
+    public class Verification { }
 
-    }
-    public class Metadata
-    {
-    }
+    public class Metadata { }
 
-    public class Web3Wallet
-    {
-    }
+    public class Web3Wallet { }
+ 
 }
 
