@@ -56,18 +56,6 @@ namespace WebApiVRoom.Controllers
 
             return Ok(usernew);
         }
-        //[HttpPost("add/{clerkId}")]
-        //public async Task<ActionResult<UserDTO>> AddUser([FromRoute] string clerkId)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    UserDTO user = await _userService.AddUser(clerkId);
-
-        //    return Ok(user);
-        //}
 
         [HttpPost("add")]
         public async Task<ActionResult<UserDTO>> AddUser([FromBody] AddUserRequest request)
@@ -76,65 +64,23 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-             UserDTO user = await _userService.AddUser(request.data.id);
-
-            return Ok(user);
-           
+            if (request.type == "user.created")
+            {
+                UserDTO user = await _userService.AddUser(request.data.id);
+                request = null;
+                return Ok(user);
+              
+            }
+            if (request.type == "user.deleted")
+            {
+                UserDTO user = await _userService.Delete(request.data.id);
+                request = null;
+                return Ok(user);
+            }
+            return BadRequest(ModelState);
         }
 
-        //[HttpPost("add")]
-        //public async Task<IActionResult> HandleWebhook()
-        //{
-        //    var WEBHOOK_SECRET = Environment.GetEnvironmentVariable("WEBHOOK_SECRET");
-
-        //    if (string.IsNullOrEmpty(WEBHOOK_SECRET))
-        //    {
-        //        throw new Exception("Please add WEBHOOK_SECRET from Clerk Dashboard to your environment variables");
-        //    }
-
-        //    var headerPayload = Request.Headers;
-        //    var svix_id = headerPayload["svix-id"];
-        //    var svix_timestamp = headerPayload["svix-timestamp"];
-        //    var svix_signature = headerPayload["svix-signature"];
-
-        //    if (string.IsNullOrEmpty(svix_id) || string.IsNullOrEmpty(svix_timestamp) || string.IsNullOrEmpty(svix_signature))
-        //    {
-        //        return BadRequest("Error occurred -- no svix headers");
-        //    }
-
-        //    string body;
-        //    using (var reader = new StreamReader(Request.Body))
-        //    {
-        //        body = await reader.ReadToEndAsync();
-        //    }
-
-        //    var wh = new Webhook(WEBHOOK_SECRET);
-
-        //    try
-        //    {
-        //        var evt = wh.Verify(body, new Dictionary<string, string>
-        //{
-        //    { "svix-id", svix_id },
-        //    { "svix-timestamp", svix_timestamp },
-        //    { "svix-signature", svix_signature }
-        //});
-
-        //        if (evt.Type == "user.created")
-        //        {
-        //            var userId = evt.Data.Id;
-        //            // Здесь вы можете добавить логику для сохранения userId в вашу базу данных
-        //            Console.WriteLine($"New user created with ID: {userId}");
-        //        }
-
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.Error.WriteLine($"Error verifying webhook: {ex.Message}");
-        //        return BadRequest("Error occurred");
-        //    }
-        //}
+     
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<UserDTO>> DeleteUser([FromRoute] int id)

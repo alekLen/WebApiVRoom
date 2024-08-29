@@ -103,7 +103,7 @@ namespace WebApiVRoom.BLL.DTO
             public string? primary_phone_number_id { get; set; } 
             public string? primary_web3_wallet_id { get; set; } 
             private string? private_metadata { get; set; }
-            public string profile_image_url { get; set; }
+            public string? profile_image_url { get; set; }
             public Metadata? public_metadata { get; set; }
             public List<string>? saml_accounts { get; set; }
             public bool? totp_enabled { get; set; }

@@ -82,6 +82,15 @@ namespace WebApiVRoom.BLL.Services
             return updatedUserDto;
         }
 
+        public async Task<UserDTO> Delete(string clerkId)
+        {
+            User user = await Database.Users.GetByClerk_Id(clerkId);
+            await Database.Users.Delete(user.Id);
+
+            var mapper = InitializeMapper();
+            return mapper.Map<User, UserDTO>(user);
+        }
+
         //public async Task<UserDTO> AddUser(AddUserRequest request)
         //{
         //    User user = new()
