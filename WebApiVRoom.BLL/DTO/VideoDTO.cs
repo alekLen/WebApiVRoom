@@ -20,9 +20,11 @@ namespace WebApiVRoom.BLL.DTO
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
         public bool IsShort { get; set; }
-        public List<int> CategoriesId { get; set; } = new List<int>();
-        public List<int> TagsId { get; set; } = new List<int>();
-        public List<int> HistoryOfBrowsingsId { get; set; } = new List<int>();
-        public List<int> CommentVideosId { get; set; } = new List<int>();
+        public List<int> CategoryIds { get; set; } = new List<int>();
+        public List<int> TagIds { get; set; } = new List<int>();
+        public List<int> HistoryOfBrowsingIds { get; set; } = new List<int>();
+        public List<int> CommentVideoIds { get; set; } = new List<int>();
+
+        public TimeSpan LastViewedPosition { get; set; }
     }
 }
