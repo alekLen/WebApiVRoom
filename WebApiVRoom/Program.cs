@@ -23,7 +23,6 @@ builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddTransient<IPlayListService, PlayListService>();
 builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
-builder.Services.AddTransient<ITagService, TagService>();
 //builder.Services.AddTransient<IVideoService, VideoService>();
 
 builder.Services.AddControllers();
@@ -41,10 +40,11 @@ if (app.Environment.IsDevelopment())
 }
 
 //  CORS
-// app.UseCors(builder => builder.AllowAnyOrigin());
-app.UseCors(builder => builder.WithOrigins("http://localhost:54206")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod());
+ app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader()
+                           .AllowAnyMethod());
+//app.UseCors(builder => builder.WithOrigins("http://localhost:54206")  //("http://localhost:54206")
+//                            .AllowAnyHeader()
+//                            .AllowAnyMethod());
 
 app.UseHttpsRedirection();
 

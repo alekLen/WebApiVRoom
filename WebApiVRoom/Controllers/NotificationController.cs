@@ -81,12 +81,31 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<List<NotificationDTO>>> ByUserId(string clerk_id)
         {
 
-            List<NotificationDTO> nf = await _nService.GetByUser(clerk_id);
-            if (nf == null)
+            try
             {
-                return NotFound();
+                List<NotificationDTO> nf = await _nService.GetByUser(clerk_id);
+                if (nf == null)
+                {
+                    return NotFound();
+                }
+                return Ok(nf);
             }
-            return new ObjectResult(nf);
+            catch (Exception ex) { return BadRequest(ex.Message); }
+        }
+        [HttpGet("getbyuserid/{pageNumber}/{pageSize}/{clerk_id}")]
+        public async Task<ActionResult<List<NotificationDTO>>> ByUserIdPaginated([FromRoute] int pageNumber, [FromRoute] int pageSize, [FromRoute] string clerk_id)
+        {
+
+            try
+            {
+                List<NotificationDTO> nf = await _nService.GetByUserPaginated(pageNumber,pageSize,clerk_id);
+                if (nf == null)
+                {
+                    return NotFound();
+                }
+                return Ok(nf);
+            }
+            catch (Exception ex) { return BadRequest(ex.Message); }
         }
         [HttpGet("getbydate")]
         public async Task<ActionResult<List<NotificationDTO>>> ByDate(string date)

@@ -66,6 +66,16 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(m => m.User.Id == user.Id)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Notification>> GetByUserPaginated(int pageNumber, int pageSize, User user)
+        {
+            return await db.Notifications
+                .Include(m => m.User)
+                .Where(m => m.User.Id == user.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<IEnumerable<Notification>> GetByDate(DateTime date)
         {
             return await db.Notifications

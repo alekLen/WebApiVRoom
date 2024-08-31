@@ -16,6 +16,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<NotificationDTO> Update(NotificationDTO t);
         Task<NotificationDTO> Delete(int id);
         Task<List<NotificationDTO>> GetByUser(string userId);
+        Task<List<NotificationDTO>> GetByUserPaginated(int pageNumber,int pageSize, string userId);
         Task<List<NotificationDTO>> GetByDate(DateTime date);
         Task<List<NotificationDTO>> GetByDateRange(DateTime startDate, DateTime endDate);
     }

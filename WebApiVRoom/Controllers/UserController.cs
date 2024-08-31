@@ -8,6 +8,10 @@ using WebApiVRoom.DAL.Repositories;
 using Microsoft.AspNetCore;
 using Microsoft.OpenApi.Any;
 using WebApiVRoom.DAL.Entities;
+using System.Net;
+using Svix;
+using Svix.Exceptions;
+using Newtonsoft.Json;
 
 namespace WebApiVRoom.Controllers
 {
@@ -17,11 +21,12 @@ namespace WebApiVRoom.Controllers
     {
 
         private IUserService _userService;
+        private INotificationService _notificationService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, INotificationService notificationService)
         {
             _userService = userService;
-           
+            _notificationService = notificationService;
         }
         
 
@@ -54,17 +59,50 @@ namespace WebApiVRoom.Controllers
             return Ok(usernew);
         }
 
+
         [HttpPost("add")]
-        public async Task<ActionResult<UserDTO>> AddUser([FromBody] AddUserRequest request)
+        public async Task<ActionResult<UserDTO>> AddUser()
         {
-            if (!ModelState.IsValid)
+            string SigningSecret = "whsec_cwCuyYEkLrK/NJkrnZHub5WcmmI1LHr0"; //  секретный ключ
+            Request.EnableBuffering();
+
+            string requestBody;
+            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
             {
-                return BadRequest(ModelState);
+                requestBody = await reader.ReadToEndAsync();
+                Request.Body.Position = 0;
             }
+
+            var headers = new WebHeaderCollection();
+            headers.Set("svix-id", Request.Headers["svix-id"]);
+            headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
+            headers.Set("svix-signature", Request.Headers["svix-signature"]);
+          
+            var wh= new Webhook(SigningSecret);
+            try
+            {
+                wh.Verify(requestBody,headers);
+            }
+            catch (WebhookVerificationException)
+            {
+                return Unauthorized("Invalid signature.");
+            }
+            try
+            {
+                var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
+
+           
             if (request.type == "user.created")
             {
                 UserDTO user = await _userService.AddUser(request.data.id);
-               
+
+                NotificationDTO notification = new NotificationDTO();
+                notification.Date = DateTime.Now;
+                notification.UserId = user.Id;
+                notification.IsRead = false;
+                notification.Message = "Добро пожаловать на на сайт!";
+                NotificationDTO n = await _notificationService.Add(notification);
+
                 return Ok(user);
               
             }
@@ -74,6 +112,8 @@ namespace WebApiVRoom.Controllers
               
                 return Ok(user);
             }
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
             return BadRequest(ModelState);
         }
 
@@ -109,7 +149,10 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+
+        
     }
+     
 
    
 }
