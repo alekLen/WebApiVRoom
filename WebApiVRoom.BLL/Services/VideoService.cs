@@ -8,6 +8,8 @@ using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -15,11 +17,41 @@ namespace WebApiVRoom.BLL.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName = "videos";
 
-        public VideoService(IUnitOfWork unitOfWork, IMapper mapper)
+        public VideoService(IUnitOfWork unitOfWork, IMapper mapper, BlobServiceClient blobServiceClient)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _blobServiceClient = blobServiceClient;
+        }
+
+        private async Task<string> UploadFileAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new ArgumentException("File cannot be null or empty");
+            }
+
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            await containerClient.CreateIfNotExistsAsync();
+
+            var blobClient = containerClient.GetBlobClient(file.FileName);
+
+            using (var stream = file.OpenReadStream())
+            {
+                await blobClient.UploadAsync(stream, overwrite: true);
+            }
+
+            return blobClient.Uri.ToString();
+        }
+
+        private async Task DeleteFileAsync(string fileUrl)
+        {
+            var blobUri = new Uri(fileUrl);
+            var blobClient = new BlobClient(blobUri);
+            await blobClient.DeleteIfExistsAsync();
         }
 
         public async Task AddVideo(VideoDTO videoDTO)
@@ -41,12 +73,20 @@ namespace WebApiVRoom.BLL.Services
                     video.Tags.Add(await _unitOfWork.Tags.GetById(tagId));
                 }
 
+                var videoUrl = await UploadFileAsync(videoDTO.VideoUrl);
+                video.VideoUrl = videoUrl;
+
                 await _unitOfWork.Videos.Add(video);
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while adding video", ex);
             }
+        }
+
+        private async Task<string> UploadFileAsync(string videoUrl)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<VideoDTO> GetVideo(int id)
@@ -66,16 +106,27 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
         }
 
+        public async Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
+        {
+            var videos = await _unitOfWork.Videos.GetAllPaginated(pageNumber, pageSize);
+            return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
+        }
+
         public async Task DeleteVideo(int id)
         {
             try
             {
-                await _unitOfWork.Videos.Delete(id);
+                var video = await _unitOfWork.Videos.GetById(id);
+                if (video == null)
+                {
+                    throw new KeyNotFoundException("Video not found");
+                }
 
+                await DeleteFileAsync(video.VideoUrl);
+                await _unitOfWork.Videos.Delete(id);
             }
             catch (Exception ex)
             {
-
                 throw new Exception("Error while deleting video", ex);
             }
         }
@@ -94,7 +145,6 @@ namespace WebApiVRoom.BLL.Services
                 video.Description = videoDTO.Description;
                 video.UploadDate = videoDTO.UploadDate;
                 video.Duration = videoDTO.Duration;
-                video.VideoUrl = videoDTO.VideoUrl;
                 video.ViewCount = videoDTO.ViewCount;
                 video.LikeCount = videoDTO.LikeCount;
                 video.DislikeCount = videoDTO.DislikeCount;
@@ -112,6 +162,13 @@ namespace WebApiVRoom.BLL.Services
                     video.Tags.Add(await _unitOfWork.Tags.GetById(tagId));
                 }
 
+                if (videoDTO.VideoUrl != null)
+                {
+                    await DeleteFileAsync(video.VideoUrl);
+                    var newVideoUrl = await UploadFileAsync(videoDTO.VideoUrl);
+                    video.VideoUrl = newVideoUrl;
+                }
+
                 await _unitOfWork.Videos.Update(video);
             }
             catch (Exception ex)
@@ -120,11 +177,7 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
-        {
-            var videos = await _unitOfWork.Videos.GetAllPaginated(pageNumber, pageSize);
-            return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
-        }
+
         public async Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId)
         {
             try
@@ -138,5 +191,34 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<List<VideoDTO>> GetByCategory(string categoryName)
+        {
+            var videos = await _unitOfWork.Videos.GetByCategory(categoryName);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<List<VideoDTO>> GetMostPopularVideos(int topCount)
+        {
+            var videos = await _unitOfWork.Videos.GetMostPopularVideos(topCount);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<List<VideoDTO>> GetVideosByDateRange(DateTime startDate, DateTime endDate)
+        {
+            var videos = await _unitOfWork.Videos.GetVideosByDateRange(startDate, endDate);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<List<VideoDTO>> GetByTag(string tagName)
+        {
+            var videos = await _unitOfWork.Videos.GetByTag(tagName);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<List<VideoDTO>> GetShortVideos()
+        {
+            var videos = await _unitOfWork.Videos.GetShortVideos();
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
     }
 }

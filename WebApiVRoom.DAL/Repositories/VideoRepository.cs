@@ -6,16 +6,23 @@ using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.EF;
 using WebApiVRoom.DAL.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
+
 
 namespace WebApiVRoom.DAL.Repositories
 {
     public class VideoRepository : IVideoRepository
     {
         private readonly VRoomContext _context;
+        private readonly BlobContainerClient _blobContainerClient;
 
-        public VideoRepository(VRoomContext context)
+        public VideoRepository(VRoomContext context, IConfiguration configuration)
         {
             _context = context;
+            string connectionString = configuration["AzureBlob:ConnectionString"];
+            string containerName = configuration["AzureBlob:ContainerName"];
+            _blobContainerClient = new BlobContainerClient(connectionString, containerName);
         }
 
         public async Task<Video> GetById(int id)
@@ -25,7 +32,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-                //.Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
@@ -42,7 +48,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-               // .Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .ToListAsync();
         }
@@ -59,12 +64,28 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-        public async Task Add(Video video)
-        {
-            ValidateVideo(video);
 
-            await _context.Videos.AddAsync(video);
-            await _context.SaveChangesAsync();
+        public async Task<string> UploadVideoToBlobAsync(string videoTitle, Stream videoStream)
+        {
+            string blobName = $"{videoTitle}-{Guid.NewGuid()}.mp4"; 
+            var blobClient = _blobContainerClient.GetBlobClient(blobName);  
+
+            await blobClient.UploadAsync(videoStream, overwrite: true);  
+
+            return blobClient.Uri.ToString();  
+        }
+
+        public async Task Add(Video video, Stream videoStream)
+        {
+            ValidateVideo(video);  
+            string videoUrl = await UploadVideoToBlobAsync(video.Tittle, videoStream);
+            video.VideoUrl = videoUrl;
+
+            if (video.UploadDate == default)
+                video.UploadDate = DateTime.UtcNow;
+
+            await _context.Videos.AddAsync(video);  
+            await _context.SaveChangesAsync();  
         }
 
         public async Task Update(Video video)
@@ -74,17 +95,6 @@ namespace WebApiVRoom.DAL.Repositories
                 throw new KeyNotFoundException("Video not found");
 
             ValidateVideo(video);
-
-            //_context.Entry(existingVideo).CurrentValues.SetValues(video);
-
-            //existingVideo.Categories = video.Categories;
-            //existingVideo.Tags = video.Tags;
-            //existingVideo.HistoryOfBrowsings = video.HistoryOfBrowsings;
-            //existingVideo.PlayLists = video.PlayLists;
-            //existingVideo.CommentVideos = video.CommentVideos;
-
-            //_context.Videos.Update(existingVideo);
-
             _context.Videos.Update(video);
             await _context.SaveChangesAsync();
         }
@@ -94,6 +104,8 @@ namespace WebApiVRoom.DAL.Repositories
             var video = await _context.Videos.FindAsync(id);
             if (video == null)
                 throw new KeyNotFoundException("Video not found");
+            var blobClient = _blobContainerClient.GetBlobClient(video.VideoUrl.Split('/').Last());
+            await blobClient.DeleteIfExistsAsync();
 
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
@@ -106,7 +118,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
-               // .Include(v => v.PlayLists)
                 .Include(v => v.CommentVideos)
                 .FirstOrDefaultAsync(v => v.Tittle == title);
 
@@ -118,38 +129,26 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<List<Video>> GetBySimilarTitle(string title)
         {
-            var videos = await _context.Videos
+            return await _context.Videos
                 .Include(v => v.ChannelSettings)
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.CommentVideos)
                 .Where(v => v.Tittle.Contains(title))
                 .ToListAsync();
-
-
-            return videos;
         }
-        public async Task<List<Video>> GetBySimilarTitlePaginated(int pageNumber, int pageSize,string title)
-        {
-            var videos = await _context.Videos
-                .Include(v => v.ChannelSettings)
-                .Include(v => v.Categories)
-                .Include(v => v.Tags)
-                .Include(v => v.CommentVideos)
-                .Where(v => v.Tittle.Contains(title))
-                .ToListAsync();
 
-            return videos;
-        }
         public async Task<List<Video>> GetByCategory(string categoryName)
         {
-            return await _context.Videos.Include(v => v.ChannelSettings)
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
                 .Include(v => v.Categories)
                 .Include(v => v.Tags)
                 .Include(v => v.CommentVideos)
                 .Where(v => v.Categories.Any(c => c.Name == categoryName))
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetByCategoryPaginated(int pageNumber, int pageSize, string categoryName)
         {
             return await _context.Videos
@@ -176,6 +175,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.UploadDate >= startDate && v.UploadDate <= endDate)
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetVideosByDateRangePaginated(int pageNumber, int pageSize, DateTime startDate, DateTime endDate)
         {
             return await _context.Videos
@@ -184,6 +184,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetByTag(string tagName)
         {
             return await _context.Videos
@@ -191,6 +192,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.Tags.Any(t => t.Name == tagName))
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetByTagPaginated(int pageNumber, int pageSize, string tagName)
         {
             return await _context.Videos
@@ -240,7 +242,7 @@ namespace WebApiVRoom.DAL.Repositories
                 throw new ArgumentException("Duration should be greater than zero");
 
             if (video.UploadDate == default)
-                video.UploadDate = DateTime.UtcNow; 
+                video.UploadDate = DateTime.UtcNow;
         }
 
         public async Task<List<Video>> GetByIds(List<int> ids)
@@ -250,7 +252,19 @@ namespace WebApiVRoom.DAL.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Video>> GetByChannelId(int channelId)
+        {
+            return await _context.Videos
+                .Where(v => v.ChannelSettings.Id == channelId)
+                .ToListAsync();
+        }
+
         public Task GetByIdAsync(int videoId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Add(Video t)
         {
             throw new NotImplementedException();
         }
