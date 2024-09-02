@@ -19,7 +19,20 @@ namespace WebApiVRoom.BLL.Services
         public CommentVideoService(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
-            Mapper = mapper;
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<CommentVideo, CommentVideoDTO>()
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
+                    .ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
+
+                cfg.CreateMap<CommentVideoDTO, CommentVideo>()
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(dest => dest.AnswerVideo, opt => opt.Ignore())
+                    .ForMember(dest => dest.User, opt => opt.Ignore())
+                    .ForMember(dest => dest.Video, opt => opt.Ignore());
+            });
+            Mapper = new Mapper(config);
         }
         public async Task<List<CommentVideoDTO>> GetAllCommentVideos()
         {

@@ -7,12 +7,14 @@ using WebApiVRoom.DAL.EF;
 using WebApiVRoom.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.DAL.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace WebApiVRoom.DAL.Repositories
 {
     public class EFUnitOfWork : IUnitOfWork
     {
         private VRoomContext db;
+        private IConfiguration configuration;
 
         private UserRepository userRepository;
         private CategoryRepository categoryRepository;
@@ -177,7 +179,7 @@ namespace WebApiVRoom.DAL.Repositories
             get
             {
                 if (videoRepository == null)
-                    videoRepository = new VideoRepository(db);
+                    videoRepository = new VideoRepository(db, configuration);
                 return videoRepository;
             }
         }

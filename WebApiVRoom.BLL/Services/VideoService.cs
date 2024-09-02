@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace WebApiVRoom.BLL.Services
 {
-    internal class VideoService : IVideoService
+    public class VideoService : IVideoService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;

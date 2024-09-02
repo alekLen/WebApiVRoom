@@ -12,6 +12,7 @@ using System.Net;
 using Svix;
 using Svix.Exceptions;
 using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApiVRoom.Controllers
 {
@@ -22,11 +23,13 @@ namespace WebApiVRoom.Controllers
 
         private IUserService _userService;
         private INotificationService _notificationService;
+        private IConfiguration _configuration;
 
-        public UserController(IUserService userService, INotificationService notificationService)
+        public UserController(IUserService userService, INotificationService notificationService, IConfiguration configuration)
         {
             _userService = userService;
             _notificationService = notificationService;
+            _configuration = configuration;
         }
         
 
@@ -53,7 +56,6 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-
             UserDTO usernew=await _userService.UpdateUser(u);
 
             return Ok(usernew);
@@ -63,7 +65,9 @@ namespace WebApiVRoom.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<UserDTO>> AddUser()
         {
-            string SigningSecret = "whsec_cwCuyYEkLrK/NJkrnZHub5WcmmI1LHr0"; //  секретный ключ
+            try
+            {
+                string SigningSecret = _configuration["Clerk:WebhookSecret"]; //  секретный ключ
             Request.EnableBuffering();
 
             string requestBody;
@@ -79,37 +83,20 @@ namespace WebApiVRoom.Controllers
             headers.Set("svix-signature", Request.Headers["svix-signature"]);
           
             var wh= new Webhook(SigningSecret);
-            try
-            {
+           
                 wh.Verify(requestBody,headers);
-            }
-            catch (WebhookVerificationException)
-            {
-                return Unauthorized("Invalid signature.");
-            }
-            try
-            {
+           
                 var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
-
            
             if (request.type == "user.created")
             {
                 UserDTO user = await _userService.AddUser(request.data.id);
-
-                NotificationDTO notification = new NotificationDTO();
-                notification.Date = DateTime.Now;
-                notification.UserId = user.Id;
-                notification.IsRead = false;
-                notification.Message = "Добро пожаловать на на сайт!";
-                NotificationDTO n = await _notificationService.Add(notification);
-
-                return Ok(user);
-              
+                    await AddNotification(user, "Добро пожаловать на на сайт!");
+                return Ok(user);             
             }
             if (request.type == "user.deleted")
             {
-                UserDTO user = await _userService.Delete(request.data.id);
-              
+                UserDTO user = await _userService.Delete(request.data.id);              
                 return Ok(user);
             }
             }
@@ -117,7 +104,15 @@ namespace WebApiVRoom.Controllers
             return BadRequest(ModelState);
         }
 
-     
+        private async Task AddNotification(UserDTO user,string text)
+        {
+            NotificationDTO notification = new NotificationDTO();
+            notification.Date = DateTime.Now;
+            notification.UserId = user.Id;
+            notification.IsRead = false;
+            notification.Message = text;
+            NotificationDTO n = await _notificationService.Add(notification);
+        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<UserDTO>> DeleteUser([FromRoute] int id)
