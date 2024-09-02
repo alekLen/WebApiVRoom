@@ -25,15 +25,30 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<CommentPost, CommentPostDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Post.Id))
+                    .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                    .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                    .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
+                    .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                    .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
+                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                     .ForMember(dest => dest.AnswerPostId, opt => opt.MapFrom(src => src.AnswerPost != null ? src.AnswerPost.Id : (int?)null));
 
                 cfg.CreateMap<CommentPostDTO, CommentPost>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
-                    .ForMember(dest => dest.AnswerPost, opt => opt.Ignore())
-                    .ForMember(dest => dest.User, opt => opt.Ignore())
-                    .ForMember(dest => dest.Post, opt => opt.Ignore());
+                   .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                   .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                   .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
+                   .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
+                   .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
+                   .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
+                   .ForMember(dest => dest.User, opt => opt.Ignore()) // Обработка вручную
+                   .ForMember(dest => dest.UserId, opt => opt.Ignore()) // Обработка вручную
+                   .ForMember(dest => dest.Post, opt => opt.Ignore()) // Обработка вручную
+                   .ForMember(dest => dest.AnswerPost, opt => opt.Ignore());// Обработка вручную
+
+
             });
 
             _mapper = new Mapper(config);
@@ -44,11 +59,10 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 var commentPost = _mapper.Map<CommentPostDTO, CommentPost>(commentPostDTO);
-
+                User user = await Database.Users.GetById(commentPostDTO.UserId);
+                commentPost.User = user;
+                commentPost.UserId=user.Id;
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
-
-                if(commentPost.UserId != null)    
-                    commentPost.User = await Database.Users.GetById((int)commentPostDTO.UserId);
 
                 if (commentPostDTO.AnswerPostId.HasValue)
                 {

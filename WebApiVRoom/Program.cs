@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.BLL.Infrastructure;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,21 +10,25 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ICountryService, CountryService>();
-builder.Services.AddTransient<ICategoryService, CategoryService>();
-builder.Services.AddTransient<ILanguageService, LanguageService>();
-builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
-builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
-builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
-builder.Services.AddTransient<ICommentPostService, CommentPostService>();
-builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
-builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
-builder.Services.AddTransient<IPlayListService, PlayListService>();
-builder.Services.AddTransient<IPostService, PostService>();
-builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
-builder.Services.AddTransient<IVideoService, VideoService>();
+builder.Services.AddSingleton(x => {
+    string connectionString = builder.Configuration["AzureBlob:ConnectionString"];
+    return new BlobServiceClient(connectionString);
+});
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<IChannelSettingsService, ChannelSettingsService>();
+builder.Services.AddScoped<IAnswerPostService, AnswerPostService>();
+builder.Services.AddScoped<IAnswerVideoService, AnswerVideoService>();
+builder.Services.AddScoped<ICommentPostService, CommentPostService>();
+builder.Services.AddScoped<ICommentVideoService, CommentVideoService>();
+builder.Services.AddScoped<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IPlayListService, PlayListService>();
+builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

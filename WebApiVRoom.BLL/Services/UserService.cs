@@ -65,9 +65,6 @@ namespace WebApiVRoom.BLL.Services
             };
             await Database.Users.Add(user);
 
-            //Language langNew = await FindLanguage(language);
-            //  Country countryNew = await FindCountry(country, countryCode);
-
             Language langNew = new();
             Country countryNew = new();
 
@@ -90,28 +87,6 @@ namespace WebApiVRoom.BLL.Services
             var mapper = InitializeMapper();
             return mapper.Map<User, UserDTO>(user);
         }
-
-        //public async Task<UserDTO> AddUser(AddUserRequest request)
-        //{
-        //    User user = new()
-        //    {
-        //        Clerk_Id = request.ClerkId
-        //    };
-        //    await Database.Users.Add(user);
-
-        //    Language langNew = await FindLanguage(request.Language);
-        //    Country countryNew = await FindCountry(request.Country, request.CountryCode);
-
-        //    ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
-
-        //    user.ChannelSettings_Id = channelSettings.Id;
-        //    await Database.Users.Update(user);
-
-        //    var mapper = InitializeMapper();
-        //    var updatedUserDto = mapper.Map<User, UserDTO>(user);
-
-        //    return updatedUserDto;
-        //}
 
         private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user)
         {

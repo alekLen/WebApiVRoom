@@ -11,5 +11,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<Tag> GetByName(string name);
         Task<IEnumerable<Tag>> GetAllPaginated(int pageNumber, int pageSize);
+        Task<List<Tag>> GetByIds(List<int> ids);
     }
 }

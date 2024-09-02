@@ -78,5 +78,11 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<List<Category>> GetByIds(List<int> ids)
+        {
+            return await db.Categories
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }

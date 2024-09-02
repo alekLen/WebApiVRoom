@@ -25,5 +25,6 @@ namespace WebApiVRoom.DAL.Entities
         public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();
        // public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
         public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+        public TimeSpan LastViewedPosition { get; set; }
     }
 }

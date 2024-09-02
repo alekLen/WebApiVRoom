@@ -33,6 +33,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Tags)
                 .Include(v => v.HistoryOfBrowsings)
                 .Include(v => v.CommentVideos)
+                .Include(v => v.LastViewedPosition)
                 .FirstOrDefaultAsync(v => v.Id == id);
 
             if (video == null)
@@ -248,6 +249,12 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<List<Video>> GetByIds(List<int> ids)
         {
             return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.LastViewedPosition)
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }

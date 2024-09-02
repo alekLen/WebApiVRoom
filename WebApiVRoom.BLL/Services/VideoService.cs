@@ -10,6 +10,7 @@ using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -17,14 +18,33 @@ namespace WebApiVRoom.BLL.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly BlobServiceClient _blobServiceClient;
+        private readonly BlobServiceClient  _blobServiceClient;
         private readonly string _containerName = "videos";
 
-        public VideoService(IUnitOfWork unitOfWork, IMapper mapper, BlobServiceClient blobServiceClient)
+        public VideoService(IUnitOfWork unitOfWork,  BlobServiceClient blobServiceClient)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _blobServiceClient = blobServiceClient;
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Video, VideoDTO>()
+                    .ForMember(dest => dest.Tittle, opt => opt.MapFrom(src => src.Tittle))
+                    .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
+                    .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                    .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate))
+                    .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
+                    .ForMember(dest => dest.VideoUrl, opt => opt.MapFrom(src => src.VideoUrl))
+                    .ForMember(dest => dest.ViewCount, opt => opt.MapFrom(src => src.ViewCount))
+                    .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
+                    .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
+                    .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
+                    .ForMember(dest => dest.LastViewedPosition, opt => opt.MapFrom(src => src.LastViewedPosition))
+                    .ForMember(dest => dest.CategoryIds, opt => opt.MapFrom(src => src.Categories.Select(s => s.Id).ToList()))
+                    .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src => src.Tags.Select(p => p.Id).ToList()))
+                    .ForMember(dest => dest.HistoryOfBrowsingIds, opt => opt.MapFrom(src => src.HistoryOfBrowsings.Select(h => h.Id).ToList()))
+                    .ForMember(dest => dest.CommentVideoIds, opt => opt.MapFrom(src => src.CommentVideos.Select(c => c.Id).ToList()));
+            });
+            _mapper = new Mapper(config);
         }
 
         private async Task<string> UploadFileAsync(IFormFile file)
@@ -58,7 +78,34 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                var video = _mapper.Map<VideoDTO, Video>(videoDTO);
+                var config = new MapperConfiguration(cfg =>
+                {
+
+                    cfg.CreateMap<VideoDTO, Video>()
+                       .ForMember(dest => dest.Tittle, opt => opt.MapFrom(src => src.Tittle))
+                       .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                       .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate))
+                       .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
+                       .ForMember(dest => dest.VideoUrl, opt => opt.MapFrom(src => src.VideoUrl))
+                       .ForMember(dest => dest.ViewCount, opt => opt.MapFrom(src => src.ViewCount))
+                       .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
+                       .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
+                       .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
+                       .ForMember(dest => dest.LastViewedPosition, opt => opt.MapFrom(src => src.LastViewedPosition))
+                       .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) // Обработка вручную;
+                       .ForMember(dest => dest.Categories, opt => opt.Ignore()) // Обработка вручную
+                       .ForMember(dest => dest.Tags, opt => opt.Ignore()) // Обработка вручную
+                       .ForMember(dest => dest.HistoryOfBrowsings, opt => opt.Ignore()) // Обработка вручную
+                       .ForMember(dest => dest.CommentVideos, opt => opt.Ignore()); // Обработка вручную;
+                });
+                
+                IMapper _map = new Mapper(config);
+                var video = _map.Map<VideoDTO, Video>(videoDTO);
+                video.Categories = await _unitOfWork.Categories.GetByIds(videoDTO.CategoryIds);
+                video.Tags = await _unitOfWork.Tags.GetByIds(videoDTO.TagIds);
+                video.HistoryOfBrowsings = await _unitOfWork.HistoryOfBrowsings.GetByIds(videoDTO.TagIds);
+                video.CommentVideos = await _unitOfWork.CommentVideos.GetByIds(videoDTO.TagIds);
+
                 video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
 
                 video.Categories = new List<Category>();

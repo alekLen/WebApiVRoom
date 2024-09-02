@@ -78,5 +78,11 @@ namespace WebApiVRoom.DAL.Repositories
                 await db.SaveChangesAsync();
             }
         }
+        public async Task<List<Tag>> GetByIds(List<int> ids)
+        {
+            return await db.Tags
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync();
+        }
     }
 }
