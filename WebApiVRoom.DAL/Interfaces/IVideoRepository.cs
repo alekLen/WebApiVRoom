@@ -15,11 +15,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<bool> Exists(int id);
         Task GetByIdAsync(int videoId);
         Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize);
-        //Task<Video> GetById(int id);
-        //Task<IEnumerable<Video>> GetAll();
-        //Task Add(Video video);
-        //Task Update(Video video);
-        //Task Delete(int id);
         Task<List<Video>> GetByIds(List<int> ids);
+        Task Add(Video video, Stream videoStream);
     }
 }

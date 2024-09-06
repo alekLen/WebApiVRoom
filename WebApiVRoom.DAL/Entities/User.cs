@@ -20,6 +20,7 @@ namespace WebApiVRoom.DAL.Entities
         public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
         public List<AnswerPost> AnswerPosts { get; set; } = new List<AnswerPost>();
         public List<AnswerVideo> AnswerVideos { get; set; } = new List<AnswerVideo>();
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
 
     }
 }

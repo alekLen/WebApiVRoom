@@ -39,7 +39,8 @@ namespace WebApiVRoom.Controllers
             try
             {
                 await _videoService.AddVideo(videoDto);
-                return CreatedAtAction(nameof(GetVideo), new { id = videoDto.Id }, videoDto);
+                //return CreatedAtAction(nameof(GetVideo), new { id = videoDto.Id }, videoDto);
+                return Ok( videoDto);
             }
             catch (Exception ex)
             {

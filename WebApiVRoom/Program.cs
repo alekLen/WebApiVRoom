@@ -3,6 +3,7 @@ using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.BLL.Infrastructure;
 using Azure.Storage.Blobs;
+using Algolia.Search.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +12,13 @@ string? connection = builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton(x => {
-    string connectionString = builder.Configuration["AzureBlob:ConnectionString"];
+    string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
     return new BlobServiceClient(connectionString);
 });
+string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+builder.Services.AddSingleton<ISearchClient>(sp =>
+    new SearchClient(AlgoliaAppId, AlgoliaKey));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -29,6 +34,7 @@ builder.Services.AddScoped<IPlayListService, PlayListService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IAlgoliaService,AlgoliaService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

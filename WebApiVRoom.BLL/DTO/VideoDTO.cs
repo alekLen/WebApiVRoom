@@ -10,6 +10,7 @@ namespace WebApiVRoom.BLL.DTO
     public class VideoDTO
     {
         public int Id { get; set; }
+        public string ObjectID { get; set; }
         public int ChannelSettingsId { get; set; }
         public string Tittle { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -25,6 +26,6 @@ namespace WebApiVRoom.BLL.DTO
         public List<int> HistoryOfBrowsingIds { get; set; } = new List<int>();
         public List<int> CommentVideoIds { get; set; } = new List<int>();
 
-        public TimeSpan LastViewedPosition { get; set; }
+        public string LastViewedPosition { get; set; }
     }
 }
