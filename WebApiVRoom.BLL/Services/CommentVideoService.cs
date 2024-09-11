@@ -22,13 +22,13 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<CommentVideo, CommentVideoDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Clerk_Id))
                     .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
+                    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
                     .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                     .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                     .ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
@@ -69,29 +69,47 @@ namespace WebApiVRoom.BLL.Services
             if (commentVideo == null)
                 throw new ValidationException("Comment not found for the specified video!", "");
 
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
+            List<CommentVideoDTO> list= Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
+            //foreach (var item in list)
+            //{
+            //    User us =await Database.Users.GetByClerk_Id(item.UserId);
+            //    ChannelSettings ch= await Database.ChannelSettings.FindByOwner(us.Id); 
+            //    item.UserName=ch.ChannelName;
+            //}
+            return list;
         }
 
         public async Task<List<CommentVideoDTO>> GetByVideoPaginated(int pageNumber, int pageSize, int videoId)
         {
             var commentVideos = await Database.CommentVideos.GetByVideoPaginated(pageNumber, pageSize,  videoId);
-            return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
+            List<CommentVideoDTO> list = Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
+            //foreach (var item in list)
+            //{
+            //    User us = await Database.Users.GetByClerk_Id(item.UserId);
+            //    ChannelSettings ch = await Database.ChannelSettings.FindByOwner(us.Id);
+            //    item.UserName = ch.ChannelName;
+            //}
+            return list;
         }
 
         public async Task<CommentVideoDTO> AddCommentVideo(CommentVideoDTO commentVideoDTO)
         {
-            var commentVideo = new CommentVideo();
-            User user = await Database.Users.GetById(commentVideoDTO.UserId);
+            var commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
+            User user = await Database.Users.GetByClerk_Id(commentVideoDTO.UserId);
             commentVideo.User = user;
             commentVideo.UserId = user.Id;
             commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
-            if (commentVideoDTO.AnswerVideoId.Value != 0)
+            if ( commentVideoDTO.AnswerVideoId != null )
             {
                 commentVideo.AnswerVideo = await Database.AnswerVideos.GetById(commentVideoDTO.AnswerVideoId.Value);
             }
 
             await Database.CommentVideos.Add(commentVideo);
-            return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+            CommentVideoDTO com= Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
+            //User us = await Database.Users.GetByClerk_Id(com.UserId);
+            //ChannelSettings ch = await Database.ChannelSettings.FindByOwner(us.Id);
+            //com.UserName = ch.ChannelName;
+            return com;
         }
 
         public async Task<CommentVideoDTO> UpdateCommentVideo(CommentVideoDTO commentVideoDTO)

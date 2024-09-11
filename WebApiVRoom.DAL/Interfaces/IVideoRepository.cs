@@ -17,5 +17,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize);
         Task<List<Video>> GetByIds(List<int> ids);
         Task Add(Video video, Stream videoStream);
+        Task<List<Video>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
+        Task<List<Video>> GetByChannelId(int channelId);
     }
 }

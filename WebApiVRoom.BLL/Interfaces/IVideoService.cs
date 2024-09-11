@@ -11,5 +11,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<VideoDTO> GetVideo(int id);
         Task UpdateVideo(VideoDTO videoDTO);
         Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId);
+        Task<List<VideoDTO>> GetByChannelId(int channelId);
+        Task<List<VideoDTO>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
     }
 }

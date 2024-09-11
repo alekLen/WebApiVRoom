@@ -27,6 +27,7 @@ namespace WebApiVRoom.BLL.Services
                 cfg.CreateMap<CommentPost, CommentPostDTO>()
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Post.Id))
+                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
                     .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))

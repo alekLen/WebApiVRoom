@@ -31,6 +31,7 @@ namespace WebApiVRoom.BLL.Services
                 cfg.CreateMap<User, UserDTO>()
                     .ForMember(dest => dest.Clerk_Id, opt => opt.MapFrom(src => src.Clerk_Id))
                     .ForMember(dest => dest.ChannelSettings_Id, opt => opt.MapFrom(src => src.ChannelSettings_Id))
+                    .ForMember(dest => dest.ChannelName, opt => opt.MapFrom(src => src.ChannelName))
                     .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium))
                     .ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount))
                     .ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()))
@@ -69,8 +70,9 @@ namespace WebApiVRoom.BLL.Services
             Country countryNew = new();
 
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
-
+           
             user.ChannelSettings_Id = channelSettings.Id;
+            user.ChannelName = "VRoom_Channel" + channelSettings.Id + "_created";
             await Database.Users.Update(user);
 
             var mapper = InitializeMapper();
@@ -96,6 +98,7 @@ namespace WebApiVRoom.BLL.Services
                 Language = l,
                 Country = c,
                 Owner = user
+
             };
 
             await Database.ChannelSettings.Add(channelSettings);

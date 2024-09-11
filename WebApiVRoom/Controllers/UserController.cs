@@ -22,14 +22,16 @@ namespace WebApiVRoom.Controllers
     {
 
         private IUserService _userService;
+        private IVideoService _videoService;
         private INotificationService _notificationService;
         private IConfiguration _configuration;
 
-        public UserController(IUserService userService, INotificationService notificationService, IConfiguration configuration)
+        public UserController(IUserService userService,IVideoService video,INotificationService notificationService, IConfiguration configuration)
         {
             _userService = userService;
             _notificationService = notificationService;
             _configuration = configuration;
+            _videoService = video;
         }
         
 
@@ -96,8 +98,15 @@ namespace WebApiVRoom.Controllers
             }
             if (request.type == "user.deleted")
             {
-                UserDTO user = await _userService.Delete(request.data.id);              
-                return Ok(user);
+                    UserDTO user = await _userService.GetUserByClerkId(request.data.id);
+
+                    List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+                    foreach (VideoDTO video in videos)
+                    {
+                        await _videoService.DeleteVideo(video.Id);
+                    }
+                UserDTO user2 = await _userService.Delete(request.data.id);              
+                return Ok(user2);
             }
             }
             catch (Exception ex) { return BadRequest(ModelState); }
@@ -128,7 +137,11 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-
+            List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+            foreach (VideoDTO video in videos)
+            {
+                await _videoService.DeleteVideo(video.Id);
+            }
             await _userService.DeleteUser(id);
 
             return Ok(user);

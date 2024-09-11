@@ -271,5 +271,16 @@ namespace WebApiVRoom.BLL.Services
             var videos = await _unitOfWork.Videos.GetShortVideos();
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
+
+        public async Task<List<VideoDTO>> GetByChannelId(int channelId)
+        {
+            var videos = await _unitOfWork.Videos.GetByChannelId(channelId);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+        public async Task<List<VideoDTO>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId)
+        {
+            var videos = await _unitOfWork.Videos.GetByChannelIdPaginated( pageNumber, pageSize, channelId);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
     }
 }

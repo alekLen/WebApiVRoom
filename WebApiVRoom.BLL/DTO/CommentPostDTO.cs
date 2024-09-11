@@ -10,7 +10,8 @@ namespace WebApiVRoom.BLL.DTO
     public sealed class CommentPostDTO
     {
         public int Id { get; set; }
-        public int UserId { get; set; } 
+        public int UserId { get; set; }
+        public string UserName { get; set; }
         public int PostId { get; set; }
         public string Comment { get; set; }
         public DateTime Date { get; set; }

@@ -11,6 +11,7 @@ namespace WebApiVRoom.BLL.DTO
     {
         public int Id { get; set; }
         public int UserId { get; set; }
+        public string UserName { get; set; }
         public int CommentPost_Id { get; set; }
         public string Text { get; set; }
         public DateTime AnswerDate { get; set; }
