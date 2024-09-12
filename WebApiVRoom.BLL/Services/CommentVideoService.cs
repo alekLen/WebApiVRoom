@@ -25,6 +25,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Clerk_Id))
                     .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
+                    .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.User.ChannelBanner))
                     .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
@@ -70,12 +71,7 @@ namespace WebApiVRoom.BLL.Services
                 throw new ValidationException("Comment not found for the specified video!", "");
 
             List<CommentVideoDTO> list= Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideo).ToList();
-            //foreach (var item in list)
-            //{
-            //    User us =await Database.Users.GetByClerk_Id(item.UserId);
-            //    ChannelSettings ch= await Database.ChannelSettings.FindByOwner(us.Id); 
-            //    item.UserName=ch.ChannelName;
-            //}
+           
             return list;
         }
 
@@ -83,12 +79,7 @@ namespace WebApiVRoom.BLL.Services
         {
             var commentVideos = await Database.CommentVideos.GetByVideoPaginated(pageNumber, pageSize,  videoId);
             List<CommentVideoDTO> list = Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
-            //foreach (var item in list)
-            //{
-            //    User us = await Database.Users.GetByClerk_Id(item.UserId);
-            //    ChannelSettings ch = await Database.ChannelSettings.FindByOwner(us.Id);
-            //    item.UserName = ch.ChannelName;
-            //}
+           
             return list;
         }
 
@@ -97,7 +88,7 @@ namespace WebApiVRoom.BLL.Services
             var commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
             User user = await Database.Users.GetByClerk_Id(commentVideoDTO.UserId);
             commentVideo.User = user;
-            commentVideo.UserId = user.Id;
+            commentVideo.UserId = user.Id;           
             commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
             if ( commentVideoDTO.AnswerVideoId != null )
             {
@@ -106,9 +97,7 @@ namespace WebApiVRoom.BLL.Services
 
             await Database.CommentVideos.Add(commentVideo);
             CommentVideoDTO com= Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
-            //User us = await Database.Users.GetByClerk_Id(com.UserId);
-            //ChannelSettings ch = await Database.ChannelSettings.FindByOwner(us.Id);
-            //com.UserName = ch.ChannelName;
+           
             return com;
         }
 

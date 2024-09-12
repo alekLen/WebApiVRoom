@@ -58,11 +58,12 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        public async Task<UserDTO> AddUser(string clerk_id)
+        public async Task<UserDTO> AddUser(string clerk_id,string imgurl)
         {
             User user = new()
             {
-                Clerk_Id = clerk_id
+                Clerk_Id = clerk_id,
+                ChannelBanner =imgurl
             };
             await Database.Users.Add(user);
 

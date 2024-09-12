@@ -13,6 +13,7 @@ namespace WebApiVRoom.BLL.DTO
         public string Clerk_Id { get; set; }
         public int ChannelSettings_Id { get; set; }
         public string ChannelName { get; set; }
+        public string ChannelBanner { get; set; }
         public bool IsPremium { get; set; }
         public int SubscriptionCount { get; set; }
         public List<int> Subscriptions { get; set; } = new List<int>();

@@ -92,7 +92,7 @@ namespace WebApiVRoom.Controllers
            
             if (request.type == "user.created")
             {
-                UserDTO user = await _userService.AddUser(request.data.id);
+                UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
                     await AddNotification(user, "Добро пожаловать на на сайт!");
                 return Ok(user);             
             }
