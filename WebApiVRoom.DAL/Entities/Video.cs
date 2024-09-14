@@ -22,8 +22,8 @@ namespace WebApiVRoom.DAL.Entities
         public bool IsShort { get; set; }
         public List<Category> Categories { get; set; }=new List<Category>();
         public List<Tag> Tags { get; set; } = new List<Tag>();
-        public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();
-       // public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
+        public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();    
         public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+    // public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
     }
 }

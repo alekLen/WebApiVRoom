@@ -13,7 +13,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetByTag(string tagName);
         Task<List<Video>> GetShortVideos();
         Task<bool> Exists(int id);
-        Task GetByIdAsync(int videoId);
         Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize);
         Task<Video> GetById(int id);
         Task<IEnumerable<Video>> GetAll();
@@ -21,5 +20,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task Update(Video video);
         Task Delete(int id);
         Task<List<Video>> GetByIds(List<int> ids);
+        Task<Video> GetById(int? videoId);
     }
 }

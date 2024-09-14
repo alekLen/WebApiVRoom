@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using WebApiVRoom.DAL.Entities;
 
@@ -24,7 +25,6 @@ namespace WebApiVRoom.BLL.DTO
         public List<int> TagIds { get; set; } = new List<int>();
         public List<int> HistoryOfBrowsingIds { get; set; } = new List<int>();
         public List<int> CommentVideoIds { get; set; } = new List<int>();
-
-        public TimeSpan LastViewedPosition { get; set; }
+        //public string LastViewedPosition { get; set; }
     }
 }

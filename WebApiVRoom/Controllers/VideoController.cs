@@ -29,16 +29,22 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<VideoDTO>> AddVideo([FromBody] VideoDTO videoDto)
+        public async Task<ActionResult<VideoDTO>> AddVideo([FromForm] VideoDTO videoDto, IFormFile file)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || file == null)
             {
                 return BadRequest(ModelState);
             }
 
             try
             {
-                await _videoService.AddVideo(videoDto);
+                // Test версія
+                string stream = "D:\\Vide VRoom\\5845158-uhd_3840_2160_30fps.mp4"; // D:\Vide VRoom\5638009-uhd_3840_2160_25fps.mp4
+                // production версія
+                //using (var stream = file.OpenReadStream())
+                ///{
+                    await _videoService.AddVideo(videoDto, stream);
+                //}
                 return CreatedAtAction(nameof(GetVideo), new { id = videoDto.Id }, videoDto);
             }
             catch (Exception ex)
@@ -46,7 +52,8 @@ namespace WebApiVRoom.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error while adding video: {ex.Message}");
             }
         }
-       
+
+
         [HttpPut("update")]
         public async Task<ActionResult<VideoDTO>> UpdateVideo([FromBody] VideoDTO videoDto)
         {
@@ -77,13 +84,12 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-            else { 
-                await _videoService.DeleteVideo(id);
-                return NoContent();
-            }
+
+            await _videoService.DeleteVideo(id); 
+            return NoContent();
         }
 
-       
+
         [HttpGet("{id}/comments")]
         public async Task<ActionResult<IEnumerable<CommentVideoDTO>>> GetVideoComments([FromRoute] int id)
         {
@@ -99,7 +105,7 @@ namespace WebApiVRoom.Controllers
         [HttpGet("{userId}/history")]
         public async Task<ActionResult<IEnumerable<HistoryOfBrowsingDTO>>> GetUserVideoHistory([FromRoute] int userId)
         {
-            var history = await _videoService.GetCommentsByVideoId(userId);
+            var history = await _videoService.GetUserVideoHistory(userId); 
             if (history == null || !history.Any())
             {
                 return NotFound();
