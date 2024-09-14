@@ -32,6 +32,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                     .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
+                     .ForMember(dest => dest.users, opt => opt.MapFrom(src => src.users.Select(s => s.Id).ToList()))
                     .ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
 
                 cfg.CreateMap<CommentVideoDTO, CommentVideo>()
@@ -42,6 +43,7 @@ namespace WebApiVRoom.BLL.Services
                    .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                    .ForMember(dest => dest.User, opt => opt.Ignore()) // Обработка вручную
+                    .ForMember(dest => dest.users, opt => opt.Ignore()) // Обработка вручную
                    .ForMember(dest => dest.UserId, opt => opt.Ignore()) // Обработка вручную
                    .ForMember(dest => dest.Video, opt => opt.Ignore()) // Обработка вручную
                    .ForMember(dest => dest.AnswerVideo, opt => opt.Ignore());// Обработка вручную

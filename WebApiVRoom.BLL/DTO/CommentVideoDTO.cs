@@ -21,5 +21,6 @@ namespace WebApiVRoom.BLL.DTO
         public int? AnswerVideoId { get; set; }
         public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
+        public List<string>? users { get; set; }=new List<string>();
     }
 }

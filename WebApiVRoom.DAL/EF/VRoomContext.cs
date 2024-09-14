@@ -38,6 +38,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<LikesDislikesCV> LikesCV { get; set; }
     }
 }
 

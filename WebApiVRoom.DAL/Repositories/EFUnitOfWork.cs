@@ -32,13 +32,23 @@ namespace WebApiVRoom.DAL.Repositories
         private SubscriptionRepository subscriptionRepository;
         private TagRepository tagRepository;
         private VideoRepository videoRepository;
+        private LikesDislikesCVRepository likesDislikesRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
         }
 
-       
+
+        public ILikesDislikesCVRepository LikesCV
+        {
+            get
+            {
+                if (likesDislikesRepository == null)
+                    likesDislikesRepository = new LikesDislikesCVRepository(db);
+                return likesDislikesRepository;
+            }
+        }
         public IUserRepository Users
         {
             get

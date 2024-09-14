@@ -75,6 +75,8 @@ namespace WebApiVRoom.BLL.Services
             user.ChannelSettings_Id = channelSettings.Id;
             user.ChannelName = "VRoom_Channel" + channelSettings.Id + "_created";
             await Database.Users.Update(user);
+            channelSettings.ChannelName= "VRoom_Channel" + channelSettings.Id + "_created";
+            await Database.ChannelSettings.Update(channelSettings);
 
             var mapper = InitializeMapper();
             var updatedUserDto = mapper.Map<User, UserDTO>(user);

@@ -9,10 +9,12 @@ namespace WebApiVRoom.Controllers
     public class CommentVideoController : Controller
     {
         private ICommentVideoService _comService;
+        private ILikesDislikesCVService _likesService;
 
-        public CommentVideoController(ICommentVideoService cService)
+        public CommentVideoController(ICommentVideoService cService, ILikesDislikesCVService likesService)
         {
             _comService = cService;
+            _likesService = likesService;
         }
 
 
@@ -43,6 +45,54 @@ namespace WebApiVRoom.Controllers
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
 
             return Ok(c);
+        }
+        [HttpPut("like/{comment}/{user}")]
+        public async Task<ActionResult> likeCommentVideo([FromRoute] int comment, [FromRoute] string user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCVDTO like = await _likesService.Get(comment, user);
+            if (like == null)
+            {
+                LikesDislikesCVDTO likeDto = new() { commentId=comment, userId=user };
+                await _likesService.Add(likeDto);
+            CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+            ans.LikeCount += 1;
+
+            CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+           
+            }
+
+            return Ok();
+        }
+        [HttpPut("dislike/{comment}/{user}")]
+        public async Task<ActionResult> dislikeCommentVideo([FromRoute] int comment, [FromRoute] string user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCVDTO like = await _likesService.Get(comment, user);
+            if (like == null)
+            {
+                LikesDislikesCVDTO likeDto = new() { commentId = comment, userId = user };
+                await _likesService.Add(likeDto);
+                CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.DislikeCount += 1;
+
+                CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+            }
+            return Ok();
         }
 
         [HttpPost("add")]

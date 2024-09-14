@@ -19,5 +19,6 @@ namespace WebApiVRoom.DAL.Entities
         public AnswerVideo? AnswerVideo { get; set; }
         public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
+        public List<LikesDislikesCV> users { get; set; } = new List<LikesDislikesCV>();
     }
 }
