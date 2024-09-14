@@ -46,15 +46,15 @@ namespace WebApiVRoom.Controllers
 
             return Ok(c);
         }
-        [HttpPut("like/{comment}/{user}")]
-        public async Task<ActionResult> likeCommentVideo([FromRoute] int comment, [FromRoute] string user)
+        [HttpPut("like/{comment}/{user}/{i}")]
+        public async Task<ActionResult> likeCommentVideo([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             LikesDislikesCVDTO like = await _likesService.Get(comment, user);
-            if (like == null)
+            if (like == null && user!=i )
             {
                 LikesDislikesCVDTO likeDto = new() { commentId=comment, userId=user };
                 await _likesService.Add(likeDto);
@@ -71,15 +71,15 @@ namespace WebApiVRoom.Controllers
 
             return Ok();
         }
-        [HttpPut("dislike/{comment}/{user}")]
-        public async Task<ActionResult> dislikeCommentVideo([FromRoute] int comment, [FromRoute] string user)
+        [HttpPut("dislike/{comment}/{user}/{i}")]
+        public async Task<ActionResult> dislikeCommentVideo([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             LikesDislikesCVDTO like = await _likesService.Get(comment, user);
-            if (like == null)
+            if (like == null && user != i)
             {
                 LikesDislikesCVDTO likeDto = new() { commentId = comment, userId = user };
                 await _likesService.Add(likeDto);
