@@ -25,7 +25,7 @@ namespace WebApiVRoom.BLL.DTO
         public List<int> TagIds { get; set; } = new List<int>();
         public List<int> HistoryOfBrowsingIds { get; set; } = new List<int>();
         public List<int> CommentVideoIds { get; set; } = new List<int>();
-
+        public List<int> PlayLists { get; set; } = new List<int>();
         public string LastViewedPosition { get; set; }
     }
 }

@@ -20,6 +20,14 @@ namespace WebApiVRoom.DAL.Entities
         public List<Video> Videos { get; set; } = new List<Video>();
         public List<Post> Posts { get; set; } = new List<Post>();
         public List<Subscription> Subscriptions { get; set; } = new List<Subscription>();
+        public int SubscriptionCount { get; set; } = 0;
+        public List<PlayList> PlayLists { get; set; } = new List<PlayList>();
+        public List<HistoryOfBrowsing> HistoryOfBrowsing { get; set; } = new List<HistoryOfBrowsing>();
+        public List<CommentPost> CommentPosts { get; set; } = new List<CommentPost>();
+        public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+        public List<AnswerPost> AnswerPosts { get; set; } = new List<AnswerPost>();
+        public List<AnswerVideo> AnswerVideos { get; set; } = new List<AnswerVideo>();
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
 
     }
 }

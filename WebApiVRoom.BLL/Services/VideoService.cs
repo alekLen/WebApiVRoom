@@ -46,6 +46,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.CategoryIds, opt => opt.MapFrom(src => src.Categories.Select(s => s.Id).ToList()))
                     .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src => src.Tags.Select(p => p.Id).ToList()))
                     .ForMember(dest => dest.HistoryOfBrowsingIds, opt => opt.MapFrom(src => src.HistoryOfBrowsings.Select(h => h.Id).ToList()))
+                    .ForMember(dest => dest.PlayLists, opt => opt.MapFrom(src => src.PlayListVideos.Select(h => h.PlayListId).ToList()))
                     .ForMember(dest => dest.CommentVideoIds, opt => opt.MapFrom(src => src.CommentVideos.Select(c => c.Id).ToList()));
 
                 cfg.CreateMap<VideoDTO, Video>()
@@ -63,7 +64,8 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) // Обработка вручную;
                   .ForMember(dest => dest.Categories, opt => opt.Ignore()) // Обработка вручную
                   .ForMember(dest => dest.Tags, opt => opt.Ignore()) // Обработка вручную
-                  .ForMember(dest => dest.HistoryOfBrowsings, opt => opt.Ignore()) // Обработка вручную
+                  .ForMember(dest => dest.HistoryOfBrowsings, opt => opt.Ignore())
+                  .ForMember(dest => dest.PlayListVideos, opt => opt.Ignore()) // Обработка вручную
                   .ForMember(dest => dest.CommentVideos, opt => opt.Ignore()); // Обработка вручную;
             });
             _mapper = new Mapper(config);

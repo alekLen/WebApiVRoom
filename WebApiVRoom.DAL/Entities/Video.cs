@@ -24,8 +24,8 @@ namespace WebApiVRoom.DAL.Entities
         public List<Category> Categories { get; set; }=new List<Category>();
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();
-       // public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
         public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
+        public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>();
         public TimeSpan LastViewedPosition { get; set; }
     }
 }

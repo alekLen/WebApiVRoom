@@ -27,8 +27,8 @@ namespace WebApiVRoom.BLL.Services
                        .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                         .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
-                       .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.Videos.Select
-                       (ch => new CommentPost { Id = ch.Id })));
+                       .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select
+                       (ch => new CommentPost { Id = ch.VideoId })));
 
             });
             return new Mapper(config);
@@ -76,7 +76,7 @@ namespace WebApiVRoom.BLL.Services
                 playlist.Title = pl.Title;
                 playlist.Date = pl.Date;   
                 playlist.Access = pl.Access;
-                playlist.Videos = await Database.Videos.GetByIds(pl.VideosId);
+            
 
                 await Database.PlayLists.Add(playlist);
 
@@ -104,7 +104,7 @@ namespace WebApiVRoom.BLL.Services
                     playlist.Title = pl.Title;
                     playlist.Date = pl.Date;
                     playlist.Access = pl.Access;
-                    playlist.Videos = await Database.Videos.GetByIds(pl.VideosId);
+                
 
                     await Database.PlayLists.Update(playlist);
 

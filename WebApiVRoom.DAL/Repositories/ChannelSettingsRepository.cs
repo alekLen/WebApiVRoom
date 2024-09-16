@@ -76,7 +76,7 @@ namespace WebApiVRoom.DAL.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task<ChannelSettings> FindByOwner(int ownerId)
+        public async Task<ChannelSettings> FindByOwner(string ownerId)
         {
             return await db.ChannelSettings
                 .Include(cp => cp.Owner)
@@ -85,7 +85,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Videos)
                 .Include(cp => cp.Posts)
                 .Include(cp => cp.Subscriptions)
-                .FirstOrDefaultAsync(cs => cs.Owner.Id == ownerId);
+                .FirstOrDefaultAsync(cs => cs.Owner.Clerk_Id == ownerId);
                
         }
        

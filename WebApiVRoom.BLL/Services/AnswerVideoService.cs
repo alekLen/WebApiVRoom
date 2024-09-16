@@ -28,6 +28,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.CommentVideo_Id, opt => opt.MapFrom(src => src.CommentVideo_Id))
                      .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
+                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.User.ChannelBanner))
                     .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
                     .ForMember(dest => dest.AnswerDate, opt => opt.MapFrom(src => src.AnswerDate))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
@@ -60,7 +61,7 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                User user = await Database.Users.GetById(a.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(a.UserId);
                 if (user == null) { return null; }
                 CommentVideo comment = await Database.CommentVideos.GetById(a.CommentVideo_Id);
                 if (comment == null) { return null; }
@@ -86,7 +87,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 AnswerVideo answer = await Database.AnswerVideos.GetById(a.Id);
                 if (answer == null) { return null; }
-                User user = await Database.Users.GetById(a.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(a.UserId);
                 if (user == null) { return null; }
                 answer.AnswerDate = a.AnswerDate;
                 answer.Text = a.Text;

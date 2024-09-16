@@ -22,7 +22,7 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<CommentVideo, CommentVideoDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Clerk_Id))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.clerkId))
                     .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.User.ChannelBanner))
@@ -32,8 +32,9 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                     .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
-                     .ForMember(dest => dest.users, opt => opt.MapFrom(src => src.users.Select(s => s.Id).ToList()))
-                    .ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
+                     .ForMember(dest => dest.users, opt => opt.MapFrom(src => src.users.Select(s => s.Id).ToList()));
+                      //.ForMember(dest => dest.AnswerVideoIds, opt => opt.Ignore());
+                //.ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
 
                 cfg.CreateMap<CommentVideoDTO, CommentVideo>()
                    .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
@@ -42,11 +43,12 @@ namespace WebApiVRoom.BLL.Services
                    .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                    .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
+                   .ForMember(dest => dest.clerkId, opt => opt.MapFrom(src => src.UserId))
                    .ForMember(dest => dest.User, opt => opt.Ignore()) // Обработка вручную
                     .ForMember(dest => dest.users, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.UserId, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.Video, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.AnswerVideo, opt => opt.Ignore());// Обработка вручную
+                   /* .ForMember(dest => dest.clerkId, opt => opt.Ignore())*/ // Обработка вручную
+                   .ForMember(dest => dest.Video, opt => opt.Ignore()); // Обработка вручную
+                /*   .ForMember(dest => dest.AnswerVideos, opt => opt.Ignore());*/// Обработка вручную
 
             });
             Mapper = new Mapper(config);
@@ -87,15 +89,15 @@ namespace WebApiVRoom.BLL.Services
 
         public async Task<CommentVideoDTO> AddCommentVideo(CommentVideoDTO commentVideoDTO)
         {
-            var commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
-            User user = await Database.Users.GetByClerk_Id(commentVideoDTO.UserId);
+            CommentVideo commentVideo = Mapper.Map<CommentVideoDTO, CommentVideo>(commentVideoDTO);
+           ChannelSettings user = await Database.ChannelSettings.FindByOwner(commentVideoDTO.UserId);
             commentVideo.User = user;
-            commentVideo.UserId = user.Id;           
+            commentVideo.clerkId = commentVideoDTO.UserId;           
             commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
-            if ( commentVideoDTO.AnswerVideoId != null )
-            {
-                commentVideo.AnswerVideo = await Database.AnswerVideos.GetById(commentVideoDTO.AnswerVideoId.Value);
-            }
+            //if ( commentVideoDTO.AnswerVideoIds != null && commentVideoDTO.AnswerVideoIds.Count > 0)
+            //{
+            //    commentVideo.AnswerVideos = await Database.AnswerVideos.GetByIds(commentVideoDTO.AnswerVideoIds);
+            //}
 
             await Database.CommentVideos.Add(commentVideo);
             CommentVideoDTO com= Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
@@ -109,7 +111,13 @@ namespace WebApiVRoom.BLL.Services
             if (commentVideo == null)
                 throw new ValidationException("Comment not found!", "");
 
-            Mapper.Map(commentVideoDTO, commentVideo);  
+            Mapper.Map(commentVideoDTO, commentVideo);
+
+            ChannelSettings user = await Database.ChannelSettings.FindByOwner(commentVideoDTO.UserId);
+            commentVideo.User = user;
+            commentVideo.clerkId = commentVideoDTO.UserId;
+            commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
+
             await Database.CommentVideos.Update(commentVideo);
             return Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
 

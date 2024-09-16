@@ -18,7 +18,7 @@ namespace WebApiVRoom.BLL.DTO
         public DateTime Date { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-        public int? AnswerVideoId { get; set; }
+        //public List<int>? AnswerVideoIds { get; set; } =new List<int>();
         public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
         public List<string>? users { get; set; }=new List<string>();

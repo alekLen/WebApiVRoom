@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace WebApiVRoom.DAL.Entities
 {
-    public class HistoryOfBrowsing
+    public class PlayListVideo
     {
-        public int Id { get; set; }
-        public User User { get; set; }
+        public int PlayListId { get; set; }
+        public PlayList PlayList { get; set; }
+
+        public int VideoId { get; set; }
         public Video Video { get; set; }
-        public DateTime Date {  get; set; }
-        public int TimeCode { get; set; }
     }
 }

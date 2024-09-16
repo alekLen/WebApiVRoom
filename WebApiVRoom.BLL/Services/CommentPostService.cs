@@ -25,17 +25,18 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<CommentPost, CommentPostDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.clerkId))
                     .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Post.Id))
                      .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
+                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.User.ChannelBanner))
                     .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
-                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
-                    .ForMember(dest => dest.AnswerPostId, opt => opt.MapFrom(src => src.AnswerPost != null ? src.AnswerPost.Id : (int?)null));
+                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited));
+                    //.ForMember(dest => dest.AnswerPostIds, opt => opt.Ignore());
 
                 cfg.CreateMap<CommentPostDTO, CommentPost>()
                    .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
@@ -45,9 +46,10 @@ namespace WebApiVRoom.BLL.Services
                    .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                    .ForMember(dest => dest.User, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.UserId, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.Post, opt => opt.Ignore()) // Обработка вручную
-                   .ForMember(dest => dest.AnswerPost, opt => opt.Ignore());// Обработка вручную
+                   .ForMember(dest => dest.users, opt => opt.Ignore())
+                   /*  .ForMember(dest => dest.ClerkId, opt => opt.Ignore())*/ // Обработка вручную
+                   .ForMember(dest => dest.Post, opt => opt.Ignore()); // Обработка вручную
+                   //.ForMember(dest => dest.AnswerPosts, opt => opt.Ignore());// Обработка вручную
 
 
             });
@@ -60,15 +62,15 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 var commentPost = _mapper.Map<CommentPostDTO, CommentPost>(commentPostDTO);
-                User user = await Database.Users.GetById(commentPostDTO.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(commentPostDTO.UserId);
                 commentPost.User = user;
-                commentPost.UserId=user.Id;
+                commentPost.clerkId= commentPostDTO.UserId;
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
 
-                if (commentPostDTO.AnswerPostId.HasValue)
-                {
-                    commentPost.AnswerPost = await Database.AnswerPosts.GetById(commentPostDTO.AnswerPostId.Value);
-                }
+                //if (commentPostDTO.AnswerPostIds != null)
+                //{
+                //    commentPost.AnswerPosts = await Database.AnswerPosts.GetByIds(commentPostDTO.AnswerPostIds);
+                //}
 
                 commentPost.Date = DateTime.UtcNow;
 
@@ -148,15 +150,16 @@ namespace WebApiVRoom.BLL.Services
                 commentPost = _mapper.Map(commentPostDTO, commentPost);
 
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
-                if (commentPost.UserId != null)
-                    commentPost.User = await Database.Users.GetById((int)commentPostDTO.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(commentPostDTO.UserId);
+                commentPost.User = user;
+                commentPost.clerkId = commentPostDTO.UserId;
 
-                if (commentPostDTO.AnswerPostId.HasValue)
-                {
-                    commentPost.AnswerPost = await Database.AnswerPosts.GetById(commentPostDTO.AnswerPostId.Value);
-                }
+                //if (commentPostDTO.AnswerPostIds != null)
+                //{
+                //    commentPost.AnswerPosts = await Database.AnswerPosts.GetByIds(commentPostDTO.AnswerPostIds);
+                //}
 
-                commentPost.Date = DateTime.UtcNow;
+              //  commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Update(commentPost);
 
