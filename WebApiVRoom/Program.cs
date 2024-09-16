@@ -5,6 +5,7 @@ using WebApiVRoom.BLL.Infrastructure;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Azure;
+using Algolia.Search.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
+string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -23,8 +26,8 @@ builder.Services.AddTransient<ILanguageService, LanguageService>();
 builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
 builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
 builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
-//builder.Services.AddTransient<ICommentPostService, CommentPostService>();
-//builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
+builder.Services.AddTransient<ICommentPostService, CommentPostService>();
+builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
 builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddTransient<IPlayListService, PlayListService>();
@@ -32,8 +35,9 @@ builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddTransient<ITagService, TagService>();
 builder.Services.AddTransient<IVideoService, VideoService>();
-//builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
-//    new BlobStorageService(builder.Configuration.GetConnectionString("BlobStorage:ConnectionString")));
+builder.Services.AddScoped<IAlgoliaService, AlgoliaService>();
+builder.Services.AddSingleton<ISearchClient>(sp =>
+    new SearchClient(AlgoliaAppId, AlgoliaKey));
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
