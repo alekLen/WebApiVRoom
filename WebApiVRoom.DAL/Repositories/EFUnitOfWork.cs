@@ -32,7 +32,12 @@ namespace WebApiVRoom.DAL.Repositories
         private SubscriptionRepository subscriptionRepository;
         private TagRepository tagRepository;
         private VideoRepository videoRepository;
-        private LikesDislikesCVRepository likesDislikesRepository;
+        private LikesDislikesCVRepository likesDislikesRepositoryCV;
+        private LikesDislikesCPRepository likesDislikesRepositoryCP;
+        private LikesDislikesAVRepository likesDislikesRepositoryAV;
+        private LikesDislikesAPRepository likesDislikesRepositoryAP;
+        private LikesDislikesVRepository likesDislikesRepositoryV;
+        private LikesDislikesPRepository likesDislikesRepositoryP;
 
         public EFUnitOfWork(VRoomContext context)
         {
@@ -44,9 +49,54 @@ namespace WebApiVRoom.DAL.Repositories
         {
             get
             {
-                if (likesDislikesRepository == null)
-                    likesDislikesRepository = new LikesDislikesCVRepository(db);
-                return likesDislikesRepository;
+                if (likesDislikesRepositoryCV == null)
+                    likesDislikesRepositoryCV = new LikesDislikesCVRepository(db);
+                return likesDislikesRepositoryCV;
+            }
+        }
+        public ILikesDislikesAVRepository LikesAV
+        {
+            get
+            {
+                if (likesDislikesRepositoryAV == null)
+                    likesDislikesRepositoryAV = new LikesDislikesAVRepository(db);
+                return likesDislikesRepositoryAV;
+            }
+        }
+        public ILikesDislikesCPRepository LikesCP
+        {
+            get
+            {
+                if (likesDislikesRepositoryCP == null)
+                    likesDislikesRepositoryCP = new LikesDislikesCPRepository(db);
+                return likesDislikesRepositoryCP;
+            }
+        }
+        public ILikesDislikesAPRepository LikesAP
+        {
+            get
+            {
+                if (likesDislikesRepositoryAP == null)
+                    likesDislikesRepositoryAP = new LikesDislikesAPRepository(db);
+                return likesDislikesRepositoryAP;
+            }
+        }
+        public ILikesDislikesVRepository LikesV
+        {
+            get
+            {
+                if (likesDislikesRepositoryV == null)
+                    likesDislikesRepositoryV = new LikesDislikesVRepository(db);
+                return likesDislikesRepositoryV;
+            }
+        }
+        public ILikesDislikesPRepository LikesP
+        {
+            get
+            {
+                if (likesDislikesRepositoryP == null)
+                    likesDislikesRepositoryP = new LikesDislikesPRepository(db);
+                return likesDislikesRepositoryP;
             }
         }
         public IUserRepository Users

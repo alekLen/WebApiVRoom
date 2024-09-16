@@ -36,6 +36,12 @@ builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<IAlgoliaService,AlgoliaService>();
 builder.Services.AddScoped<ILikesDislikesCVService, LikesDislikesCVService>();
+builder.Services.AddScoped<ILikesDislikesVService, LikesDislikesVService>();
+builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
+builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
+builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
+builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

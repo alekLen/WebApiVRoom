@@ -39,6 +39,11 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Post> Posts { get; set; }
         public DbSet<Video> Videos { get; set; }
         public DbSet<LikesDislikesCV> LikesCV { get; set; }
+        public DbSet<LikesDislikesCP> LikesCP { get; set; }
+        public DbSet<LikesDislikesAV> LikesAV { get; set; }
+        public DbSet<LikesDislikesAP> LikesAP { get; set; }
+        public DbSet<LikesDislikesV> LikesV { get; set; }
+        public DbSet<LikesDislikesP> LikesP { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

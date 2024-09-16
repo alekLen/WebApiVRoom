@@ -48,7 +48,7 @@ namespace WebApiVRoom.DAL.Repositories
             var u = await db.LikesCV.FindAsync(t.Id);
             if (u != null)
             {
-                db.LikesCV.Update(u);
+                db.LikesCV.Update(t);
                 await db.SaveChangesAsync();
             }
         }
