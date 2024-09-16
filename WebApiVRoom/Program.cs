@@ -15,10 +15,27 @@ builder.Services.AddSingleton(x => {
     string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
     return new BlobServiceClient(connectionString);
 });
-string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-builder.Services.AddSingleton<ISearchClient>(sp =>
-    new SearchClient(AlgoliaAppId, AlgoliaKey));
+//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//builder.Services.AddSingleton<ISearchClient>(sp =>
+//    new SearchClient(AlgoliaAppId, AlgoliaKey));
+
+string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
+string? containerName = builder.Configuration["BlobStorage:ContainerName"];
+if (string.IsNullOrEmpty(blobStorageConnectionString))
+{
+    throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
+}
+
+builder.Services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
+
+// ?????????? IBlobStorageService 
+builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
+{
+    var blobServiceClient = provider.GetRequiredService<BlobServiceClient>();
+    return new BlobStorageService(blobServiceClient, containerName);
+});
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -47,6 +64,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!, preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!, preferMsi: true);
+});
+
 
 var app = builder.Build();
 
