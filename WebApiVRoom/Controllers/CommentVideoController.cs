@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
+using System.Text;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 
@@ -43,7 +45,20 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
-
+            var message = new
+            {
+                type = "new_comment"
+            };
+            var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
+            // Отправляем сообщение всем активным WebSocket-клиентам
+            foreach (var socket in WebSocketConnectionManager.GetAllSockets())
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(messageJson);
+                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+            }
             return Ok(c);
         }
         [HttpPut("like/{comment}/{user}/{i}")]
@@ -66,7 +81,22 @@ namespace WebApiVRoom.Controllers
             ans.LikeCount += 1;
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
-           
+                var message = new
+                {
+                    type = "new_comment"
+                };
+                var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
+                // Отправляем сообщение всем активным WebSocket-клиентам
+                foreach (var socket in WebSocketConnectionManager.GetAllSockets())
+                {
+                    if (socket.State == WebSocketState.Open)
+                    {
+                        var buffer = Encoding.UTF8.GetBytes(messageJson);
+                        await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                }
+
+                return Ok();
             }
 
             return Ok();
@@ -91,6 +121,25 @@ namespace WebApiVRoom.Controllers
                 ans.DislikeCount += 1;
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+
+                var message = new
+                {
+                    type = "new_comment"
+                };
+
+                var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
+
+                // Отправляем сообщение всем активным WebSocket-клиентам
+                foreach (var socket in WebSocketConnectionManager.GetAllSockets())
+                {
+                    if (socket.State == WebSocketState.Open)
+                    {
+                        var buffer = Encoding.UTF8.GetBytes(messageJson);
+                        await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                    }
+                }
+
+                return Ok();
             }
             return Ok();
         }
@@ -104,6 +153,24 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentVideoDTO ans = await _comService.AddCommentVideo(request);
+
+            var message = new
+            {
+                type = "new_comment",
+                comment = ans
+            };
+
+            var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
+
+            // Отправляем сообщение всем активным WebSocket-клиентам
+            foreach (var socket in WebSocketConnectionManager.GetAllSockets())
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(messageJson);
+                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+            }
 
             return Ok(ans);
         }
