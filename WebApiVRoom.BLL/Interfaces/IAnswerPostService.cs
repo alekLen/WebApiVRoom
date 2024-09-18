@@ -14,7 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<AnswerPostDTO> Add(AnswerPostDTO t);
         Task<AnswerPostDTO> Update(AnswerPostDTO t);
         Task<AnswerPostDTO> Delete(int id);
-        Task<AnswerPostDTO> GetByComment(int comId);
+        Task<IEnumerable<AnswerPostDTO>> GetByComment(int comId);
         Task<AnswerPostDTO> GetByUser(int userId);
     }
 }

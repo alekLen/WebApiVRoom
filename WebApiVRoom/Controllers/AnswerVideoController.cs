@@ -102,7 +102,8 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<AnswerVideoDTO>> ByCommentId(int com_id)
         {
 
-            AnswerVideoDTO answer = await _answerService.GetByComment(com_id);
+            var answer1 = await _answerService.GetByComment(com_id);
+            List<AnswerVideoDTO> answer =answer1.ToList();
             if (answer == null)
             {
                 return NotFound();

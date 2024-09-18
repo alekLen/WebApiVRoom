@@ -24,11 +24,11 @@ namespace WebApiVRoom.DAL.Repositories
                    .Include(ap=>ap.User)
                    .FirstOrDefaultAsync(User => User.Id == id);
         }
-        public async Task<AnswerPost> GetByComment(int comId)
+        public async Task<List<AnswerPost> >GetByComment(int comId)
         {
             return await db.AnswerPosts
                    .Include(ap => ap.User)
-                  .FirstOrDefaultAsync(m => m.CommentPost_Id == comId);
+                  .Where(m => m.CommentPost_Id == comId).ToListAsync();
         }
         public async Task<AnswerPost> GetByUser(int userId)
         {
