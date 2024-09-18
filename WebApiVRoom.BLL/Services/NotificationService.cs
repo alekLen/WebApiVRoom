@@ -131,6 +131,26 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
+        public async Task<List<NotificationDTO>> GetByUserPaginated(int pageNumber, int pageSize, string userId)
+        {
+            try
+            {
+                User user = await Database.Users.GetByClerk_Id( userId);
+                if (user != null)
+                {
+                    var hb = await Database.Notifications.GetByUserPaginated(pageNumber, pageSize, user);
+                    if (hb == null)
+                        return null;
+
+                    var mapper = InitializeMapper();
+                    var not = mapper.Map<IEnumerable<Notification>, IEnumerable<NotificationDTO>>(hb);
+
+                    return not.ToList();
+                }
+                return null;
+            }
+            catch (Exception ex) { throw ex; }
+        }
         public async Task<List<NotificationDTO>> GetByDate(DateTime date)
         {
             try

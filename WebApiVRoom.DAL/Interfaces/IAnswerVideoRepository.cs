@@ -9,7 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface IAnswerVideoRepository: ISetGetRepository<AnswerVideo>
     {
-        Task<AnswerVideo> GetByComment(int comId);
+        Task<IEnumerable<AnswerVideo>> GetByComment(int comId);
         Task<AnswerVideo> GetByUser(int userId);
         Task<AnswerVideo> GetByDate(DateTime date);
         Task<List<AnswerVideo>> GetByIds(List<int> ids);

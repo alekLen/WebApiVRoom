@@ -13,7 +13,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<AnswerVideoDTO> Add(AnswerVideoDTO t);
         Task<AnswerVideoDTO> Update(AnswerVideoDTO t);
         Task<AnswerVideoDTO> Delete(int id);
-        Task<AnswerVideoDTO> GetByComment(int comId);
+        Task<IEnumerable<AnswerVideoDTO>> GetByComment(int comId);
         Task<AnswerVideoDTO> GetByUser(int userId);
     }
 }

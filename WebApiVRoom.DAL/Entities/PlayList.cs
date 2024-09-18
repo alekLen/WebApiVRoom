@@ -13,6 +13,6 @@ namespace WebApiVRoom.DAL.Entities
         public string Title { get; set; }
         public bool Access {  get; set; }
         public DateTime Date {  get; set; }
-        public List<Video> Videos { get; set; } = new List<Video>() ;
+        public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>() ;
     }
 }

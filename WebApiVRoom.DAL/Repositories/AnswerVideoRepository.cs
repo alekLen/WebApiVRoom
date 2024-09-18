@@ -24,11 +24,11 @@ namespace WebApiVRoom.DAL.Repositories
                    .Include(ap => ap.User)
                    .FirstOrDefaultAsync(User => User.Id == id);
         }
-        public async Task<AnswerVideo> GetByComment(int comId)
+        public async Task<IEnumerable<AnswerVideo>> GetByComment(int comId)
         {
             return await db.AnswerVideos
                    .Include(ap => ap.User)
-                  .FirstOrDefaultAsync(m => m.CommentVideo_Id == comId);
+                  .Where(m => m.CommentVideo_Id == comId).ToListAsync();
         }
         public async Task<AnswerVideo> GetByUser(int userId)
         {
@@ -82,8 +82,11 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<List<AnswerVideo>> GetByIds(List<int> ids)
         {
             return await db.AnswerVideos
+                 .Include(ap => ap.User)
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }
+
+       
     }
 }

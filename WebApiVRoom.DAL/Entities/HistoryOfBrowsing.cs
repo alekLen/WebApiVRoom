@@ -10,7 +10,6 @@ namespace WebApiVRoom.DAL.Entities
     {
         public int Id { get; set; }
         public User User { get; set; }
-        public int? VideoId { get; set; } = null;
         public Video Video { get; set; }
         public DateTime Date {  get; set; }
         public int TimeCode { get; set; }

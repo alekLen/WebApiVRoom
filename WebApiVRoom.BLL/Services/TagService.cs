@@ -94,7 +94,7 @@ namespace WebApiVRoom.BLL.Services
             var a = await Database.Tags.GetById(id);
 
             if (a == null)
-                throw new ValidationException("Wrong country!", "");
+                throw new ValidationException("Wrong tag!", "");
 
             TagDTO tag = new TagDTO();
             tag.Id = a.Id;
@@ -115,7 +115,7 @@ namespace WebApiVRoom.BLL.Services
             var a = await Database.Tags.GetByName(name);
 
             if (a == null)
-                throw new ValidationException("Wrong country!", "");
+                throw new ValidationException("Wrong tag!", "");
 
             TagDTO tag = new TagDTO();
             tag.Id = a.Id;
@@ -131,7 +131,7 @@ namespace WebApiVRoom.BLL.Services
             return tag;
         }
 
-        public async Task UpdateTag(TagDTO tagDTO)
+        public async Task<TagDTO> UpdateTag(TagDTO tagDTO)
         {
             Tag tag = await Database.Tags.GetById(tagDTO.Id);
 
@@ -147,10 +147,11 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await Database.Tags.Update(tag);
-                
+                return tagDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
+using System.Text;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 
@@ -9,10 +11,12 @@ namespace WebApiVRoom.Controllers
     public class CommentVideoController : Controller
     {
         private ICommentVideoService _comService;
+        private ILikesDislikesCVService _likesService;
 
-        public CommentVideoController(ICommentVideoService cService)
+        public CommentVideoController(ICommentVideoService cService, ILikesDislikesCVService likesService)
         {
             _comService = cService;
+            _likesService = likesService;
         }
 
 
@@ -42,7 +46,64 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
 
+            await SendMessage();
+
             return Ok(c);
+        }
+        [HttpPut("like/{comment}/{user}/{i}")]
+        public async Task<ActionResult> likeCommentVideo([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCVDTO like = await _likesService.Get(comment, user);
+            if (like == null && user!=i )
+            {
+                LikesDislikesCVDTO likeDto = new() { commentId=comment, userId=user };
+                await _likesService.Add(likeDto);
+            CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+            ans.LikeCount += 1;
+
+            CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+
+                await SendMessage();
+
+                return Ok();
+            }
+
+            return Ok();
+        }
+        [HttpPut("dislike/{comment}/{user}/{i}")]
+        public async Task<ActionResult> dislikeCommentVideo([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCVDTO like = await _likesService.Get(comment, user);
+            if (like == null && user != i)
+            {
+                LikesDislikesCVDTO likeDto = new() { commentId = comment, userId = user };
+                await _likesService.Add(likeDto);
+                CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.DislikeCount += 1;
+
+                CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+
+                await SendMessage();
+
+                return Ok();
+            }
+            return Ok();
         }
 
         [HttpPost("add")]
@@ -54,6 +115,8 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentVideoDTO ans = await _comService.AddCommentVideo(request);
+
+            await SendMessage();
 
             return Ok(ans);
         }
@@ -73,6 +136,8 @@ namespace WebApiVRoom.Controllers
             }
 
             await _comService.DeleteCommentVideo(id);
+
+            await SendMessage();
 
             return Ok(ans);
         }
@@ -109,6 +174,26 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(list);
+        }
+
+        private async Task SendMessage()
+        {
+            var message = new
+            {
+                type = "new_comment"
+            };
+
+            var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
+
+            // Отправляем сообщение всем активным WebSocket-клиентам
+            foreach (var socket in WebSocketConnectionManager.GetAllSockets())
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(messageJson);
+                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+            }
         }
     }
 }

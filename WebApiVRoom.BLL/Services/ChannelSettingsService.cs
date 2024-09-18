@@ -121,8 +121,8 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                User owner=await Database.Users.GetByClerk_Id(clerk_id);
-                var channelSettings = await Database.ChannelSettings.FindByOwner(owner.Id);
+                //User owner=await Database.Users.GetByClerk_Id(clerk_id);
+                var channelSettings = await Database.ChannelSettings.FindByOwner(clerk_id);
 
                 if (channelSettings == null)
                 {
@@ -139,9 +139,9 @@ namespace WebApiVRoom.BLL.Services
         }
         public async Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId,string lang)
         {
-            User user = await Database.Users.GetByClerk_Id(clerkId);
-            if (user == null) { return null; }
-            var channelSettings = await Database.ChannelSettings.FindByOwner(user.Id);
+            //User user = await Database.Users.GetByClerk_Id(clerkId);
+            //if (user == null) { return null; }
+            var channelSettings = await Database.ChannelSettings.FindByOwner(clerkId);
             if (channelSettings == null)
             {
                 return null;

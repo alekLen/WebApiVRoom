@@ -29,7 +29,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await _context.PlayLists
                  .Include(m => m.User)
-                .Include(m => m.Videos)
+                .Include(m => m.PlayListVideos)
                 .FirstOrDefaultAsync(m => m.Id==id);
         }
  
@@ -37,7 +37,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await _context.PlayLists
                 .Include(m => m.User)
-                .Include(m => m.Videos)
+                .Include(m => m.PlayListVideos)
                 .ToListAsync();
         }
 
@@ -63,7 +63,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await _context.PlayLists
                   .Include(m => m.User)
-                  .Include(m => m.Videos)
+                  .Include(m => m.PlayListVideos)
                   .Where(m => m.User.Id == userId)
                   .ToListAsync();
         }
@@ -72,7 +72,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await _context.PlayLists
                   .Include(m => m.User)
-                  .Include(m => m.Videos)
+                  .Include(m => m.PlayListVideos)
                   .Where(m => m.User.Id == userId)
                   .Skip((pageNumber - 1) * pageSize)
                   .Take(pageSize)

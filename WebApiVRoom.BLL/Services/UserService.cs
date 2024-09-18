@@ -31,15 +31,17 @@ namespace WebApiVRoom.BLL.Services
                 cfg.CreateMap<User, UserDTO>()
                     .ForMember(dest => dest.Clerk_Id, opt => opt.MapFrom(src => src.Clerk_Id))
                     .ForMember(dest => dest.ChannelSettings_Id, opt => opt.MapFrom(src => src.ChannelSettings_Id))
-                    .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium))
-                    .ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount))
-                    .ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()))
-                    .ForMember(dest => dest.PlayLists, opt => opt.MapFrom(src => src.PlayLists.Select(p => p.Id).ToList()))
-                    .ForMember(dest => dest.HistoryOfBrowsing, opt => opt.MapFrom(src => src.HistoryOfBrowsing.Select(h => h.Id).ToList()))
-                    .ForMember(dest => dest.CommentPosts, opt => opt.MapFrom(src => src.CommentPosts.Select(c => c.Id).ToList()))
-                    .ForMember(dest => dest.CommentVideos, opt => opt.MapFrom(src => src.CommentVideos.Select(c => c.Id).ToList()))
-                    .ForMember(dest => dest.AnswerPosts, opt => opt.MapFrom(src => src.AnswerPosts.Select(a => a.Id).ToList()))
-                    .ForMember(dest => dest.AnswerVideos, opt => opt.MapFrom(src => src.AnswerVideos.Select(a => a.Id).ToList()));
+                    //.ForMember(dest => dest.ChannelName, opt => opt.MapFrom(src => src.ChannelName))
+                    // .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
+                    .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium));
+                    //.ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount))
+                    //.ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()))
+                    //.ForMember(dest => dest.PlayLists, opt => opt.MapFrom(src => src.PlayLists.Select(p => p.Id).ToList()))
+                    //.ForMember(dest => dest.HistoryOfBrowsing, opt => opt.MapFrom(src => src.HistoryOfBrowsing.Select(h => h.Id).ToList()))
+                    //.ForMember(dest => dest.CommentPosts, opt => opt.MapFrom(src => src.CommentPosts.Select(c => c.Id).ToList()))
+                    //.ForMember(dest => dest.CommentVideos, opt => opt.MapFrom(src => src.CommentVideos.Select(c => c.Id).ToList()))
+                    //.ForMember(dest => dest.AnswerPosts, opt => opt.MapFrom(src => src.AnswerPosts.Select(a => a.Id).ToList()))
+                    //.ForMember(dest => dest.AnswerVideos, opt => opt.MapFrom(src => src.AnswerVideos.Select(a => a.Id).ToList()));
             });
             return new Mapper(config);
         }
@@ -57,24 +59,25 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        public async Task<UserDTO> AddUser(string clerk_id)
+        public async Task<UserDTO> AddUser(string clerk_id,string imgurl)
         {
             User user = new()
             {
-                Clerk_Id = clerk_id
+                Clerk_Id = clerk_id,
+                //ChannelBanner = imgurl
             };
             await Database.Users.Add(user);
-
-            //Language langNew = await FindLanguage(language);
-            //  Country countryNew = await FindCountry(country, countryCode);
 
             Language langNew = new();
             Country countryNew = new();
 
-            ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
-
+            ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
+           
             user.ChannelSettings_Id = channelSettings.Id;
+            //user.ChannelName = "VRoom_Channel" + channelSettings.Id + "_created";
             await Database.Users.Update(user);
+            channelSettings.ChannelName= "VRoom_Channel" + channelSettings.Id + "_created";
+            await Database.ChannelSettings.Update(channelSettings);
 
             var mapper = InitializeMapper();
             var updatedUserDto = mapper.Map<User, UserDTO>(user);
@@ -82,36 +85,24 @@ namespace WebApiVRoom.BLL.Services
             return updatedUserDto;
         }
 
-        //public async Task<UserDTO> AddUser(AddUserRequest request)
-        //{
-        //    User user = new()
-        //    {
-        //        Clerk_Id = request.ClerkId
-        //    };
-        //    await Database.Users.Add(user);
+        public async Task<UserDTO> Delete(string clerkId)
+        {
+            User user = await Database.Users.GetByClerk_Id(clerkId);
+            await Database.Users.Delete(user.Id);
 
-        //    Language langNew = await FindLanguage(request.Language);
-        //    Country countryNew = await FindCountry(request.Country, request.CountryCode);
+            var mapper = InitializeMapper();
+            return mapper.Map<User, UserDTO>(user);
+        }
 
-        //    ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user);
-
-        //    user.ChannelSettings_Id = channelSettings.Id;
-        //    await Database.Users.Update(user);
-
-        //    var mapper = InitializeMapper();
-        //    var updatedUserDto = mapper.Map<User, UserDTO>(user);
-
-        //    return updatedUserDto;
-        //}
-
-        private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user)
+        private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user,  string imgurl)
         {
             ChannelSettings channelSettings = new()
             {
                 DateJoined = DateTime.Now,
                 Language = l,
                 Country = c,
-                Owner = user
+                Owner = user,
+               ChannelBanner = imgurl
             };
 
             await Database.ChannelSettings.Add(channelSettings);
@@ -169,15 +160,15 @@ namespace WebApiVRoom.BLL.Services
                 user.Clerk_Id = userDto.Clerk_Id;
                 user.ChannelSettings_Id = userDto.ChannelSettings_Id;
                 user.IsPremium = userDto.IsPremium;
-                user.SubscriptionCount = userDto.SubscriptionCount;
+                //user.SubscriptionCount = userDto.SubscriptionCount;
 
-                user.Subscriptions = await Database.Subscriptions.GetByIds(userDto.Subscriptions);
-                user.PlayLists = await Database.PlayLists.GetByIds(userDto.PlayLists);
-                user.HistoryOfBrowsing = await Database.HistoryOfBrowsings.GetByIds(userDto.HistoryOfBrowsing);
-                user.CommentPosts = await Database.CommentPosts.GetByIds(userDto.CommentPosts);
-                user.CommentVideos = await Database.CommentVideos.GetByIds(userDto.CommentVideos);
-                user.AnswerPosts = await Database.AnswerPosts.GetByIds(userDto.AnswerPosts);
-                user.AnswerVideos = await Database.AnswerVideos.GetByIds(userDto.AnswerVideos);
+                //user.Subscriptions = await Database.Subscriptions.GetByIds(userDto.Subscriptions);
+                //user.PlayLists = await Database.PlayLists.GetByIds(userDto.PlayLists);
+                //user.HistoryOfBrowsing = await Database.HistoryOfBrowsings.GetByIds(userDto.HistoryOfBrowsing);
+                //user.CommentPosts = await Database.CommentPosts.GetByIds(userDto.CommentPosts);
+                //user.CommentVideos = await Database.CommentVideos.GetByIds(userDto.CommentVideos);
+                //user.AnswerPosts = await Database.AnswerPosts.GetByIds(userDto.AnswerPosts);
+                //user.AnswerVideos = await Database.AnswerVideos.GetByIds(userDto.AnswerVideos);
 
                 await Database.Users.Update(user);
 

@@ -1,4 +1,6 @@
-﻿using Azure;
+﻿using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
-using WebApiVRoom.DAL.Interfaces;
+using WebApiVRoom.BLL.DTO;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -157,4 +159,5 @@ namespace WebApiVRoom.BLL.Services
             return blobs;
         }
     }
+
 }

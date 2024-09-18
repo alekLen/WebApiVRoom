@@ -91,10 +91,11 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(answer);
         }
         [HttpGet("getbycommentid/{com_id}")]
-        public async Task<ActionResult<AnswerPostDTO>> ByCommentId(int com_id)
+        public async Task<ActionResult<List<AnswerPostDTO>>> ByCommentId(int com_id)
         {
 
-            AnswerPostDTO answer = await _answerService.GetByComment(com_id);
+           var answer1 = await _answerService.GetByComment(com_id);
+            List<AnswerPostDTO> answer=answer1.ToList();
             if (answer == null)
             {
                 return NotFound();

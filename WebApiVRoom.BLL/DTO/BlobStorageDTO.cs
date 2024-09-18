@@ -17,4 +17,5 @@ namespace WebApiVRoom.BLL.DTO
         public Stream VideoStream { get; set; }
 
     }
+
 }

@@ -5,6 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.DAL.Repositories;
+using Microsoft.AspNetCore;
+using Microsoft.OpenApi.Any;
+using WebApiVRoom.DAL.Entities;
+using System.Net;
+using Svix;
+using Svix.Exceptions;
+using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApiVRoom.Controllers
 {
@@ -14,10 +22,16 @@ namespace WebApiVRoom.Controllers
     {
 
         private IUserService _userService;
+        private IVideoService _videoService;
+        private INotificationService _notificationService;
+        private IConfiguration _configuration;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,IVideoService video,INotificationService notificationService, IConfiguration configuration)
         {
             _userService = userService;
+            _notificationService = notificationService;
+            _configuration = configuration;
+            _videoService = video;
         }
         
 
@@ -44,36 +58,71 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-
             UserDTO usernew=await _userService.UpdateUser(u);
 
             return Ok(usernew);
         }
-        [HttpPost("add/{clerkId}")]
-        public async Task<ActionResult<UserDTO>> AddUser([FromRoute] string clerkId)
+
+
+        [HttpPost("add")]
+        public async Task<ActionResult<UserDTO>> AddUser()
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                string SigningSecret = _configuration["Clerk:WebhookSecret"]; //  секретный ключ
+            Request.EnableBuffering();
+
+            string requestBody;
+            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
+            {
+                requestBody = await reader.ReadToEndAsync();
+                Request.Body.Position = 0;
             }
 
-            UserDTO user = await _userService.AddUser(clerkId);
+            var headers = new WebHeaderCollection();
+            headers.Set("svix-id", Request.Headers["svix-id"]);
+            headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
+            headers.Set("svix-signature", Request.Headers["svix-signature"]);
+          
+            var wh= new Webhook(SigningSecret);
+           
+                wh.Verify(requestBody,headers);
+           
+                var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
+           
+            if (request.type == "user.created")
+            {
+                UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
+                    await AddNotification(user, "Добро пожаловать на на сайт!");
+                return Ok(user);             
+            }
+            if (request.type == "user.deleted")
+            {
+                    UserDTO user = await _userService.GetUserByClerkId(request.data.id);
 
-            return Ok(user);
+                    List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+                    foreach (VideoDTO video in videos)
+                    {
+                        await _videoService.DeleteVideo(video.Id);
+                    }
+                UserDTO user2 = await _userService.Delete(request.data.id);              
+                return Ok(user2);
+            }
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
+
+            return BadRequest(ModelState);
         }
 
-        //[HttpPost("add")]
-        //public async Task<ActionResult<UserDTO>> AddUser([FromBody] AddUserRequest request)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    UserDTO user = await _userService.AddUser(request);
-
-        //    return Ok(user);
-        //}
+        private async Task AddNotification(UserDTO user,string text)
+        {
+            NotificationDTO notification = new NotificationDTO();
+            notification.Date = DateTime.Now;
+            notification.UserId = user.Id;
+            notification.IsRead = false;
+            notification.Message = text;
+            NotificationDTO n = await _notificationService.Add(notification);
+        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<UserDTO>> DeleteUser([FromRoute] int id)
@@ -88,7 +137,11 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-
+            List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+            foreach (VideoDTO video in videos)
+            {
+                await _videoService.DeleteVideo(video.Id);
+            }
             await _userService.DeleteUser(id);
 
             return Ok(user);
@@ -105,7 +158,10 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+
+       
     }
+     
 
    
 }

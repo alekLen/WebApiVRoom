@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -27,8 +28,10 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<AnswerPost, AnswerPostDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.clerkId))
                     .ForMember(dest => dest.CommentPost_Id, opt => opt.MapFrom(src => src.CommentPost_Id))
+                     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.ChannelName))
+                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.User.ChannelBanner))
                     .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
                     .ForMember(dest => dest.AnswerDate, opt => opt.MapFrom(src => src.AnswerDate))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
@@ -61,12 +64,13 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                User user = await Database.Users.GetById(a.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(a.UserId);
                 if (user == null) { return null; }
                 CommentPost comment = await Database.CommentPosts.GetById(a.CommentPost_Id);
                 if (comment == null) { return null; }
                 AnswerPost answer = new AnswerPost();
                 answer.User = user;
+                answer.clerkId = a.UserId;
                 answer.CommentPost_Id = a.CommentPost_Id;
                 answer.Text = a.Text;
                 answer.AnswerDate = DateTime.Now;
@@ -87,7 +91,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 AnswerPost answer =await Database.AnswerPosts.GetById(a.Id);
                 if (answer == null) { return null; }
-                User user = await Database.Users.GetById(a.UserId);
+                ChannelSettings user = await Database.ChannelSettings.FindByOwner(a.UserId);
                 if (user == null) { return null; }
                 answer.AnswerDate = a.AnswerDate;
                 answer.Text=a.Text;
@@ -118,7 +122,7 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        public async Task<AnswerPostDTO> GetByComment(int comId)
+        public async Task<IEnumerable<AnswerPostDTO>> GetByComment(int comId)
         {
             try
             {
@@ -130,7 +134,7 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 var mapper = InitializeMapper();
-                return mapper.Map<AnswerPost, AnswerPostDTO>(ans);
+                return mapper.Map<IEnumerable<AnswerPost>,IEnumerable< AnswerPostDTO>>(ans);
             }
             catch (Exception ex)
             {

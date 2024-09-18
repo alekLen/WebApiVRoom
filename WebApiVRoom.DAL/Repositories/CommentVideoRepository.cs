@@ -22,7 +22,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                 .Include(cv => cv.User)
                 .Include(cv => cv.Video)
-                .Include(cv => cv.AnswerVideo)
+                //.Include(cv => cv.AnswerVideos)
+                .Include(cv => cv.users)
                 .ToListAsync();
         }
         public async Task<CommentVideo> GetById(int id)
@@ -30,7 +31,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                 .Include(cv => cv.User)
                 .Include(cv => cv.Video)
-                .Include(cv => cv.AnswerVideo)
+                //.Include(cv => cv.AnswerVideos)
+                .Include(cv=>cv.users)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
         public async Task<IEnumerable<CommentVideo>> GetByVideo(int videoId)
@@ -38,7 +40,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                   .Where(m => m.Video.Id == videoId)
                   .ToListAsync();
         }
@@ -47,7 +50,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                   .Where(m => m.Video.Id == videoId)
                   .Skip((pageNumber - 1) * pageSize)
                   .Take(pageSize)
@@ -58,7 +62,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                   .Where(m => m.User.Id == userId)
                   .ToListAsync();
         }
@@ -67,7 +72,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                   .Where(m => m.User.Id == userId)
                   .Skip((pageNumber - 1) * pageSize)
                   .Take(pageSize)
@@ -79,7 +85,8 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentVideos
                   .Include(cp => cp.User)
                   .Include(cp => cp.Video)
-                  .Include(cp => cp.AnswerVideo)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                   .Where(m => m.Date == date)
                   .ToListAsync();
         }
@@ -116,6 +123,10 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<List<CommentVideo>> GetByIds(List<int> ids)
         {
             return await db.CommentVideos
+                 .Include(cp => cp.User)
+                  .Include(cp => cp.Video)
+                  //.Include(cp => cp.AnswerVideos)
+                  .Include(cv => cv.users)
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }

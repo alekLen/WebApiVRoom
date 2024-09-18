@@ -24,6 +24,11 @@ namespace WebApiVRoom.DAL.Interfaces
         ISubscriptionRepository Subscriptions { get; }
         ITagRepository Tags { get; }
         IVideoRepository Videos { get; }
-
+        ILikesDislikesCVRepository LikesCV {  get; }
+        ILikesDislikesCPRepository LikesCP { get; }
+        ILikesDislikesAVRepository LikesAV { get; }
+        ILikesDislikesAPRepository LikesAP { get; }
+        ILikesDislikesVRepository LikesV { get; }
+        ILikesDislikesPRepository LikesP { get; }
     }
 }

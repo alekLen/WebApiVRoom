@@ -16,6 +16,6 @@ namespace WebApiVRoom.BLL.DTO
         public string? Photo { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-        public List<int> CommentPostsId { get; set; } = new List<int>();
+      //  public List<int> CommentPostsId { get; set; } = new List<int>();
     }
 }

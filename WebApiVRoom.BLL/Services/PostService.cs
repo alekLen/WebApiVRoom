@@ -26,9 +26,9 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<Post, PostDTO>()
                        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                       .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                       .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select
-                       (ch => new CommentPost { Id = ch.Id })));
+                       .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id));
+                       //.ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select
+                       //(ch => new CommentPost { Id = ch.Id })));
 
             });
             return new Mapper(config);
@@ -48,12 +48,12 @@ namespace WebApiVRoom.BLL.Services
                 post.LikeCount = postDTO.LikeCount;
                 post.DislikeCount = postDTO.DislikeCount;
 
-                List<CommentPost> list = new();
-                foreach (int id in postDTO.CommentPostsId)
-                {
-                    list.Add(await Database.CommentPosts.GetById(id));
-                }
-                post.CommentPosts = list;
+                //List<CommentPost> list = new();
+                //foreach (int id in postDTO.CommentPostsId)
+                //{
+                //    list.Add(await Database.CommentPosts.GetById(id));
+                //}
+                //post.CommentPosts = list;
 
                 await Database.Posts.Add(post);
                
@@ -106,11 +106,11 @@ namespace WebApiVRoom.BLL.Services
             var channelSettings = await Database.ChannelSettings.GetById(id);
             post.ChannelSettingsId = channelSettings.Id;
 
-            post.CommentPostsId = new List<int>();
-            foreach (CommentPost comment in a.CommentPosts)
-            {
-                post.CommentPostsId.Add(comment.Id);
-            }
+            //post.CommentPostsId = new List<int>();
+            //foreach (CommentPost comment in a.CommentPosts)
+            //{
+            //    post.CommentPostsId.Add(comment.Id);
+            //}
 
             return post;
         }
@@ -166,16 +166,16 @@ namespace WebApiVRoom.BLL.Services
             var channelSettings = await Database.ChannelSettings.GetById(a.Id);
             post.ChannelSettingsId = channelSettings.Id;
 
-            post.CommentPostsId = new List<int>();
-            foreach (CommentPost comment in a.CommentPosts)
-            {
-                post.CommentPostsId.Add(comment.Id);
-            }
+            //post.CommentPostsId = new List<int>();
+            //foreach (CommentPost comment in a.CommentPosts)
+            //{
+            //    post.CommentPostsId.Add(comment.Id);
+            //}
 
             return post;
         }
 
-        public async Task UpdatePost(PostDTO postDTO)
+        public async Task<PostDTO> UpdatePost(PostDTO postDTO)
         {
             Post post = await Database.Posts.GetById(((int)postDTO.Id));
             var channelSettings = await Database.ChannelSettings.GetById(((int)postDTO.Id));
@@ -190,20 +190,21 @@ namespace WebApiVRoom.BLL.Services
                 post.LikeCount = postDTO.LikeCount;
                 post.DislikeCount = postDTO.DislikeCount;
 
-                List<CommentPost> list = new();
+                //List<CommentPost> list = new();
 
-                foreach (int id in postDTO.CommentPostsId)
-                {
-                    list.Add(await Database.CommentPosts.GetById(id));
-                }
+                //foreach (int id in postDTO.CommentPostsId)
+                //{
+                //    list.Add(await Database.CommentPosts.GetById(id));
+                //}
 
-                post.CommentPosts = list;
+                //post.CommentPosts = list;
 
                 await Database.Posts.Update(post);
-               
+                return postDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
     }

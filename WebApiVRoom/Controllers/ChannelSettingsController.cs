@@ -40,6 +40,24 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(ch);
         }
+
+        [HttpGet("getinfochannel/{clerkId}")]
+        public async Task<ActionResult<ChannelUserFor_CommentDTO>> GetInfoChannelByClerkId([FromRoute] string clerkId)
+        {
+            var ch = await _chService.FindByOwner(clerkId);
+            if (ch == null)
+            {
+                return NotFound();
+            }
+
+            ChannelUserFor_CommentDTO user = new() { 
+                Clerk_Id=clerkId,
+                ChannelBanner = ch.ChannelBanner,
+                ChannelName = ch.ChannelName };
+
+            return new ObjectResult(user);
+        }
+
         [HttpPut("update")]
         public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings([FromBody] ChannelSettingsDTO ch)
         {

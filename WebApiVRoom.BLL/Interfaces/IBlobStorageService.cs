@@ -14,6 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<BlobStorageDTO> DownloadFileAsync(string fileName);
         Task<IEnumerable<BlobStorageDTO>> ListBlobsAsync();
         Task<BlobStorageDTO> UploadFileAsync(Stream fileStream, string fileName);
-        
+
     }
+
 }
