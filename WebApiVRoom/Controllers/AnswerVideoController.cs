@@ -3,6 +3,8 @@ using System.Net.WebSockets;
 using System.Text;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
+using WebApiVRoom.Helpers;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApiVRoom.Controllers
 {
@@ -46,7 +48,7 @@ namespace WebApiVRoom.Controllers
 
             AnswerVideoDTO answer = await _answerService.Update(u);
 
-            await SendMessage();
+            await WebSocketHelper.SendMessageToAllAsync("new_answer", null);
 
             return Ok(answer);
         }
@@ -61,7 +63,9 @@ namespace WebApiVRoom.Controllers
 
             AnswerVideoDTO ans = await _answerService.Add(request);
 
-            await SendMessage();
+            object obj = ConvertObject(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
 
             return Ok(ans);
         }
@@ -81,8 +85,9 @@ namespace WebApiVRoom.Controllers
             }
 
             await _answerService.Delete(id);
+            object obj = ConvertObject(ans);
 
-            await SendMessage();
+            await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
 
             return Ok(ans);
         }
@@ -131,8 +136,9 @@ namespace WebApiVRoom.Controllers
                 ans.LikeCount += 1;
 
                 AnswerVideoDTO c = await _answerService.Update(ans);
+                object obj = ConvertObject(c);
 
-                await SendMessage();
+                await WebSocketHelper.SendMessageToAllAsync("like_answer", obj);
 
                 return Ok();
             }
@@ -159,32 +165,31 @@ namespace WebApiVRoom.Controllers
                 ans.DislikeCount += 1;
 
                 AnswerVideoDTO c = await _answerService.Update(ans);
+                object obj = ConvertObject(c);
 
-                await SendMessage();
+                await WebSocketHelper.SendMessageToAllAsync("dislike_answer", obj);
 
                 return Ok();
             }
             return Ok();
         }
 
-        private async Task SendMessage()
+        private object ConvertObject(AnswerVideoDTO ans)
         {
-            var message = new
+            object obj = new
             {
-                type = "new_comment"
+                id = ans.Id,
+                userId = ans.UserId,
+                userName = ans.UserName,
+                channelBanner = ans.ChannelBanner,
+                commentVideo_Id = ans.CommentVideo_Id,
+                text = ans.Text,
+                answerDate = ans.AnswerDate,
+                likeCount = ans.LikeCount,
+                dislikeCount = ans.DislikeCount,
+                isEdited = ans.IsEdited,
             };
-
-            var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
-
-            // Отправляем сообщение всем активным WebSocket-клиентам
-            foreach (var socket in WebSocketConnectionManager.GetAllSockets())
-            {
-                if (socket.State == WebSocketState.Open)
-                {
-                    var buffer = Encoding.UTF8.GetBytes(messageJson);
-                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-            }
+            return obj;
         }
     }
 }

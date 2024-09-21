@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
+using WebApiVRoom.Helpers;
 
 namespace WebApiVRoom.Controllers
 {
@@ -46,7 +47,7 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
 
-            await SendMessage();
+            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
 
             return Ok(c);
         }
@@ -71,7 +72,7 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                await SendMessage();
+                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
 
                 return Ok();
             }
@@ -99,7 +100,7 @@ namespace WebApiVRoom.Controllers
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                await SendMessage();
+                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
 
                 return Ok();
             }
@@ -116,7 +117,7 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO ans = await _comService.AddCommentVideo(request);
 
-            await SendMessage();
+            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
 
             return Ok(ans);
         }
@@ -137,7 +138,7 @@ namespace WebApiVRoom.Controllers
 
             await _comService.DeleteCommentVideo(id);
 
-            await SendMessage();
+            await WebSocketHelper.SendMessageToAllAsync("new_comment",null);
 
             return Ok(ans);
         }
@@ -176,24 +177,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(list);
         }
 
-        private async Task SendMessage()
-        {
-            var message = new
-            {
-                type = "new_comment"
-            };
-
-            var messageJson = System.Text.Json.JsonSerializer.Serialize(message);
-
-            // Отправляем сообщение всем активным WebSocket-клиентам
-            foreach (var socket in WebSocketConnectionManager.GetAllSockets())
-            {
-                if (socket.State == WebSocketState.Open)
-                {
-                    var buffer = Encoding.UTF8.GetBytes(messageJson);
-                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-            }
-        }
+        
     }
 }

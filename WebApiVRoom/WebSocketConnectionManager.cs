@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using System.Text;
 
 namespace WebApiVRoom
 {
@@ -20,6 +21,8 @@ namespace WebApiVRoom
         {
             return _sockets.Values;
         }
+
+        
 
         public static async Task RemoveSocket(string id)
         {
