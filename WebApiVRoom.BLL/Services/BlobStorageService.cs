@@ -72,26 +72,53 @@ namespace WebApiVRoom.BLL.Services
 
             Uri uri = new Uri(fileUrl);
             string fileName = Path.GetFileName(uri.LocalPath);
-            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-            var blobClient = containerClient.GetBlobClient(fileName);
+            string filePrefix = Path.GetFileNameWithoutExtension(fileName); // Визначаємо префікс для пов'язаних сегментів
 
-            Console.WriteLine($"Deleting file: {fileName}");
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+
+            // Видаляємо сам файл плейлиста (.m3u8)
+            var blobClient = containerClient.GetBlobClient(fileName);
+            Console.WriteLine($"Deleting playlist file: {fileName}");
 
             try
             {
                 var response = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
                 if (!response)
                 {
-                    Console.WriteLine("File did not exist or could not be deleted.");
+                    Console.WriteLine("Playlist file did not exist or could not be deleted.");
                 }
                 else
                 {
-                    Console.WriteLine("File successfully deleted.");
+                    Console.WriteLine("Playlist file successfully deleted.");
                 }
             }
             catch (RequestFailedException ex)
             {
-                Console.WriteLine($"Failed to delete blob: {ex.Message}");
+                Console.WriteLine($"Failed to delete playlist file: {ex.Message}");
+                throw;
+            }
+
+            try
+            {
+                await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: filePrefix))
+                {
+                    var segmentBlobClient = containerClient.GetBlobClient(blobItem.Name);
+                    Console.WriteLine($"Deleting segment file: {blobItem.Name}");
+
+                    var deleteSegmentResponse = await segmentBlobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                    if (!deleteSegmentResponse)
+                    {
+                        Console.WriteLine($"Segment file {blobItem.Name} did not exist or could not be deleted.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Segment file {blobItem.Name} successfully deleted.");
+                    }
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Failed to delete segment files: {ex.Message}");
                 throw;
             }
         }

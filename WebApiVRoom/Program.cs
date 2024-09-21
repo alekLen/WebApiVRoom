@@ -24,8 +24,6 @@ builder.Services.AddSingleton(x => {
     return new BlobServiceClient(connectionString);
 });
 
-string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
-string? containerName = builder.Configuration["BlobStorage:ContainerName"];
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
@@ -69,8 +67,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAzureClients(clientBuilder =>
 {
-    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!, preferMsi: true);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!, preferMsi: true);
+    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!);
 });
 
 builder.Services.AddAzureClients(clientBuilder =>

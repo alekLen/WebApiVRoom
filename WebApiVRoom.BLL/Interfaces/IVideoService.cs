@@ -1,5 +1,6 @@
 ﻿using WebApiVRoom.BLL.DTO;
 using static WebApiVRoom.BLL.DTO.VideoService;
+using static WebApiVRoom.BLL.Services.VideoService;
 
 namespace WebApiVRoom.BLL.Interfaces
 {
@@ -17,7 +18,5 @@ namespace WebApiVRoom.BLL.Interfaces
         Task UpdateVideo(VideoDTO videoDTO);
         Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId);
 
-        Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId);
-        Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId);
     }
 }

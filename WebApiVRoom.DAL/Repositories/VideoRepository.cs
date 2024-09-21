@@ -20,9 +20,6 @@ namespace WebApiVRoom.DAL.Repositories
         public VideoRepository(VRoomContext context)
         {
             _context = context;
-          //  string connectionString = configuration["AzureBlob:ConnectionString"];
-           // string containerName = configuration["AzureBlob:ContainerName"];
-            //_blobContainerClient = new BlobContainerClient(connectionString, containerName);
         }
 
         public async Task<Video> GetById(int id)
@@ -77,19 +74,7 @@ namespace WebApiVRoom.DAL.Repositories
             await _context.Videos.AddAsync(video);  
             await _context.SaveChangesAsync();  
         }
-        public async Task Add(Video video)
-        {
-            ValidateVideo(video);
 
-            if (video.UploadDate == default)
-                video.UploadDate = DateTime.UtcNow;
-
-            await _context.Videos.AddAsync(video);
-            try
-            {
-                await _context.SaveChangesAsync();
-            } catch (Exception ex) { throw ex; };
-        }
         public async Task Update(Video video)
         {
             var existingVideo = await _context.Videos.FindAsync(video.Id);
@@ -320,22 +305,19 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-        public Task GetByIdAsync(int videoId)
+
+        public async Task<Video> GetById(int? videoId)
         {
-            if (videoId == null)
-            {
-                throw new ArgumentNullException(nameof(videoId), "Video ID cannot be null");
-            }
             var video = await _context.Videos
-                .Include(v => v.Categories) 
-                .Include(v => v.Tags)      
-                .Include(v => v.ChannelSettings) 
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
                 .FirstOrDefaultAsync(v => v.Id == videoId);
 
             if (video == null)
-            {
-                throw new KeyNotFoundException($"Video with ID {videoId} was not found.");
-            }
+                throw new KeyNotFoundException("Video not found");
 
             return video;
         }

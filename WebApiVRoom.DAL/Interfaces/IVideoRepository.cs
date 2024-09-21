@@ -4,7 +4,7 @@ using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
-    public interface IVideoRepository:ISetGetRepository<Video>
+    public interface IVideoRepository: ISetGetRepository<Video>
     {
         Task<Video> GetByTitle(string title);
         Task<List<Video>> GetByCategory(string categoryName);
@@ -15,7 +15,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<bool> Exists(int id);
         Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize);
         Task<List<Video>> GetByIds(List<int> ids);
-        Task Add(Video video, Stream videoStream);
+        Task Add(Video video);
         Task<List<Video>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
         Task<List<Video>> GetByChannelId(int channelId);
         Task<Video> GetById(int? videoId);

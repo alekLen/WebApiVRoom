@@ -143,7 +143,7 @@ namespace WebApiVRoom.Controllers
             try
             {
                 // Test версія
-                string stream = "D:\\Vide VRoom\\5845158-uhd_3840_2160_30fps.mp4"; // D:\Vide VRoom\5638009-uhd_3840_2160_25fps.mp4
+                string stream = "D:\\Vide VRoom\\mixkit-52212-video-52212-hd-ready.mp4"; // D:\Vide VRoom\5638009-uhd_3840_2160_25fps.mp4
                 // production версія
                 //using (var stream = file.OpenReadStream())
                 ///{
