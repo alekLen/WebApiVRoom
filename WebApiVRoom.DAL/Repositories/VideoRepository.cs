@@ -16,14 +16,10 @@ namespace WebApiVRoom.DAL.Repositories
     public class VideoRepository : IVideoRepository
     {
         private readonly VRoomContext _context;
-        private readonly BlobContainerClient _blobContainerClient;
 
-        public VideoRepository(VRoomContext context, IConfiguration configuration)
+        public VideoRepository(VRoomContext context)
         {
             _context = context;
-          //  string connectionString = configuration["AzureBlob:ConnectionString"];
-           // string containerName = configuration["AzureBlob:ContainerName"];
-            //_blobContainerClient = new BlobContainerClient(connectionString, containerName);
         }
 
         public async Task<Video> GetById(int id)
@@ -68,29 +64,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
-        public async Task<string> UploadVideoToBlobAsync(string videoTitle, Stream videoStream)
-        {
-            string blobName = $"{videoTitle}-{Guid.NewGuid()}.mp4"; 
-            var blobClient = _blobContainerClient.GetBlobClient(blobName);  
-
-            await blobClient.UploadAsync(videoStream, overwrite: true);  
-
-            return blobClient.Uri.ToString();  
-        }
-
-        public async Task Add(Video video, Stream videoStream)
-        {
-            ValidateVideo(video);  
-            string videoUrl = await UploadVideoToBlobAsync(video.Tittle, videoStream);
-            video.VideoUrl = videoUrl;
-
-            if (video.UploadDate == default)
-                video.UploadDate = DateTime.UtcNow;
-
-            await _context.Videos.AddAsync(video);  
-            await _context.SaveChangesAsync();  
-        }
         public async Task Add(Video video)
         {
             ValidateVideo(video);
@@ -98,12 +71,10 @@ namespace WebApiVRoom.DAL.Repositories
             if (video.UploadDate == default)
                 video.UploadDate = DateTime.UtcNow;
 
-            await _context.Videos.AddAsync(video);
-            try
-            {
-                await _context.SaveChangesAsync();
-            } catch (Exception ex) { throw ex; };
+            await _context.Videos.AddAsync(video);  
+            await _context.SaveChangesAsync();  
         }
+
         public async Task Update(Video video)
         {
             var existingVideo = await _context.Videos.FindAsync(video.Id);
@@ -115,13 +86,12 @@ namespace WebApiVRoom.DAL.Repositories
             await _context.SaveChangesAsync();
         }
 
+
         public async Task Delete(int id)
         {
             var video = await _context.Videos.FindAsync(id);
             if (video == null)
                 throw new KeyNotFoundException("Video not found");
-            var blobClient = _blobContainerClient.GetBlobClient(video.VideoUrl.Split('/').Last());
-            await blobClient.DeleteIfExistsAsync();
 
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
@@ -335,11 +305,21 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-        public Task GetByIdAsync(int videoId)
-        {
-            throw new NotImplementedException();
-        }
 
-       
+        public async Task<Video> GetById(int? videoId)
+        {
+            var video = await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .FirstOrDefaultAsync(v => v.Id == videoId);
+
+            if (video == null)
+                throw new KeyNotFoundException("Video not found");
+
+            return video;
+        }
     }
 }

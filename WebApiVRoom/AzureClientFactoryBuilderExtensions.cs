@@ -1,4 +1,4 @@
-﻿using Azure.Core.Extensions;
+using Azure.Core.Extensions;
 using Azure.Storage.Blobs;
 using Azure.Storage.Queues;
 using Microsoft.Extensions.Azure;

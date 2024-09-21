@@ -15,6 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
+string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
+string? containerName = builder.Configuration["BlobStorage:ContainerName"];
+string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton(x => {
@@ -22,8 +26,24 @@ builder.Services.AddSingleton(x => {
     return new BlobServiceClient(connectionString);
 });
 
-string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
-string? containerName = builder.Configuration["BlobStorage:ContainerName"];
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ICountryService, CountryService>();
+builder.Services.AddTransient<ICategoryService, CategoryService>();
+builder.Services.AddTransient<ILanguageService, LanguageService>();
+builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
+builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
+builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
+//builder.Services.AddTransient<ICommentPostService, CommentPostService>();
+//builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
+builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<IPlayListService, PlayListService>();
+builder.Services.AddTransient<IPostService, PostService>();
+builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
+builder.Services.AddTransient<ITagService, TagService>();
+builder.Services.AddTransient<IVideoService, VideoService>();
+//builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
+//    new BlobStorageService(builder.Configuration.GetConnectionString("BlobStorage:ConnectionString")));
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
@@ -65,6 +85,11 @@ builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!);
+});
 
 builder.Services.AddAzureClients(clientBuilder =>
 {

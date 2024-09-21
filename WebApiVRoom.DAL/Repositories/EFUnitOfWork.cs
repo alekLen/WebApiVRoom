@@ -239,7 +239,7 @@ namespace WebApiVRoom.DAL.Repositories
             get
             {
                 if (videoRepository == null)
-                    videoRepository = new VideoRepository(db, configuration);
+                    videoRepository = new VideoRepository(db);
                 return videoRepository;
             }
         }
