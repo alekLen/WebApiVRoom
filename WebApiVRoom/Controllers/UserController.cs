@@ -158,8 +158,19 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+        [HttpGet("getbyvideoid/{videoId}")]
+        public async Task<ActionResult<UserDTO>> ByVideoId([FromRoute] int videoId)
+        {
 
-       
+            var user = await _userService.GetUserByVideoId(videoId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(user);
+        }
+
+
     }
      
 

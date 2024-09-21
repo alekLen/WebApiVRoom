@@ -107,6 +107,51 @@ namespace WebApiVRoom.Controllers
             return Ok();
         }
 
+        [HttpPut("topin/{comment}")]
+        public async Task<ActionResult> pinCommentVideo([FromRoute] int comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+           
+                CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+
+                ans.IsPinned=true;
+
+                CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+
+                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+             
+            return Ok();
+        }
+        [HttpPut("unpin/{comment}")]
+        public async Task<ActionResult> unpinCommentVideo([FromRoute] int comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            CommentVideoDTO ans = await _comService.GetCommentVideoById(comment);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+
+            ans.IsPinned = false;
+
+            CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+
+            return Ok();
+        }
+
         [HttpPost("add")]
         public async Task<ActionResult<CommentVideoDTO>> Add([FromBody] CommentVideoDTO request)
         {

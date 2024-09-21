@@ -419,6 +419,7 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+
         public async Task<List<VideoDTO>> GetByCategory(string categoryName)
         {
             var videos = await _unitOfWork.Videos.GetByCategory(categoryName);

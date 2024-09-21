@@ -12,6 +12,7 @@ using AutoMapper;
 using WebApiVRoom.BLL.Infrastructure;
 using WebApiVRoom.DAL.Repositories;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Xml.Linq;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -213,6 +214,26 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<UserDTO> GetUserByVideoId(int videoId)
+        {
+            try
+            {
+                Video video = await Database.Videos.GetById(videoId);
+                ChannelSettings ch = await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
+                User user = await Database.Users.GetById(ch.Owner.Id);
+                if (user != null)
+                {
+                    var mapper = InitializeMapper();
+                    return mapper.Map<User, UserDTO>(user);
+                }
+                return null;
+                
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
             try

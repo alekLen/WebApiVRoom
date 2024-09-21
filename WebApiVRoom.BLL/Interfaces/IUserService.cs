@@ -17,5 +17,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<UserDTO> UpdateUser(UserDTO userDto);
         Task<UserDTO> DeleteUser(int id);
         Task<UserDTO> Delete(string clerkId);
+        Task<UserDTO> GetUserByVideoId(int videoId);
     }
 }
