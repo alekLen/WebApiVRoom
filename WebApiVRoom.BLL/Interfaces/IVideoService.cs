@@ -1,5 +1,6 @@
 ﻿using WebApiVRoom.BLL.DTO;
 using static WebApiVRoom.BLL.DTO.VideoService;
+using static WebApiVRoom.BLL.Services.VideoService;
 
 namespace WebApiVRoom.BLL.Interfaces
 {
