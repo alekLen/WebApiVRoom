@@ -44,18 +44,24 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getinfochannel/{clerkId}")]
         public async Task<ActionResult<ChannelUserFor_CommentDTO>> GetInfoChannelByClerkId([FromRoute] string clerkId)
         {
-            var ch = await _chService.FindByOwner(clerkId);
-            if (ch == null)
+            try
             {
-                return NotFound();
+                var ch = await _chService.FindByOwner(clerkId);
+                if (ch == null)
+                {
+                    return NotFound();
+                }
+
+                ChannelUserFor_CommentDTO user = new()
+                {
+                    Clerk_Id = clerkId,
+                    ChannelBanner = ch.ChannelBanner,
+                    ChannelName = ch.ChannelName
+                };
+
+                return new ObjectResult(user);
             }
-
-            ChannelUserFor_CommentDTO user = new() { 
-                Clerk_Id=clerkId,
-                ChannelBanner = ch.ChannelBanner,
-                ChannelName = ch.ChannelName };
-
-            return new ObjectResult(user);
+            catch (Exception ex) { return BadRequest(ModelState); }
         }
 
         [HttpPut("update")]

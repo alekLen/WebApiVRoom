@@ -85,11 +85,11 @@ builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!);
-});
+//builder.Services.AddAzureClients(clientBuilder =>
+//{
+//    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!);
+//    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!);
+//});
 
 builder.Services.AddAzureClients(clientBuilder =>
 {
