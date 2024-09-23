@@ -65,13 +65,39 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings([FromBody] ChannelSettingsDTO ch)
+        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings(IFormFile? channelBanner, IFormFile? profilePhoto, [FromForm] ChannelSettingsDTO ch)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettings(ch);
+
+            FormFileCollection files = new FormFileCollection();
+            files.Add(channelBanner);
+            files.Add(profilePhoto);
+
+            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettings(ch, files);
+            if (chDto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(chDto);
+        }
+
+        [HttpPut("updateShort")]
+        public async Task<IActionResult> UpdateChannelSettingsShort(IFormFile? channelBanner, IFormFile? profilePhoto, [FromForm] ChannelSettingsShortDTO ch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            FormFileCollection files = new FormFileCollection();
+            files.Add(channelBanner);
+            files.Add(profilePhoto);
+
+            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettingsShort(ch, files);
             if (chDto == null)
             {
                 return NotFound();
