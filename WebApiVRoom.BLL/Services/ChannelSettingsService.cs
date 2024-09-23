@@ -32,6 +32,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.DateJoined, opt => opt.MapFrom(src => src.DateJoined))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
+                    .ForMember(dest => dest.ChannelPlofilePhoto, opt => opt.MapFrom(src => src.ChannelPlofilePhoto))//
                     .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => src.Notification))
                     .ForMember(dest => dest.Videos, opt => opt.MapFrom(src => src.Videos.Select(v => v.Id).ToList()))
                     .ForMember(dest => dest.Posts, opt => opt.MapFrom(src => src.Posts.Select(p => p.Id).ToList()))
@@ -75,6 +76,7 @@ namespace WebApiVRoom.BLL.Services
                 channelSettings.DateJoined = chDto.DateJoined;
                 channelSettings.Description = chDto.Description;
                 channelSettings.ChannelBanner = chDto.ChannelBanner;
+                channelSettings.ChannelPlofilePhoto = chDto.ChannelPlofilePhoto;
                 channelSettings.Notification = chDto.Notification;
 
                 channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);
