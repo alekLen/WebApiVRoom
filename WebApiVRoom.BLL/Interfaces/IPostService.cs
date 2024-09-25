@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<List<PostDTO>> GetPostByChannellIdPaginated(int pageNumber, int pageSize, int channelSettingsId);
         Task<IEnumerable<PostDTO>> GetAllPosts();
         Task<PostDTO> GetPostByText(string text);
-        Task AddPost(PostDTO postDTO);
+        Task AddPost(IFormFile? img, IFormFile? video, string text, string id);
         Task<PostDTO> UpdatePost(PostDTO postDTO);
         Task DeletePost(int id);
 

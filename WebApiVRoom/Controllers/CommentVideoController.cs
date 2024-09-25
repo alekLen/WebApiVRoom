@@ -46,8 +46,9 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
+            object com= ConvertObject(c);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            await WebSocketHelper.SendMessageToAllAsync("update_comment", com);
 
             return Ok(c);
         }
@@ -222,6 +223,16 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(list);
         }
 
-        
+        private object ConvertObject(CommentVideoDTO ans)
+        {
+            object obj = new
+            {
+                id = ans.Id,
+                text = ans.Comment,
+                isEdited = ans.IsEdited,
+            };
+            return obj;
+        }
+
     }
 }

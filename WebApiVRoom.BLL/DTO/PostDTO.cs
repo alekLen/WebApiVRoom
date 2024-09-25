@@ -14,8 +14,9 @@ namespace WebApiVRoom.BLL.DTO
         public int ChannelSettingsId { get; set; }
         public DateTime Date { get; set; }
         public string? Photo { get; set; }
+        public string? Video { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-      //  public List<int> CommentPostsId { get; set; } = new List<int>();
+  
     }
 }

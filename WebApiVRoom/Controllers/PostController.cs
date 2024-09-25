@@ -58,14 +58,14 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<PostDTO>> AddPost(PostDTO postDTO)
+        public async Task<ActionResult<PostDTO>> AddPost(IFormFile? img, IFormFile? video, [FromForm] AddPostRequest req)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _postService.AddPost(postDTO);
+            await _postService.AddPost(img,video,req.text,req.id);
             return Ok();
         }
 

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Newtonsoft.Json;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -22,16 +23,18 @@ namespace WebApiVRoom.BLL.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly BlobServiceClient _blobServiceClient;
-        private readonly string _containerName = "videos";
+        private readonly string _containerName ;
         private readonly IAlgoliaService _algoliaService;
         private readonly IBlobStorageService _blobStorageService;
 
-        public VideoService(IUnitOfWork unitOfWork, BlobServiceClient blobServiceClient, IAlgoliaService algoliaService, IBlobStorageService blobStorageService)
+        public VideoService(IUnitOfWork unitOfWork, BlobServiceClient blobServiceClient, IAlgoliaService algoliaService,
+                            IBlobStorageService blobStorageService, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _blobServiceClient = blobServiceClient;
             _algoliaService = algoliaService;
             _blobStorageService = blobStorageService;
+            _containerName = configuration.GetConnectionString("ContainerName");
 
             var config = new MapperConfiguration(cfg =>
             {
@@ -241,7 +244,7 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        private async Task<string> UploadFileAsync(IFormFile file)
+        public async Task<string> UploadFileAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {

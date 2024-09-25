@@ -17,8 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton(x => {

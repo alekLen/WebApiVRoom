@@ -47,8 +47,9 @@ namespace WebApiVRoom.Controllers
             }
 
             AnswerVideoDTO answer = await _answerService.Update(u);
+            object obj=ConvertObject(answer);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_answer", null);
+            await WebSocketHelper.SendMessageToAllAsync("update_answer", obj);
 
             return Ok(answer);
         }

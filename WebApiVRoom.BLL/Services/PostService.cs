@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,14 @@ namespace WebApiVRoom.BLL.Services
     public class PostService : IPostService
     {
         IUnitOfWork Database { get; set; }
+        private readonly IBlobStorageService _blobStorageService;
+        private readonly IVideoService _videoService;
 
-        public PostService(IUnitOfWork database)
+        public PostService(IUnitOfWork database, IBlobStorageService blobStorageService, IVideoService videoService)
         {
             Database = database;
+            _blobStorageService= blobStorageService;
+            _videoService = videoService;
         }
         public static IMapper InitializeMapper()
         {
@@ -27,39 +33,40 @@ namespace WebApiVRoom.BLL.Services
                 cfg.CreateMap<Post, PostDTO>()
                        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
                        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id));
-                       //.ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select
-                       //(ch => new CommentPost { Id = ch.Id })));
-
             });
             return new Mapper(config);
         }
-        public async Task AddPost(PostDTO postDTO)
+        public async Task AddPost(IFormFile? img, IFormFile? video, string text, string id)
         {
             try
             {
-                var channelSettings = await Database.ChannelSettings.GetById(postDTO.ChannelSettingsId);
+                int Id=int.Parse(id);
+                var channelSettings = await Database.ChannelSettings.GetById(Id);
 
                 Post post = new Post();
-                post.Id = postDTO.Id;
-                post.Text = postDTO.Text;
+                post.Text = text;
                 post.ChannelSettings = channelSettings;
-                post.Date = postDTO.Date;
-                post.Photo = postDTO.Photo;
-                post.LikeCount = postDTO.LikeCount;
-                post.DislikeCount = postDTO.DislikeCount;
+                post.Date = DateTime.Now;
+                post.LikeCount = 0;
+                post.DislikeCount = 0;
 
-                //List<CommentPost> list = new();
-                //foreach (int id in postDTO.CommentPostsId)
-                //{
-                //    list.Add(await Database.CommentPosts.GetById(id));
-                //}
-                //post.CommentPosts = list;
+                    if (img != null)
+                    {
+                        post.Photo = await _videoService.UploadFileAsync(img); // Сохраняем URL изображения в объекте Post
+                    }
+
+                    if (video != null)
+                    {
+                        post.Video = await _videoService.UploadFileAsync(video);
+                    }
+
 
                 await Database.Posts.Add(post);
                
             }
             catch (Exception ex)
             {
+                throw ex;
             }
         }
 
