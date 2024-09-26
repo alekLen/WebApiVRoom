@@ -9,10 +9,12 @@ namespace WebApiVRoom.Controllers
     public class CommentPostController : Controller
     {
         private ICommentPostService _comService;
+        ILikesDislikesCPService _likesService;
 
-        public CommentPostController(ICommentPostService cService)
+        public CommentPostController(ICommentPostService cService, ILikesDislikesCPService likesService)
         {
             _comService = cService;
+            _likesService = likesService;
         }
 
 

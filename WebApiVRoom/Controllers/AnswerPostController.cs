@@ -11,10 +11,12 @@ namespace WebApiVRoom.Controllers
     public class AnswerPostController : Controller
     {
         private IAnswerPostService _answerService;
+        ILikesDislikesAPService _likesService;
 
-        public AnswerPostController(IAnswerPostService ansService)
+        public AnswerPostController(IAnswerPostService ansService, ILikesDislikesAPService likesService)
         {
             _answerService = ansService;
+            _likesService = likesService;
         }
 
 

@@ -10,10 +10,12 @@ namespace WebApiVRoom.Controllers
     public class ChannelSettingsController : ControllerBase
     {
         private IChannelSettingsService _chService;
+        private IUserService _uService;
 
-        public ChannelSettingsController(IChannelSettingsService chService)
+        public ChannelSettingsController(IChannelSettingsService chService, IUserService userService)
         {
             _chService = chService;
+            _uService = userService;
         }
 
 
@@ -27,6 +29,26 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(ch);
+        }
+        [HttpGet("getinfobychannelid/{id}")]
+        public async Task<ActionResult<ChannelSettingsDTO>> GetChannelInfo([FromRoute] int id)
+        {
+            try {  
+            var ch = await _chService.GetChannelSettings(id);
+            if (ch == null)
+            {
+                return NotFound();
+            }
+            UserDTO u= await _uService.GetUser(ch.Owner_Id);
+            ChannelUserFor_CommentDTO user = new()
+            {
+                Clerk_Id =u.Clerk_Id,
+                ChannelBanner = ch.ChannelBanner,
+                ChannelName = ch.ChannelName
+            };
+            return new ObjectResult(user);
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
         }
 
         [HttpGet("getbyownerid/{clerk_id}")]

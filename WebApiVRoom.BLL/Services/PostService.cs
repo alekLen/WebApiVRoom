@@ -36,7 +36,7 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
-        public async Task AddPost(IFormFile? img, IFormFile? video, string text, string id)
+        public async Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id)
         {
             try
             {
@@ -62,11 +62,13 @@ namespace WebApiVRoom.BLL.Services
 
 
                 await Database.Posts.Add(post);
-               
+                IMapper mapper = InitializeMapper();
+                return mapper.Map<Post, PostDTO>(post);
+
             }
             catch (Exception ex)
             {
-                throw ex;
+                return null;
             }
         }
 
@@ -109,15 +111,13 @@ namespace WebApiVRoom.BLL.Services
             PostDTO post = new PostDTO();
             post.Id = a.Id;
             post.Text = a.Text;
+            post.Date = a.Date;
+            post.Photo = a.Photo;
+            post.Video = a.Video;
+            post.DislikeCount = a.DislikeCount;
+            post.LikeCount = a.LikeCount;
+            post.ChannelSettingsId = a.ChannelSettings.Id;
 
-            var channelSettings = await Database.ChannelSettings.GetById(id);
-            post.ChannelSettingsId = channelSettings.Id;
-
-            //post.CommentPostsId = new List<int>();
-            //foreach (CommentPost comment in a.CommentPosts)
-            //{
-            //    post.CommentPostsId.Add(comment.Id);
-            //}
 
             return post;
         }
@@ -184,8 +184,8 @@ namespace WebApiVRoom.BLL.Services
 
         public async Task<PostDTO> UpdatePost(PostDTO postDTO)
         {
-            Post post = await Database.Posts.GetById(((int)postDTO.Id));
-            var channelSettings = await Database.ChannelSettings.GetById(((int)postDTO.Id));
+            Post post = await Database.Posts.GetById(postDTO.Id);
+            var channelSettings = await Database.ChannelSettings.GetById(postDTO.ChannelSettingsId);
 
             try
             {
@@ -194,19 +194,12 @@ namespace WebApiVRoom.BLL.Services
                 post.ChannelSettings = channelSettings;
                 post.Date = postDTO.Date;
                 post.Photo = postDTO.Photo;
+                post.Video = postDTO.Video;
                 post.LikeCount = postDTO.LikeCount;
                 post.DislikeCount = postDTO.DislikeCount;
 
-                //List<CommentPost> list = new();
-
-                //foreach (int id in postDTO.CommentPostsId)
-                //{
-                //    list.Add(await Database.CommentPosts.GetById(id));
-                //}
-
-                //post.CommentPosts = list;
-
                 await Database.Posts.Update(post);
+                post.ChannelSettings = channelSettings;
                 return postDTO;
             }
             catch (Exception ex)

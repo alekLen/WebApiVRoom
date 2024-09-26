@@ -241,6 +241,29 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
+
+        public async Task<UserDTO> GetUserByPostId(int postId)
+        {
+            try
+            {
+
+                  Post post = await Database.Posts.GetById(postId);
+                ChannelSettings ch = await Database.ChannelSettings.GetById(post.ChannelSettings.Id);
+
+                User user = await Database.Users.GetById(ch.Owner.Id);
+                if (user != null)
+                {
+                    var mapper = InitializeMapper();
+                    return mapper.Map<User, UserDTO>(user);
+                }
+                return null;
+
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
             try
