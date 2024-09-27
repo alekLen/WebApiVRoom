@@ -3,6 +3,7 @@ using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.DAL.Entities;
+using WebApiVRoom.Helpers;
 
 namespace WebApiVRoom.Controllers
 {
@@ -46,6 +47,10 @@ namespace WebApiVRoom.Controllers
 
             AnswerPostDTO answer = await _answerService.Update(u);
 
+            object obj = ConvertObject(answer);
+
+            await WebSocketHelper.SendMessageToAllAsync("update_answerpost", obj);
+
             return Ok(answer);
         }
 
@@ -58,6 +63,9 @@ namespace WebApiVRoom.Controllers
             }
 
             AnswerPostDTO ans = await _answerService.Add(request);
+            object obj = ConvertObject(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_answerpost", obj);
 
             return Ok(ans);
         }
@@ -77,6 +85,9 @@ namespace WebApiVRoom.Controllers
             }
 
             await _answerService.Delete(id);
+            object obj = ConvertObject(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("delete_answerpost", obj);
 
             return Ok(ans);
         }
@@ -103,6 +114,82 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(answer);
+        }
+
+        [HttpPut("like/{answer}/{user}/{i}")]
+        public async Task<ActionResult> likeAnswerPost([FromRoute] int answer, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesAPDTO like = await _likesService.Get(answer, user);
+            if (like == null && user != i)
+            {
+                LikesDislikesAPDTO likeDto = new() { answerId = answer, userId = user };
+                await _likesService.Add(likeDto);
+                AnswerPostDTO ans = await _answerService.GetById(answer);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.LikeCount += 1;
+
+                AnswerPostDTO c = await _answerService.Update(ans);
+                object obj = ConvertObject(c);
+
+                await WebSocketHelper.SendMessageToAllAsync("like_answerpost", obj);
+
+                return Ok();
+            }
+
+            return Ok();
+        }
+        [HttpPut("dislike/{answer}/{user}/{i}")]
+        public async Task<ActionResult> dislikeAnswerPost([FromRoute] int answer, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesAPDTO like = await _likesService.Get(answer, user);
+            if (like == null && user != i)
+            {
+                LikesDislikesAPDTO likeDto = new() { answerId = answer, userId = user };
+                await _likesService.Add(likeDto);
+                AnswerPostDTO ans = await _answerService.GetById(answer);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.DislikeCount += 1;
+
+                AnswerPostDTO c = await _answerService.Update(ans);
+                object obj = ConvertObject(c);
+
+                await WebSocketHelper.SendMessageToAllAsync("dislike_answerpost", obj);
+
+                return Ok();
+            }
+            return Ok();
+        }
+
+        private object ConvertObject(AnswerPostDTO ans)
+        {
+            object obj = new
+            {
+                id = ans.Id,
+                userId = ans.UserId,
+                userName = ans.UserName,
+                channelBanner = ans.ChannelBanner,
+                commentPost_Id = ans.CommentPost_Id,
+                text = ans.Text,
+                answerDate = ans.AnswerDate,
+                likeCount = ans.LikeCount,
+                dislikeCount = ans.DislikeCount,
+                isEdited = ans.IsEdited,
+            };
+            return obj;
         }
     }
 }

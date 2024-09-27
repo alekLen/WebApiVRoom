@@ -88,7 +88,7 @@ namespace WebApiVRoom.Controllers
             await _answerService.Delete(id);
             object obj = ConvertObject(ans);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
+            await WebSocketHelper.SendMessageToAllAsync("delete_answer", obj);
 
             return Ok(ans);
         }

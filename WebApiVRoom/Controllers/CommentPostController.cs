@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
+using WebApiVRoom.Helpers;
 
 namespace WebApiVRoom.Controllers
 {
@@ -43,6 +44,9 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentPostDTO c = await _comService.UpdateCommentPost(u);
+            object com = ConvertObject(c);
+
+            await WebSocketHelper.SendMessageToAllAsync("update_commentpost", com);
 
             return Ok(c);
         }
@@ -111,6 +115,118 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(list);
+        }
+
+        [HttpPut("like/{comment}/{user}/{i}")]
+        public async Task<ActionResult> likeCommentPost([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCPDTO like = await _likesService.Get(comment, user);
+            if (like == null && user != i)
+            {
+                LikesDislikesCPDTO likeDto = new() { commentId = comment, userId = user };
+                await _likesService.Add(likeDto);
+                CommentPostDTO ans = await _comService.GetCommentPost(comment);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.LikeCount += 1;
+
+                CommentPostDTO c = await _comService.UpdateCommentPost(ans);
+
+                await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+
+                return Ok();
+            }
+
+            return Ok();
+        }
+        [HttpPut("dislike/{comment}/{user}/{i}")]
+        public async Task<ActionResult> dislikeCommentPost([FromRoute] int comment, [FromRoute] string user, [FromRoute] string i)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            LikesDislikesCPDTO like = await _likesService.Get(comment, user);
+            if (like == null && user != i)
+            {
+                LikesDislikesCPDTO likeDto = new() { commentId = comment, userId = user };
+                await _likesService.Add(likeDto);
+                CommentPostDTO ans = await _comService.GetCommentPost(comment);
+                if (ans == null)
+                {
+                    return NotFound();
+                }
+                ans.DislikeCount += 1;
+
+                CommentPostDTO c = await _comService.UpdateCommentPost(ans);
+
+                await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+
+                return Ok();
+            }
+            return Ok();
+        }
+
+        [HttpPut("topin/{comment}")]
+        public async Task<ActionResult> pinCommentPost([FromRoute] int comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            CommentPostDTO ans = await _comService.GetCommentPost(comment);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+
+            ans.IsPinned = true;
+
+            CommentPostDTO c = await _comService.UpdateCommentPost(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+
+            return Ok();
+        }
+        [HttpPut("unpin/{comment}")]
+        public async Task<ActionResult> unpinCommentVideo([FromRoute] int comment)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            CommentPostDTO ans = await _comService.GetCommentPost(comment);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+
+            ans.IsPinned = false;
+
+            CommentPostDTO c = await _comService.UpdateCommentPost(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+
+            return Ok();
+        }
+
+        private object ConvertObject(CommentPostDTO ans)
+        {
+            object obj = new
+            {
+                id = ans.Id,
+                text = ans.Comment,
+                isEdited = ans.IsEdited,
+            };
+            return obj;
         }
     }
 }
