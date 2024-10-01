@@ -33,7 +33,6 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                     .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited));
                     //.ForMember(dest => dest.AnswerPostIds, opt => opt.Ignore());
@@ -102,6 +101,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 var commentPosts = await Database.CommentPosts.GetByPost(postId);
+
                 return _mapper.Map<IEnumerable<CommentPost>, IEnumerable<CommentPostDTO>>(commentPosts).ToList();
             }
             catch (Exception ex)
@@ -147,19 +147,13 @@ namespace WebApiVRoom.BLL.Services
                 if (commentPost == null)
                     throw new ValidationException("Comment not found!");
 
-                commentPost = _mapper.Map(commentPostDTO, commentPost);
+                // CommentPost commentPost2 = _mapper.Map<CommentPostDTO, CommentPost>(commentPostDTO);
+               _mapper.Map(commentPostDTO, commentPost);
 
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
                 ChannelSettings user = await Database.ChannelSettings.FindByOwner(commentPostDTO.UserId);
                 commentPost.User = user;
                 commentPost.clerkId = commentPostDTO.UserId;
-
-                //if (commentPostDTO.AnswerPostIds != null)
-                //{
-                //    commentPost.AnswerPosts = await Database.AnswerPosts.GetByIds(commentPostDTO.AnswerPostIds);
-                //}
-
-              //  commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Update(commentPost);
 

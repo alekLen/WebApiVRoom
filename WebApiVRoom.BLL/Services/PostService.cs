@@ -28,10 +28,13 @@ namespace WebApiVRoom.BLL.Services
         }
         public static IMapper InitializeMapper()
         {
-            var config = new MapperConfiguration(cfg =>
+        var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Post, PostDTO>()
                        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
+                       .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                       .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
+                       .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id));
             });
             return new Mapper(config);
@@ -76,6 +79,15 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
+                var c =await Database.CommentPosts.GetByPost(id) ;
+                if (c != null)
+                {
+                    List<CommentPost> comments = c.ToList();
+                    foreach (CommentPost com in comments)
+                    {
+                        await Database.CommentPosts.Delete(com.Id);
+                    }
+                }
                 await Database.Posts.Delete(id);
                 
             }

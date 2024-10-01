@@ -60,6 +60,9 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentPostDTO ans = await _comService.AddCommentPost(request);
+            object com = ConvertObject(ans);
+
+            await WebSocketHelper.SendMessageToAllAsync("new_commentpost", com);
 
             return Ok(ans);
         }
@@ -138,7 +141,7 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+                await WebSocketHelper.SendMessageToAllAsync("like_commentpost", null);
 
                 return Ok();
             }
@@ -166,7 +169,7 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+                await WebSocketHelper.SendMessageToAllAsync("dislike_commentpost", null);
 
                 return Ok();
             }
@@ -190,8 +193,8 @@ namespace WebApiVRoom.Controllers
             ans.IsPinned = true;
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
-
-            await WebSocketHelper.SendMessageToAllAsync("new_commentpost", null);
+            object com = ConvertObject(c);
+            await WebSocketHelper.SendMessageToAllAsync("pin_commentpost", com);
 
             return Ok();
         }
@@ -212,8 +215,8 @@ namespace WebApiVRoom.Controllers
             ans.IsPinned = false;
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
-
-            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            object com = ConvertObject(c);
+            await WebSocketHelper.SendMessageToAllAsync("pin_commentpost",com);
 
             return Ok();
         }

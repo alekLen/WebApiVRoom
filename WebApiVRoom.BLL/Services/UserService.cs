@@ -103,7 +103,8 @@ namespace WebApiVRoom.BLL.Services
                 Language = l,
                 Country = c,
                 Owner = user,
-               ChannelBanner = imgurl
+               ChannelBanner = imgurl,
+               ChannelPlofilePhoto = imgurl,
             };
 
             await Database.ChannelSettings.Add(channelSettings);
