@@ -21,6 +21,7 @@ namespace WebApiVRoom.DAL.Entities
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
         public bool IsShort { get; set; }
+        public string Cover { get; set; }
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();

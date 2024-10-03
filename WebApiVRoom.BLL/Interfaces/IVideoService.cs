@@ -19,6 +19,8 @@ namespace WebApiVRoom.BLL.Interfaces
         Task UpdateVideo(VideoDTO videoDTO);
         Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId);
         Task<string> UploadFileAsync(IFormFile file);
+        Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream();
+        Task<VideoDTO> GetVideoInfo(int id);
 
     }
 }

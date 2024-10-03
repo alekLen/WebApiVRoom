@@ -50,6 +50,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                     .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
+                     .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
                     .ForMember(dest => dest.LastViewedPosition, opt => opt.MapFrom(src => src.LastViewedPosition.ToString()))
                     .ForMember(dest => dest.CategoryIds, opt => opt.MapFrom(src => src.Categories.Select(s => s.Id).ToList()))
                     .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src => src.Tags.Select(p => p.Id).ToList()))
@@ -68,6 +69,7 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                   .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                   .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
+                   .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
                   .ForMember(dest => dest.LastViewedPosition, opt => opt.Ignore())
                   .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) // Обработка вручную;
                   .ForMember(dest => dest.Categories, opt => opt.Ignore()) // Обработка вручную
@@ -275,7 +277,11 @@ namespace WebApiVRoom.BLL.Services
             throw new NotImplementedException();
         }
 
-
+        public async Task<VideoDTO> GetVideoInfo(int id)
+        {
+            var video = await _unitOfWork.Videos.GetById(id);
+            return _mapper.Map<Video,VideoDTO>(video);
+        }
         public async Task<IEnumerable<VideoDTO>> GetAllVideos()
         {
             var videos = await _unitOfWork.Videos.GetAll();
@@ -475,6 +481,57 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream()
+        {
+            try
+            {
+                List<VideoWithStreamDTO> list = new List<VideoWithStreamDTO>();
+
+                var videos = await _unitOfWork.Videos.GetAll();
+                foreach (var video in videos)
+                {
+                    if (video == null)
+                    {
+                        throw new KeyNotFoundException("Video not found");
+                    }
+
+                    var videoDto = _mapper.Map<Video, VideoDTO>(video);
+
+                    var blobInfo = await _blobStorageService.DownloadFileAsync(video.VideoUrl);
+
+                    if (blobInfo == null || blobInfo.Size == 0)
+                    {
+                        throw new InvalidOperationException("Failed to download video from Blob Storage.");
+                    }
+                    var videoStream = await new HttpClient().GetStreamAsync(blobInfo.FileUrl);
+
+                    if (videoStream == null)
+                    {
+                        throw new InvalidOperationException("Failed to retrieve video stream.");
+                    }
+
+
+
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await videoStream.CopyToAsync(memoryStream);
+                        byte[] videoBytes = memoryStream.ToArray();
+
+                        list.Add(new VideoWithStreamDTO
+                        {
+                            Metadata = videoDto,
+                            VideoStream = videoBytes
+                        });
+                    }
+                }
+                return list;    
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while retrieving video", ex);
+            }
+        }
+    
         public async Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId)
         {
             try
