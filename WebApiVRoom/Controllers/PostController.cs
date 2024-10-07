@@ -5,6 +5,7 @@ using WebApiVRoom.BLL.Services;
 using WebApiVRoom.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.Helpers;
+using Microsoft.AspNetCore.SignalR;
 
 namespace WebApiVRoom.Controllers
 {
@@ -14,11 +15,14 @@ namespace WebApiVRoom.Controllers
     {
         private IPostService _postService;
         private ILikesDislikesPService _likesService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public PostController(IPostService postService, ILikesDislikesPService likesService)
+
+        public PostController(IPostService postService, ILikesDislikesPService likesService, IHubContext<ChatHub> hubContext)
         {
             _postService = postService;
             _likesService = likesService;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -70,7 +74,8 @@ namespace WebApiVRoom.Controllers
 
            PostDTO post = await _postService.AddPost(img,video,req.text,req.id);
             object obj = ConvertObject(post);
-            await WebSocketHelper.SendMessageToAllAsync("new_post", obj);
+            //await WebSocketHelper.SendMessageToAllAsync("new_post", obj);
+            await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_post", payload = obj });
             return Ok();
         }
 
@@ -110,8 +115,9 @@ namespace WebApiVRoom.Controllers
 
             object obj = ConvertObject(post);
 
-            await WebSocketHelper.SendMessageToAllAsync("post_deleted", obj);
-            return Ok();
+            //await WebSocketHelper.SendMessageToAllAsync("post_deleted", obj);
+            await _hubContext.Clients.All.SendAsync("postMessage", new { type = "post_deleted", payload = obj });
+        
 
             return Ok(post);
         }
@@ -136,7 +142,8 @@ namespace WebApiVRoom.Controllers
 
                 PostDTO c = await _postService.UpdatePost(ans);
                 object obj = ConvertObject(c);
-                await WebSocketHelper.SendMessageToAllAsync("new_likepost", obj);
+                //await WebSocketHelper.SendMessageToAllAsync("new_likepost", obj);
+                await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_likepost", payload = obj });
 
                 return Ok();
             }
@@ -165,7 +172,8 @@ namespace WebApiVRoom.Controllers
                 PostDTO c = await _postService.UpdatePost(ans);
                 object obj = ConvertObject(c);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_dislikepost", obj);
+                //await WebSocketHelper.SendMessageToAllAsync("new_dislikepost", obj);
+                await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_dislikepost", payload = obj });
 
                 return Ok();
             }

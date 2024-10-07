@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.Helpers;
@@ -10,12 +11,14 @@ namespace WebApiVRoom.Controllers
     public class CommentPostController : Controller
     {
         private ICommentPostService _comService;
-        ILikesDislikesCPService _likesService;
+        private ILikesDislikesCPService _likesService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public CommentPostController(ICommentPostService cService, ILikesDislikesCPService likesService)
+        public CommentPostController(ICommentPostService cService, ILikesDislikesCPService likesService, IHubContext<ChatHub> hubContext)
         {
             _comService = cService;
             _likesService = likesService;
+            _hubContext = hubContext;
         }
 
 
@@ -46,7 +49,8 @@ namespace WebApiVRoom.Controllers
             CommentPostDTO c = await _comService.UpdateCommentPost(u);
             object com = ConvertObject(c);
 
-            await WebSocketHelper.SendMessageToAllAsync("update_commentpost", com);
+            //await WebSocketHelper.SendMessageToAllAsync("update_commentpost", com);
+            await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "update_commentpost", payload = com });
 
             return Ok(c);
         }
@@ -62,7 +66,8 @@ namespace WebApiVRoom.Controllers
             CommentPostDTO ans = await _comService.AddCommentPost(request);
             object com = ConvertObject(ans);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_commentpost", com);
+            //await WebSocketHelper.SendMessageToAllAsync("new_commentpost", com);
+            await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "new_commentpost", payload = com });
 
             return Ok(ans);
         }
@@ -141,7 +146,8 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("like_commentpost", null);
+                //await WebSocketHelper.SendMessageToAllAsync("like_commentpost", null);
+                await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "like_commentpost", payload = c });
 
                 return Ok();
             }
@@ -169,7 +175,8 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("dislike_commentpost", null);
+                //await WebSocketHelper.SendMessageToAllAsync("dislike_commentpost", null);
+                await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "dislike_commentpost", payload = c });
 
                 return Ok();
             }
@@ -194,7 +201,8 @@ namespace WebApiVRoom.Controllers
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
             object com = ConvertObject(c);
-            await WebSocketHelper.SendMessageToAllAsync("pin_commentpost", com);
+            //await WebSocketHelper.SendMessageToAllAsync("pin_commentpost", com);
+            await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "pin_commentpost", payload = com });
 
             return Ok();
         }
@@ -216,7 +224,8 @@ namespace WebApiVRoom.Controllers
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
             object com = ConvertObject(c);
-            await WebSocketHelper.SendMessageToAllAsync("pin_commentpost",com);
+            //await WebSocketHelper.SendMessageToAllAsync("pin_commentpost",com);
+            await _hubContext.Clients.All.SendAsync("postcommentMessage", new { type = "pin_commentpost", payload = com });
 
             return Ok();
         }
@@ -228,6 +237,7 @@ namespace WebApiVRoom.Controllers
                 id = ans.Id,
                 text = ans.Comment,
                 isEdited = ans.IsEdited,
+                isPinned = ans.IsPinned,
             };
             return obj;
         }

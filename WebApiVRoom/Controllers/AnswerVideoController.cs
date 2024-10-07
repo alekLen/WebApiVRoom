@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Net.WebSockets;
 using System.Text;
 using WebApiVRoom.BLL.DTO;
@@ -14,11 +15,13 @@ namespace WebApiVRoom.Controllers
     {
         private IAnswerVideoService _answerService;
         private ILikesDislikesAVService _likesService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public AnswerVideoController(IAnswerVideoService ansService, ILikesDislikesAVService likesService)
+        public AnswerVideoController(IAnswerVideoService ansService, ILikesDislikesAVService likesService, IHubContext<ChatHub> hubContext)
         {
             _answerService = ansService;
             _likesService = likesService;
+            _hubContext = hubContext;
         }
 
 
@@ -49,7 +52,8 @@ namespace WebApiVRoom.Controllers
             AnswerVideoDTO answer = await _answerService.Update(u);
             object obj=ConvertObject(answer);
 
-            await WebSocketHelper.SendMessageToAllAsync("update_answer", obj);
+            //await WebSocketHelper.SendMessageToAllAsync("update_answer", obj);
+            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "update_answer", payload = obj });
 
             return Ok(answer);
         }
@@ -66,7 +70,8 @@ namespace WebApiVRoom.Controllers
 
             object obj = ConvertObject(ans);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
+            //await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
+            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "new_answer", payload = obj });
 
             return Ok(ans);
         }
@@ -88,7 +93,8 @@ namespace WebApiVRoom.Controllers
             await _answerService.Delete(id);
             object obj = ConvertObject(ans);
 
-            await WebSocketHelper.SendMessageToAllAsync("delete_answer", obj);
+            //await WebSocketHelper.SendMessageToAllAsync("delete_answer", obj);
+            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "delete_answer", payload = obj });
 
             return Ok(ans);
         }
@@ -139,7 +145,8 @@ namespace WebApiVRoom.Controllers
                 AnswerVideoDTO c = await _answerService.Update(ans);
                 object obj = ConvertObject(c);
 
-                await WebSocketHelper.SendMessageToAllAsync("like_answer", obj);
+                //await WebSocketHelper.SendMessageToAllAsync("like_answer", obj);
+                await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "like_answer", payload = obj });
 
                 return Ok();
             }
@@ -168,7 +175,8 @@ namespace WebApiVRoom.Controllers
                 AnswerVideoDTO c = await _answerService.Update(ans);
                 object obj = ConvertObject(c);
 
-                await WebSocketHelper.SendMessageToAllAsync("dislike_answer", obj);
+                //await WebSocketHelper.SendMessageToAllAsync("dislike_answer", obj);
+                await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "dislike_answer", payload = obj });
 
                 return Ok();
             }
