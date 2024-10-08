@@ -10,6 +10,7 @@ using System.Net.WebSockets;
 using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,6 +84,14 @@ builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 400_000_000; 
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 400_000_000; 
+});
 
 builder.Services.AddAzureClients(clientBuilder =>
 {

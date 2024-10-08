@@ -195,13 +195,11 @@ namespace WebApiVRoom.Controllers
 
             try
             {
-                // Test версія
-                string stream = "D:\\Vide VRoom\\mixkit-52212-video-52212-hd-ready.mp4"; // D:\Vide VRoom\5638009-uhd_3840_2160_25fps.mp4
-                // production версія
-                //using (var stream = file.OpenReadStream())
-                ///{
+
+                using (var stream = file.OpenReadStream())
+                {
                     await _videoService.AddVideo(videoDto, stream);
-                //}
+                }
                 return CreatedAtAction(nameof(GetVideo), new { id = videoDto.Id }, videoDto);
             }
             catch (Exception ex)
