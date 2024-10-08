@@ -372,6 +372,7 @@ namespace WebApiVRoom.BLL.Services
                 video.LikeCount = videoDTO.LikeCount;
                 video.DislikeCount = videoDTO.DislikeCount;
                 video.IsShort = videoDTO.IsShort;
+                video.Cover = videoDTO.Cover;
 
                 video.Categories.Clear();
                 foreach (var categoryId in videoDTO.CategoryIds)
@@ -395,6 +396,37 @@ namespace WebApiVRoom.BLL.Services
                         video.VideoUrl = newVideoUrl.FileUrl;
                     }
                 }
+
+                await _unitOfWork.Videos.Update(video);
+                await _algoliaService.AddOrUpdateVideoAsync(video);
+
+                return _mapper.Map<Video, VideoDTO>(video);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while updating video", ex);
+            }
+        }
+
+        public async Task<VideoDTO> UpdateVideoInfo(VideoDTO videoDTO)
+        {
+            try
+            {
+                var video = await _unitOfWork.Videos.GetById(videoDTO.Id);
+                if (video == null)
+                {
+                    throw new KeyNotFoundException("Video not found");
+                }
+
+                video.Tittle = videoDTO.Tittle;
+                video.Description = videoDTO.Description;
+                video.UploadDate = videoDTO.UploadDate;
+                video.Duration = videoDTO.Duration;
+                video.ViewCount = videoDTO.ViewCount;
+                video.LikeCount = videoDTO.LikeCount;
+                video.DislikeCount = videoDTO.DislikeCount;
+                video.IsShort = videoDTO.IsShort;
+                video.Cover= videoDTO.Cover;
 
                 await _unitOfWork.Videos.Update(video);
                 await _algoliaService.AddOrUpdateVideoAsync(video);

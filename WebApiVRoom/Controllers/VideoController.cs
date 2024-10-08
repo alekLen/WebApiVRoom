@@ -297,7 +297,7 @@ namespace WebApiVRoom.Controllers
 
                 videoDto.LikeCount += 1;
 
-                VideoDTO vid = await _videoService.UpdateVideo(videoDto);
+                VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
                 object obj=ConvertObject(videoDto);
                 
                 await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
@@ -327,7 +327,7 @@ namespace WebApiVRoom.Controllers
 
                 videoDto.DislikeCount += 1;
 
-                VideoDTO vid = await _videoService.UpdateVideo(videoDto);
+                VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
                 object obj = ConvertObject(videoDto);
 
                 await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
