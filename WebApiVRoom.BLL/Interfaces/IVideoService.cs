@@ -11,7 +11,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<List<VideoDTO>> GetByChannelId(int channelId);
         Task<List<VideoDTO>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
 
-        Task AddVideo(VideoDTO videoDTO, string pathFile);// тестовий метод
+        Task AddVideo(VideoDTO videoDTO, Stream pathFile);// тестовий метод
         Task DeleteVideo(int id);
         Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<IEnumerable<VideoDTO>> GetAllVideos();

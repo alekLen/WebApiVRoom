@@ -71,17 +71,17 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
                    .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
                   .ForMember(dest => dest.LastViewedPosition, opt => opt.Ignore())
-                  .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) // Обработка вручную;
-                  .ForMember(dest => dest.Categories, opt => opt.Ignore()) // Обработка вручную
-                  .ForMember(dest => dest.Tags, opt => opt.Ignore()) // Обработка вручную
+                  .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) 
+                  .ForMember(dest => dest.Categories, opt => opt.Ignore()) 
+                  .ForMember(dest => dest.Tags, opt => opt.Ignore()) 
                   .ForMember(dest => dest.HistoryOfBrowsings, opt => opt.Ignore())
-                  .ForMember(dest => dest.PlayListVideos, opt => opt.Ignore()) // Обработка вручную
-                  .ForMember(dest => dest.CommentVideos, opt => opt.Ignore()); // Обработка вручную;
+                  .ForMember(dest => dest.PlayListVideos, opt => opt.Ignore()) 
+                  .ForMember(dest => dest.CommentVideos, opt => opt.Ignore()); 
             });
             _mapper = new Mapper(config);
         }
 
-        public async Task AddVideo(VideoDTO videoDTO, string filePath)
+        public async Task AddVideo(VideoDTO videoDTO, Stream fileStream)
         {
             try
             {
@@ -90,64 +90,29 @@ namespace WebApiVRoom.BLL.Services
                 string sanitizedTitle = videoDTO.Tittle.Replace(" ", "_");
                 string outputFolder = Path.Combine(Path.GetTempPath(), sanitizedTitle);
                 Directory.CreateDirectory(outputFolder);
-                string outputPlaylistPath = Path.Combine(outputFolder, $"{sanitizedTitle}.m3u8");
-                ///
-                ///Варіант вигрузки відео без формату
-
-                //string ffmpegArgs = $"-i \"{filePath}\" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylistPath}\"";
-
-                //await RunFfmpegCommand(ffmpegArgs);
-
-                //using (var playlistStream = new FileStream(outputPlaylistPath, FileMode.Open, FileAccess.Read))
-                //{
-                //    var playlistBlobUrl = await _blobStorageService.UploadFileAsync(playlistStream, $"{sanitizedTitle}.m3u8");
-                //    if (string.IsNullOrEmpty(playlistBlobUrl.FileUrl))
-                //    {
-                //        throw new Exception("URL can`t find in Blob Storage.");
-                //    }
-
-                //    video.VideoUrl = playlistBlobUrl.FileUrl;
-                //}
-
-                //foreach (var segmentFilePath in Directory.GetFiles(outputFolder, "*.ts"))
-                //{
-                //    string segmentFileName = Path.GetFileName(segmentFilePath);
-                //    using (var segmentStream = new FileStream(segmentFilePath, FileMode.Open, FileAccess.Read))
-                //    {
-                //        await _blobStorageService.UploadFileAsync(segmentStream, segmentFileName);
-                //    }
-                //}
-
-                ///Вигрузка з форматами
-                // Плейлисти для різних форматів
                 string outputPlaylist720p = Path.Combine(outputFolder, $"{sanitizedTitle}_720p.m3u8");
-                string outputPlaylist480p = Path.Combine(outputFolder, $"{sanitizedTitle}_480p.m3u8");
-                string outputPlaylist360p = Path.Combine(outputFolder, $"{sanitizedTitle}_360p.m3u8");
 
-                // Команди для кожної якості
-                string ffmpegArgs720p = $"-i \"{filePath}\" -vf scale=-1:720 -c:v libx264 -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist720p}\"";
-                string ffmpegArgs480p = $"-i \"{filePath}\" -vf scale=-1:480 -c:v libx264 -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist480p}\"";
-                string ffmpegArgs360p = $"-i \"{filePath}\" -vf scale=-1:360 -c:v libx264 -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist360p}\"";
+                // Створюємо тимчасовий шлях для збереження файлу
+                string tempFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp4");
+
+                // Зберігаємо вміст потоку у файл
+                using (var fileStreamOutput = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    await fileStream.CopyToAsync(fileStreamOutput);
+                }
+
+                // Після цього можна використовувати tempFilePath у FFmpeg
+                string ffmpegArgs720p = $"-i \"{tempFilePath}\" -vf scale=1280:720 -c:v libx264 -b:v 1500k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist720p}\"";
 
 
                 RunFfmpegCommand(ffmpegArgs720p);
-                RunFfmpegCommand(ffmpegArgs480p);
-                RunFfmpegCommand(ffmpegArgs360p);
-                
 
                 string masterPlaylistPath = Path.Combine(outputFolder, $"{sanitizedTitle}_master.m3u8");
                 using (var writer = new StreamWriter(masterPlaylistPath))
                 {
                     writer.WriteLine("#EXTM3U");
-
                     writer.WriteLine("#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=1280x720");
                     writer.WriteLine($"{sanitizedTitle}_720p.m3u8");
-
-                    writer.WriteLine("#EXT-X-STREAM-INF:BANDWIDTH=500000,RESOLUTION=854x480");
-                    writer.WriteLine($"{sanitizedTitle}_480p.m3u8");
-
-                    writer.WriteLine("#EXT-X-STREAM-INF:BANDWIDTH=300000,RESOLUTION=640x360");
-                    writer.WriteLine($"{sanitizedTitle}_360p.m3u8");
                 }
 
                 using (var masterPlaylistStream = new FileStream(masterPlaylistPath, FileMode.Open, FileAccess.Read))
@@ -161,7 +126,7 @@ namespace WebApiVRoom.BLL.Services
                     video.VideoUrl = masterPlaylistBlobUrl.FileUrl;
                 }
 
-                foreach (var playlistPath in new[] { outputPlaylist720p, outputPlaylist480p })
+                foreach (var playlistPath in new[] { outputPlaylist720p })
                 {
                     using (var playlistStream = new FileStream(playlistPath, FileMode.Open, FileAccess.Read))
                     {
@@ -314,6 +279,7 @@ namespace WebApiVRoom.BLL.Services
         //        throw new Exception("Error while deleting video", ex);
         //    }
         //}
+
         public async Task DeleteVideo(int id)
         {
             try
