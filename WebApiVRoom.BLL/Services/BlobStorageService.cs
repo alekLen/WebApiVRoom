@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.DTO;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -63,6 +64,86 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<BlobStorageDTO> UploadFileAsync(IFormFile file, string fileName)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return null;
+
+                // Создаем клиент для работы с контейнером
+                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+                Console.WriteLine($"Connecting to container: {_containerName}");
+
+                // Создаем контейнер, если его еще нет
+                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+                // Генерируем уникальное имя файла
+                var blobClient = containerClient.GetBlobClient(fileName);
+                Console.WriteLine($"Uploading file: {fileName}");
+
+
+                // Загружаем файл в Blob Storage
+                using (var stream = file.OpenReadStream())
+                {
+                    await blobClient.UploadAsync(stream, overwrite: true);
+                }
+
+                var blobProperties = await blobClient.GetPropertiesAsync();
+
+                return new BlobStorageDTO
+                {
+                    FileUrl = blobClient.Uri.ToString(),
+                    ContainerName = _containerName,
+                    BlobName = fileName,
+                    UploadDate = DateTime.UtcNow,
+                    ContentType = blobProperties.Value.ContentType,
+                    Size = blobProperties.Value.ContentLength
+                };
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Azure Request Failed: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in UploadFileAsync: {ex.Message}");
+                throw;
+            }
+        }
+        public async Task DeleteImgAsync(string fileUrl)
+        {
+            if (string.IsNullOrEmpty(fileUrl))
+            {
+                throw new ArgumentException("File URL cannot be null or empty");
+            }
+
+            Uri uri = new Uri(fileUrl);
+            string fileName = Path.GetFileName(uri.LocalPath);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+            var blobClient = containerClient.GetBlobClient(fileName);
+
+            Console.WriteLine($"Deleting file: {fileName}");
+
+            try
+            {
+                var response = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                if (!response)
+                {
+                    Console.WriteLine("File did not exist or could not be deleted.");
+                }
+                else
+                {
+                    Console.WriteLine("File successfully deleted.");
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Failed to delete blob: {ex.Message}");
+                throw;
+            }
+        }
         public async Task DeleteFileAsync(string fileUrl)
         {
             if (string.IsNullOrEmpty(fileUrl))

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,8 @@ namespace WebApiVRoom.BLL.Interfaces
     public interface IChannelSettingsService
     {
         Task<ChannelSettingsDTO> GetChannelSettings(int id);
-        Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto);
+        Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chSDto, IFormFileCollection channelImg);
+        Task<ChannelSettingsDTO> UpdateChannelSettingsShort(ChannelSettingsShortDTO chSDto, IFormFileCollection channelImg);
         Task<ChannelSettingsDTO> DeleteChannelSettings(int id);
         Task<ChannelSettingsDTO> FindByOwner(string ownerId);
         Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId, string lang);

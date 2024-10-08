@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,18 @@ namespace WebApiVRoom.BLL.Services
     public class ChannelSettingsService : IChannelSettingsService
     {
         IUnitOfWork Database { get; set; }
-
-        public ChannelSettingsService(IUnitOfWork uow)
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName = "videos";
+        private readonly IAlgoliaService _algoliaService;
+        private readonly IBlobStorageService _blobStorageService;
+        public ChannelSettingsService(IUnitOfWork uow, BlobServiceClient blobServiceClient, IAlgoliaService algoliaService, IBlobStorageService blobStorageService)
         {
             Database = uow;
+            _blobServiceClient = blobServiceClient;
+            _algoliaService = algoliaService;
+            _blobStorageService = blobStorageService;
         }
-      
+
         public static IMapper InitializeChannelSettingsMapper()
         {
             var config = new MapperConfiguration(cfg =>
@@ -32,6 +40,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.DateJoined, opt => opt.MapFrom(src => src.DateJoined))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
+                    .ForMember(dest => dest.ChannelPlofilePhoto, opt => opt.MapFrom(src => src.ChannelPlofilePhoto))//
                     .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => src.Notification))
                     .ForMember(dest => dest.Videos, opt => opt.MapFrom(src => src.Videos.Select(v => v.Id).ToList()))
                     .ForMember(dest => dest.Posts, opt => opt.MapFrom(src => src.Posts.Select(p => p.Id).ToList()))
@@ -49,7 +58,7 @@ namespace WebApiVRoom.BLL.Services
 
                 if (channelSettings == null)
                 {
-                    return null; 
+                    return null;
                 }
 
                 var mapper = InitializeChannelSettingsMapper();
@@ -61,7 +70,7 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto)
+        public async Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto, IFormFileCollection channelImg)
         {
             try
             {
@@ -74,8 +83,23 @@ namespace WebApiVRoom.BLL.Services
                 channelSettings.ChannelName = chDto.ChannelName;
                 channelSettings.DateJoined = chDto.DateJoined;
                 channelSettings.Description = chDto.Description;
-                channelSettings.ChannelBanner = chDto.ChannelBanner;
                 channelSettings.Notification = chDto.Notification;
+
+                //channelSettings.ChannelBanner = chDto.ChannelBanner;
+                //channelSettings.ChannelPlofilePhoto = chDto.ChannelPlofilePhoto;
+                if (channelImg != null)
+                {
+                    if (channelImg[0] != null)//если нет баннера оставляем старую ссылку
+                    {
+                        await _blobStorageService.DeleteFileAsync(channelSettings.ChannelBanner);//удаляем старый баннер
+                        channelSettings.ChannelBanner = await GetBlobFileUrl(chDto.ChannelName, channelImg[0]);//добавляем новый баннер
+                    }
+                    if (channelImg[1] != null)//если нет фото профиля канала оставляем старую ссылку
+                    {
+                        await _blobStorageService.DeleteFileAsync(channelSettings.ChannelPlofilePhoto);//удаляем старое фото профиля канала
+                        channelSettings.ChannelPlofilePhoto = await GetBlobFileUrl(chDto.ChannelName, channelImg[1]);//добавляем новое фото профиля канала
+                    }
+                }
 
                 channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);
                 channelSettings.Language = await Database.Languages.GetById(chDto.Language_Id);
@@ -95,6 +119,54 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<ChannelSettingsDTO> UpdateChannelSettingsShort(ChannelSettingsShortDTO chSDto, IFormFileCollection channelImg)
+        {
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.GetById(chSDto.Id);
+
+                if (channelSettings == null)
+                {
+                    return null;
+                }
+                channelSettings.ChannelName = chSDto.ChannelName;
+                channelSettings.Description = chSDto.Description;
+
+                if (channelImg != null)
+                {
+                    if (channelImg[0] != null)//если нет баннера оставляем старую ссылку
+                    {
+                        await _blobStorageService.DeleteImgAsync(channelSettings.ChannelBanner);//удаляем старый баннер
+                        channelSettings.ChannelBanner = await GetBlobFileUrl(chSDto.ChannelName, channelImg[0]);//добавляем новый баннер
+                    }
+                    if (channelImg[1] != null)//если нет фото профиля канала оставляем старую ссылку
+                    {
+                        await _blobStorageService.DeleteImgAsync(channelSettings.ChannelPlofilePhoto);//удаляем старое фото профиля канала
+                        channelSettings.ChannelPlofilePhoto = await GetBlobFileUrl(chSDto.ChannelName, channelImg[1]);//добавляем новое фото профиля канала
+                    }
+                }
+                await Database.ChannelSettings.Update(channelSettings);
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<string> GetBlobFileUrl(string str, IFormFile file)
+        {
+            var outputFileName = $"{str}-{Guid.NewGuid()}.jpg";
+            var videoUrl = await _blobStorageService.UploadFileAsync(file, outputFileName);
+            if (string.IsNullOrEmpty(videoUrl.FileUrl))
+            {
+                throw new Exception("URL відео не був отриманий від Blob Storage.");
+            }
+            return videoUrl.FileUrl;
+        }
+
         public async Task<ChannelSettingsDTO> DeleteChannelSettings(int id)
         {
             try
@@ -107,6 +179,10 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await Database.ChannelSettings.Delete(channelSettings.Id);
+
+                
+                await _blobStorageService.DeleteImgAsync(channelSettings.ChannelBanner);//удаляем старый баннер
+                await _blobStorageService.DeleteImgAsync(channelSettings.ChannelPlofilePhoto);//удаляем старое фото профиля канала
 
                 var mapper = InitializeChannelSettingsMapper();
                 return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
@@ -137,7 +213,7 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
-        public async Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId,string lang)
+        public async Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId, string lang)
         {
             //User user = await Database.Users.GetByClerk_Id(clerkId);
             //if (user == null) { return null; }
@@ -146,10 +222,10 @@ namespace WebApiVRoom.BLL.Services
             {
                 return null;
             }
-            Language language=await Database.Languages.GetByName(lang);
+            Language language = await Database.Languages.GetByName(lang);
             if (language == null)
             {
-                language = new Language() { Name=lang};
+                language = new Language() { Name = lang };
 
             }
             channelSettings.Language = language;

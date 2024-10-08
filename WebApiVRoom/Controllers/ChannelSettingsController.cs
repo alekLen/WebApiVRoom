@@ -10,10 +10,12 @@ namespace WebApiVRoom.Controllers
     public class ChannelSettingsController : ControllerBase
     {
         private IChannelSettingsService _chService;
+        private IUserService _uService;
 
-        public ChannelSettingsController(IChannelSettingsService chService)
+        public ChannelSettingsController(IChannelSettingsService chService, IUserService userService)
         {
             _chService = chService;
+            _uService = userService;
         }
 
 
@@ -27,6 +29,26 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(ch);
+        }
+        [HttpGet("getinfobychannelid/{id}")]
+        public async Task<ActionResult<ChannelSettingsDTO>> GetChannelInfo([FromRoute] int id)
+        {
+            try {  
+            var ch = await _chService.GetChannelSettings(id);
+            if (ch == null)
+            {
+                return NotFound();
+            }
+            UserDTO u= await _uService.GetUser(ch.Owner_Id);
+            ChannelUserFor_CommentDTO user = new()
+            {
+                Clerk_Id =u.Clerk_Id,
+                ChannelBanner = ch.ChannelBanner,
+                ChannelName = ch.ChannelName
+            };
+            return new ObjectResult(user);
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
         }
 
         [HttpGet("getbyownerid/{clerk_id}")]
@@ -44,28 +66,60 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getinfochannel/{clerkId}")]
         public async Task<ActionResult<ChannelUserFor_CommentDTO>> GetInfoChannelByClerkId([FromRoute] string clerkId)
         {
-            var ch = await _chService.FindByOwner(clerkId);
-            if (ch == null)
+            try
             {
-                return NotFound();
+                var ch = await _chService.FindByOwner(clerkId);
+                if (ch == null)
+                {
+                    return NotFound();
+                }
+
+                ChannelUserFor_CommentDTO user = new()
+                {
+                    Clerk_Id = clerkId,
+                    ChannelBanner = ch.ChannelBanner,
+                    ChannelName = ch.ChannelName
+                };
+
+                return new ObjectResult(user);
             }
-
-            ChannelUserFor_CommentDTO user = new() { 
-                Clerk_Id=clerkId,
-                ChannelBanner = ch.ChannelBanner,
-                ChannelName = ch.ChannelName };
-
-            return new ObjectResult(user);
+            catch (Exception ex) { return BadRequest(ModelState); }
         }
 
         [HttpPut("update")]
-        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings([FromBody] ChannelSettingsDTO ch)
+        public async Task<ActionResult<ChannelSettingsDTO>> UpdateChannelSettings(IFormFile? channelBanner, IFormFile? profilePhoto, [FromForm] ChannelSettingsDTO ch)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettings(ch);
+
+            FormFileCollection files = new FormFileCollection();
+            files.Add(channelBanner);
+            files.Add(profilePhoto);
+
+            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettings(ch, files);
+            if (chDto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(chDto);
+        }
+
+        [HttpPut("updateShort")]
+        public async Task<IActionResult> UpdateChannelSettingsShort(IFormFile? channelBanner, IFormFile? profilePhoto, [FromForm] ChannelSettingsShortDTO ch)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            FormFileCollection files = new FormFileCollection();
+            files.Add(channelBanner);
+            files.Add(profilePhoto);
+
+            ChannelSettingsDTO chDto = await _chService.UpdateChannelSettingsShort(ch, files);
             if (chDto == null)
             {
                 return NotFound();

@@ -13,6 +13,8 @@ namespace WebApiVRoom.DAL.Entities
         public DateTime DateJoined { get; set; }
         public string Description { get; set; } = string.Empty;
         public string ChannelBanner { get; set; } = string.Empty;
+        public string ChannelPlofilePhoto { get; set; } = string.Empty;
+
         public User Owner { get; set; }
         public Language Language { get; set; }
         public Country Country { get; set; }

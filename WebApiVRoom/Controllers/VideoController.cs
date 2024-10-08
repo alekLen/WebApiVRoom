@@ -114,15 +114,17 @@ namespace WebApiVRoom.Controllers
     public class VideoController : ControllerBase
     {
         private readonly IVideoService _videoService;
+        private readonly IChannelSettingsService _chService;
 
-        public VideoController(IVideoService videoService)
+        public VideoController(IVideoService videoService, IChannelSettingsService _ch)
         {
             _videoService = videoService;
+            _chService = _ch;
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<VideoDTO>> GetVideo([FromRoute] int id)
+        public async Task<ActionResult<VideoInfoDTO>> GetVideo([FromRoute] int id)
         {
             var video = await _videoService.GetVideo(id);
             if (video == null)
@@ -130,6 +132,57 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return Ok(video);
+        }
+        [HttpGet("getvideoinfo/{id}")]
+        public async Task<ActionResult<VideoInfoDTO>> GetVideoInfo([FromRoute] int id)
+        {
+            var video = await _videoService.GetVideoInfo(id);
+            if (video == null)
+            {
+                return NotFound();
+            }
+            ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video,ch);
+            return Ok(videoInfoDTO);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetAllVideo()
+        {
+            var video = await _videoService.GetAllVideos();
+            List<VideoInfoDTO> result = new List<VideoInfoDTO>();
+            if (video == null)
+            {
+                return NotFound();
+            }
+            foreach (var v in video)
+            {
+                ChannelSettingsDTO channelSettingsDTO = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                VideoInfoDTO vinfo=ConvertVideoToVideoInfo(v,channelSettingsDTO);
+                result.Add(vinfo);
+            }
+            return Ok(result);
+        }
+        private VideoInfoDTO ConvertVideoToVideoInfo(VideoDTO v,ChannelSettingsDTO ch)
+        {
+            return new VideoInfoDTO
+            {
+                Id =v.Id,
+               ObjectID =v.ObjectID,
+              ChannelSettingsId =ch.Id,
+              ChannelName =ch.ChannelName,
+              ChannelBanner = ch.ChannelBanner, 
+              Tittle = v.Tittle,
+              Description =v.Description,
+              UploadDate =v.UploadDate,
+              Duration = v.Duration,
+              VideoUrl = v.VideoUrl,
+              ViewCount = v.ViewCount,
+              LikeCount = v.LikeCount,
+              DislikeCount = v.DislikeCount,
+              IsShort =v.IsShort,
+              Cover = v.Cover,
+            };
         }
 
         [HttpPost("add")]

@@ -170,6 +170,18 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(user);
         }
 
+        [HttpGet("getbypostid/{postId}")]
+        public async Task<ActionResult<UserDTO>> ByPostId([FromRoute] int postId)
+        {
+
+            var user = await _userService.GetUserByPostId(postId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(user);
+        }
+
 
     }
      

@@ -1,4 +1,5 @@
-﻿using WebApiVRoom.BLL.DTO;
+﻿using Microsoft.AspNetCore.Http;
+using WebApiVRoom.BLL.DTO;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using static WebApiVRoom.BLL.Services.VideoService;
 
@@ -17,6 +18,9 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<VideoWithStreamDTO> GetVideo(int id);
         Task UpdateVideo(VideoDTO videoDTO);
         Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId);
+        Task<string> UploadFileAsync(IFormFile file);
+        Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream();
+        Task<VideoDTO> GetVideoInfo(int id);
 
     }
 }

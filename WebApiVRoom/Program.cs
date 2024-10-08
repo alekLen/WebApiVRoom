@@ -17,8 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
+//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton(x => {
@@ -42,8 +42,6 @@ builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddTransient<ITagService, TagService>();
 builder.Services.AddTransient<IVideoService, VideoService>();
-//builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
-//    new BlobStorageService(builder.Configuration.GetConnectionString("BlobStorage:ConnectionString")));
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
@@ -85,17 +83,14 @@ builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:blob"]!);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq:K1SZFPTOtr:KBHBeksoGMGw==:queue"]!);
-});
 
 builder.Services.AddAzureClients(clientBuilder =>
 {
     clientBuilder.AddBlobServiceClient(builder.Configuration["BlobStorage:ConnectionString"]!);
     clientBuilder.AddQueueServiceClient(builder.Configuration["BlobStorage:ConnectionString"]!);
 });
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -106,7 +101,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Enable CORS
-app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseCors(builder => builder.WithOrigins("http://localhost:3000")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials());
 
 app.UseHttpsRedirection();
 
@@ -114,43 +112,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Enable WebSocket
-app.UseWebSockets();
-
-app.Use(async (context, next) =>
-{
-    if (context.WebSockets.IsWebSocketRequest)
-    {
-        var socket = await context.WebSockets.AcceptWebSocketAsync();
-        var socketId = Guid.NewGuid().ToString();
-
-        // Добавляем WebSocket в хранилище
-        WebSocketConnectionManager.AddSocket(socketId, socket);
-
-        // Ждём завершения соединения
-        await ReceiveWebSocketMessages(socket, async (result, buffer) =>
-        {
-            if (result.MessageType == WebSocketMessageType.Close)
-            {
-                await WebSocketConnectionManager.RemoveSocket(socketId);
-            }
-        });
-    }
-    else
-    {
-        await next();
-    }
-});
-
+app.MapHub<ChatHub>("/hub");
 
 app.Run();
-
-async Task ReceiveWebSocketMessages(WebSocket socket, Action<WebSocketReceiveResult, byte[]> handleMessage)
-{
-    var buffer = new byte[1024 * 4];
-    while (socket.State == WebSocketState.Open)
-    {
-        var result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-        handleMessage(result, buffer);
-    }
-}

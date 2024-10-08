@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Net.WebSockets;
 using System.Text;
 using WebApiVRoom.BLL.DTO;
@@ -13,11 +14,13 @@ namespace WebApiVRoom.Controllers
     {
         private ICommentVideoService _comService;
         private ILikesDislikesCVService _likesService;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public CommentVideoController(ICommentVideoService cService, ILikesDislikesCVService likesService)
+        public CommentVideoController(ICommentVideoService cService, ILikesDislikesCVService likesService, IHubContext<ChatHub> hubContext)
         {
             _comService = cService;
             _likesService = likesService;
+            _hubContext = hubContext;
         }
 
 
@@ -46,8 +49,10 @@ namespace WebApiVRoom.Controllers
             }
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
+            object com= ConvertObject(c);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            //await WebSocketHelper.SendMessageToAllAsync("update_comment", com);
+            await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "update_comment", payload = com });
 
             return Ok(c);
         }
@@ -72,8 +77,8 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
-
+                //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+                await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment", payload = c });
                 return Ok();
             }
 
@@ -100,7 +105,8 @@ namespace WebApiVRoom.Controllers
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+                //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+                await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment", payload = c });
 
                 return Ok();
             }
@@ -125,8 +131,9 @@ namespace WebApiVRoom.Controllers
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
-             
+            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment", payload = c });
+
             return Ok();
         }
         [HttpPut("unpin/{comment}")]
@@ -147,7 +154,8 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment" });
 
             return Ok();
         }
@@ -162,7 +170,8 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO ans = await _comService.AddCommentVideo(request);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
+            await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment" });
 
             return Ok(ans);
         }
@@ -183,7 +192,8 @@ namespace WebApiVRoom.Controllers
 
             await _comService.DeleteCommentVideo(id);
 
-            await WebSocketHelper.SendMessageToAllAsync("new_comment",null);
+            //await WebSocketHelper.SendMessageToAllAsync("new_comment",null);
+            await _hubContext.Clients.All.SendAsync("commentMessage", new { type = "new_comment" });
 
             return Ok(ans);
         }
@@ -222,6 +232,17 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(list);
         }
 
-        
+        private object ConvertObject(CommentVideoDTO ans)
+        {
+            object obj = new
+            {
+                id = ans.Id,
+                text = ans.Comment,
+                isEdited = ans.IsEdited,
+                isPinned = ans.IsPinned
+            };
+            return obj;
+        }
+
     }
 }
