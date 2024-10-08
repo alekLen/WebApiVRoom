@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -115,11 +116,18 @@ namespace WebApiVRoom.Controllers
     {
         private readonly IVideoService _videoService;
         private readonly IChannelSettingsService _chService;
+        private ILikesDislikesVService _likesService;
+        private readonly IHubContext<ChatHub> _hubContext;
+        private IUserService _userService;
 
-        public VideoController(IVideoService videoService, IChannelSettingsService _ch)
+        public VideoController(IVideoService videoService, IChannelSettingsService _ch,
+            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService)
         {
             _videoService = videoService;
             _chService = _ch;
+            _hubContext = hubContext;
+            _likesService = likesService;
+            _userService = userService;
         }
 
 
@@ -266,6 +274,89 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return Ok(history);
+        }
+
+        [HttpPut("like/{video_id}/{user_clrekId}")]
+        public async Task<ActionResult> likeVideo([FromRoute] int video_id, [FromRoute] string user_clrekId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            VideoDTO videoDto = await _videoService.GetVideoInfo(video_id);
+            if (videoDto == null)
+            {
+                return NotFound();
+            }
+            UserDTO us = await  _userService.GetUserByVideoId(video_id);
+            LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
+            if (like == null && user_clrekId != us.Clerk_Id)
+            {
+                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId };
+                await _likesService.Add(likeDto);
+
+                videoDto.LikeCount += 1;
+
+                VideoDTO vid = await _videoService.UpdateVideo(videoDto);
+                object obj=ConvertObject(videoDto);
+                
+                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
+                return Ok();
+            }
+
+            return Ok();
+        }
+        [HttpPut("dislike/{video_id}/{user_clrekId}")]
+        public async Task<ActionResult> dislikeVideo([FromRoute] int video_id, [FromRoute] string user_clrekId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            VideoDTO videoDto = await _videoService.GetVideoInfo(video_id);
+            if (videoDto == null)
+            {
+                return NotFound();
+            }
+            UserDTO us = await _userService.GetUserByVideoId(video_id);
+            LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
+            if (like == null && user_clrekId != us.Clerk_Id)
+            {
+                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId };
+                await _likesService.Add(likeDto);
+
+                videoDto.DislikeCount += 1;
+
+                VideoDTO vid = await _videoService.UpdateVideo(videoDto);
+                object obj = ConvertObject(videoDto);
+
+                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
+                return Ok();
+            }
+
+            return Ok();
+        }
+
+        private object ConvertObject(VideoDTO v)
+        {
+            object obj = new
+            {
+                id = v.Id,
+                objectID = v.ObjectID,
+                channelSettingsId =v.ChannelSettingsId,
+               tittle =v.Tittle,
+             description =v.Description,
+       uploadDate =v.UploadDate,
+        duration = v.Duration,
+       videoUrl = v.VideoUrl,
+        viewCount = v.ViewCount,
+        likeCount = v.LikeCount,
+        dislikeCount = v.DislikeCount,
+        isShort = v.IsShort,
+        cover =v.Cover
+
+    };
+            return obj;
         }
     }
 }

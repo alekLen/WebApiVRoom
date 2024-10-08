@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using System.Xml.Linq;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -353,7 +354,7 @@ namespace WebApiVRoom.BLL.Services
         //    }
         //}
 
-        public async Task UpdateVideo(VideoDTO videoDTO)
+        public async Task<VideoDTO> UpdateVideo(VideoDTO videoDTO)
         {
             try
             {
@@ -397,6 +398,8 @@ namespace WebApiVRoom.BLL.Services
 
                 await _unitOfWork.Videos.Update(video);
                 await _algoliaService.AddOrUpdateVideoAsync(video);
+
+                return _mapper.Map<Video, VideoDTO>(video);
             }
             catch (Exception ex)
             {
