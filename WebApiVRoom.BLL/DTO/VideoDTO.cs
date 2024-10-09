@@ -23,6 +23,7 @@ namespace WebApiVRoom.BLL.DTO
         public int DislikeCount { get; set; }
         public bool IsShort { get; set; }
         public string Cover { get; set; }
+        public bool Visibility { get; set; }
         public List<int> CategoryIds { get; set; } = new List<int>();
         public List<int> TagIds { get; set; } = new List<int>();
         public List<int> HistoryOfBrowsingIds { get; set; } = new List<int>();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.DAL.Entities;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using static WebApiVRoom.BLL.Services.VideoService;
 
@@ -23,5 +24,12 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<VideoDTO> GetVideoInfo(int id);
         Task<VideoDTO> UpdateVideoInfo(VideoDTO videoDTO);
 
+        Task<List<VideoDTO>> GetVideosByChannelId(int channelId);
+        Task<List<VideoDTO>> GetShortVideosByChannelId(int channelId);
+
+        Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility);
+
+        Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdPaginated(int channelId, bool visibility);
+        Task<IEnumerable<VideoDTO>> GetVideosByChannelIdVisibility(int channelId, bool visibility);
     }
 }

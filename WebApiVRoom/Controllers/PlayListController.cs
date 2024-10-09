@@ -78,9 +78,8 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getbyuserid/{clerk_id}")]
-        public async Task<ActionResult<List<PlayListDTO>>> ByUserId([FromRoute]string clerk_id)
+        public async Task<ActionResult<List<PlayListDTO>>> ByUserId([FromRoute]string clerk_id)//GetPlayListsByClerkUserId
         {
-            
             List<PlayListDTO> pl = await _plService.GetByUser(clerk_id);
             if (pl == null)
             {
