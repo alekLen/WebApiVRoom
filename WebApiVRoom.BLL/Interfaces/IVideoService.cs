@@ -16,11 +16,12 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<IEnumerable<VideoDTO>> GetAllVideos();
         Task<VideoWithStreamDTO> GetVideo(int id);
-        Task UpdateVideo(VideoDTO videoDTO);
+        Task<VideoDTO> UpdateVideo(VideoDTO videoDTO);
         Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId);
         Task<string> UploadFileAsync(IFormFile file);
         Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream();
         Task<VideoDTO> GetVideoInfo(int id);
+        Task<VideoDTO> UpdateVideoInfo(VideoDTO videoDTO);
 
     }
 }
