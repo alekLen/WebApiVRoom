@@ -298,9 +298,9 @@ namespace WebApiVRoom.Controllers
                 videoDto.LikeCount += 1;
 
                 VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
-                object obj=ConvertObject(vid);
+                object obj= await ConvertObject(vid);
                 
-                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
+                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_video", payload = obj });
                 return Ok();
             }
 
@@ -328,24 +328,28 @@ namespace WebApiVRoom.Controllers
                 videoDto.DislikeCount += 1;
 
                 VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
-                object obj = ConvertObject(vid);
+                object obj = await ConvertObject(vid);
 
-                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_ video", payload = obj });
+                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_video", payload = obj });
                 return Ok();
             }
 
             return Ok();
         }
 
-        private object ConvertObject(VideoDTO v)
+        private async Task< object> ConvertObject(VideoDTO video)
         {
+            ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO v= ConvertVideoToVideoInfo(video,channelSettings);  
             object obj = new
             {
                 id = v.Id,
                 objectID = v.ObjectID,
                 channelSettingsId =v.ChannelSettingsId,
-               tittle =v.Tittle,
+                channelName= v.ChannelName,
+                tittle =v.Tittle,
              description =v.Description,
+             channelBanner=v.ChannelBanner,
        uploadDate =v.UploadDate,
         duration = v.Duration,
        videoUrl = v.VideoUrl,
