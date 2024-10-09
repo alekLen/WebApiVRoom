@@ -232,8 +232,31 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.IsShort)
                 .ToListAsync();
         }
+        public async Task<List<Video>> GetShortVideosByChannelId(int channelId)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort).Where(v => v.ChannelSettings.Id == channelId)
+                .ToListAsync();
+        }
 
-        public async Task<List<Video>> GetShortVideosPaginated(int pageNumber, int pageSize)
+        public async Task<List<Video>> GetVideosByChannelId(int channelId)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort==false).Where(v => v.ChannelSettings.Id == channelId)
+                .ToListAsync();
+        }
+
+        public async Task<List<Video>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility)
         {
             return await _context.Videos
                  .Include(v => v.Categories)
@@ -242,11 +265,45 @@ namespace WebApiVRoom.DAL.Repositories
                  .Include(v => v.ChannelSettings)
                  .Include(v => v.PlayListVideos)
                 .Where(v => v.IsShort)
+                .Where(v => v.Visibility).Where(v => v.ChannelSettings.Id == channelId)
+                .ToListAsync();
+        }
+        public async Task<List<Video>> GetShortVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort).Where(v => v.ChannelSettings.Id == channelId)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
-
+        //public async Task<List<Video>> GetVideosByChannelId(int channelId)
+        //{
+        //    return await _context.Videos
+        //         .Include(v => v.Categories)
+        //        .Include(v => v.Tags)
+        //        .Include(v => v.CommentVideos)
+        //         .Include(v => v.ChannelSettings)
+        //         .Include(v => v.PlayListVideos)
+        //        .Where(v => v.IsShort == false).Where(v => v.ChannelSettings.Id == channelId)
+        //        .ToListAsync();
+        //}
+        public async Task<List<Video>> GetVideosByChannelIdVisibility(int channelId, bool visibility)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == false)
+                .Where(v => v.Visibility == false).Where(v => v.ChannelSettings.Id == channelId)
+                .ToListAsync();
+        }
         public async Task<bool> Exists(int id)
         {
             return await _context.Videos.AnyAsync(v => v.Id == id);

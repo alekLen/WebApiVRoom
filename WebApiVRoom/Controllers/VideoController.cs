@@ -269,6 +269,28 @@ namespace WebApiVRoom.Controllers
             }
             return Ok(history);
         }
+        [HttpGet("getvideosbychannelid/{channelId}")]
+        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetVideosByChannelId(int channelId)
+        {
+            return new ObjectResult(await _videoService.GetVideosByChannelId(channelId));
+        }
+        [HttpGet("getvideosbychidvisibility/{channelId}/{visibility}")]
+        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetVideosByChannelIdVisibility(int channelId, bool visibility)
+        {
+            return new ObjectResult(await _videoService.GetVideosByChannelIdVisibility(channelId, visibility));
+        }
+
+        [HttpGet("getshortvideosbychidvisibility/{channelId}/{visibility}")]
+        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility)
+        {
+            return new ObjectResult(await _videoService.GetShortVideosByChannelIdVisibility(channelId, visibility));
+        }
+
+        [HttpGet("getshortvideobychannelid/{channelId}")]
+        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetShortVideosByChannelId(int channelId)
+        {
+            return new ObjectResult(await _videoService.GetShortVideosByChannelId(channelId));
+        }
     }
 }
 

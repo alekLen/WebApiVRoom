@@ -70,6 +70,7 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                   .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
                    .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
+                   .ForMember(dest => dest.Visibility, opt => opt.MapFrom(src => src.Visibility))
                   .ForMember(dest => dest.LastViewedPosition, opt => opt.Ignore())
                   .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) // Обработка вручную;
                   .ForMember(dest => dest.Categories, opt => opt.Ignore()) // Обработка вручную
@@ -587,6 +588,33 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
 
+        public async Task<List<VideoDTO>> GetVideosByChannelId(int channelId)
+        {
+            var videos = await _unitOfWork.Videos.GetVideosByChannelId(channelId);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+        public async Task<List<VideoDTO>> GetShortVideosByChannelId(int channelId)
+        {
+            var videos = await _unitOfWork.Videos.GetShortVideosByChannelId(channelId);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+        public async Task<IEnumerable<VideoDTO>> GetVideosByChannelIdVisibility(int channelId, bool visibility)
+        {
+            var videos = await _unitOfWork.Videos.GetVideosByChannelIdVisibility(channelId, visibility);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility)
+        {
+            var videos = await _unitOfWork.Videos.GetShortVideosByChannelIdVisibility(channelId, visibility);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
+        public async Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdPaginated(int channelId, bool visibility)
+        {
+            var videos = await _unitOfWork.Videos.GetVideosByChannelIdVisibility(channelId, visibility);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
         public async Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId)
         {
             try
