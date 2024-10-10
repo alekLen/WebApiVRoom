@@ -300,7 +300,7 @@ namespace WebApiVRoom.Controllers
                 VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
                 object obj= await ConvertObject(vid);
                 
-                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_video", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "up_video", payload = obj });
                 return Ok();
             }
 
@@ -330,7 +330,7 @@ namespace WebApiVRoom.Controllers
                 VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
                 object obj = await ConvertObject(vid);
 
-                await _hubContext.Clients.All.SendAsync("videoMessage", new { type = "new_video", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "up_video", payload = obj });
                 return Ok();
             }
 
