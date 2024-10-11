@@ -83,95 +83,10 @@ namespace WebApiVRoom.BLL.Services
             _mapper = new Mapper(config);
         }
 
-        //public async Task AddVideo(VideoDTO videoDTO, Stream fileStream)
-        //{
-        //    try
-        //    {
-        //        var video = _mapper.Map<VideoDTO, Video>(videoDTO);
-
-        //        string sanitizedTitle = videoDTO.Tittle.Replace(" ", "_");
-        //        string outputFolder = Path.Combine(Path.GetTempPath(), sanitizedTitle);
-        //        Directory.CreateDirectory(outputFolder);
-        //        string outputPlaylist720p = Path.Combine(outputFolder, $"{sanitizedTitle}_720p.m3u8");
-
-        //        // Створюємо тимчасовий шлях для збереження файлу
-        //        string tempFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp4");
-
-        //        // Зберігаємо вміст потоку у файл
-        //        using (var fileStreamOutput = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
-        //        {
-        //            await fileStream.CopyToAsync(fileStreamOutput);
-        //        }
-
-        //        // Після цього можна використовувати tempFilePath у FFmpeg
-        //        string ffmpegArgs720p = $"-i \"{tempFilePath}\" -vf scale=1280:720 -c:v libx264 -b:v 1500k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist720p}\"";
-
-
-        //        RunFfmpegCommand(ffmpegArgs720p);
-
-        //        string masterPlaylistPath = Path.Combine(outputFolder, $"{sanitizedTitle}_master.m3u8");
-        //        using (var writer = new StreamWriter(masterPlaylistPath))
-        //        {
-        //            writer.WriteLine("#EXTM3U");
-        //            writer.WriteLine("#EXT-X-STREAM-INF:BANDWIDTH=800000,RESOLUTION=1280x720");
-        //            writer.WriteLine($"{sanitizedTitle}_720p.m3u8");
-        //        }
-
-        //        using (var masterPlaylistStream = new FileStream(masterPlaylistPath, FileMode.Open, FileAccess.Read))
-        //        {
-        //            var masterPlaylistBlobUrl = await _blobStorageService.UploadFileAsync(masterPlaylistStream, $"{sanitizedTitle}_master.m3u8");
-        //            if (string.IsNullOrEmpty(masterPlaylistBlobUrl.FileUrl))
-        //            {
-        //                throw new Exception("URL майстер-плейлиста не було отримано від Blob Storage.");
-        //            }
-
-        //            video.VideoUrl = masterPlaylistBlobUrl.FileUrl;
-        //        }
-
-        //        foreach (var playlistPath in new[] { outputPlaylist720p })
-        //        {
-        //            using (var playlistStream = new FileStream(playlistPath, FileMode.Open, FileAccess.Read))
-        //            {
-        //                await _blobStorageService.UploadFileAsync(playlistStream, Path.GetFileName(playlistPath));
-        //            }
-
-        //            string playlistFolder = Path.GetDirectoryName(playlistPath);
-        //            foreach (var segmentFilePath in Directory.GetFiles(playlistFolder, "*.ts"))
-        //            {
-        //                using (var segmentStream = new FileStream(segmentFilePath, FileMode.Open, FileAccess.Read))
-        //                {
-        //                    await _blobStorageService.UploadFileAsync(segmentStream, Path.GetFileName(segmentFilePath));
-        //                }
-        //            }
-        //        }
-
-        //        Directory.Delete(outputFolder, true);
-
-        //        video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
-
-        //        video.Categories = new List<Category>();
-        //        foreach (var categoryId in videoDTO.CategoryIds)
-        //        {
-        //            video.Categories.Add(await _unitOfWork.Categories.GetById(categoryId));
-        //        }
-
-        //        video.Tags = new List<Tag>();
-        //        foreach (var tagId in videoDTO.TagIds)
-        //        {
-        //            video.Tags.Add(await _unitOfWork.Tags.GetById(tagId));
-        //        }
-
-        //        await _unitOfWork.Videos.Add(video);
-
-        //        video.ObjectID = await _algoliaService.AddOrUpdateVideoAsync(video);
-        //        await _unitOfWork.Videos.Update(video);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error while adding video", ex);
-        //    }
-        //}
-
+        private string GetFfmpegArguments(string inputFilePath, string outputFilePath, int width, int height, int bitrate)
+        {
+            return $"-i \"{inputFilePath}\" -vf scale={width}:{height} -c:v libx264 -b:v {bitrate}k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputFilePath}\"";
+        }
         public async Task AddVideo(VideoDTO videoDTO, Stream fileStream)
         {
             try
@@ -182,29 +97,25 @@ namespace WebApiVRoom.BLL.Services
                 string outputFolder = Path.Combine(Path.GetTempPath(), sanitizedTitle);
                 Directory.CreateDirectory(outputFolder);
 
-                // Пути для плейлистов
                 string outputPlaylist480p = Path.Combine(outputFolder, $"{sanitizedTitle}_480p.m3u8");
                 string outputPlaylist720p = Path.Combine(outputFolder, $"{sanitizedTitle}_720p.m3u8");
                 string outputPlaylist1200p = Path.Combine(outputFolder, $"{sanitizedTitle}_1200p.m3u8");
 
-                // Создаем временный путь для сохранения файла
                 string tempFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp4");
 
-                // Сохраняем содержимое потока в файл
                 using (var fileStreamOutput = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
                 {
                     await fileStream.CopyToAsync(fileStreamOutput);
                 }
 
-                // Команды FFmpeg для 480p, 720p и 1200p
-                string ffmpegArgs480p = $"-i \"{tempFilePath}\" -vf scale=854:480 -c:v libx264 -b:v 500k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist480p}\"";
-                string ffmpegArgs720p = $"-i \"{tempFilePath}\" -vf scale=1280:720 -c:v libx264 -b:v 1500k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist720p}\"";
-                string ffmpegArgs1200p = $"-i \"{tempFilePath}\" -vf scale=1920:1200 -c:v libx264 -b:v 2500k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputPlaylist1200p}\"";
-
-                // Запуск FFmpeg команд
-                RunFfmpegCommand(ffmpegArgs480p);
-                RunFfmpegCommand(ffmpegArgs720p);
-                RunFfmpegCommand(ffmpegArgs1200p);
+                // Генерация аргументов для FFmpeg
+                var tasks = new List<Task>
+                {
+                    RunFfmpegCommand(GetFfmpegArguments(tempFilePath, outputPlaylist480p, 854, 480, 500)),
+                    RunFfmpegCommand(GetFfmpegArguments(tempFilePath, outputPlaylist720p, 1280, 720, 1500)),
+                    RunFfmpegCommand(GetFfmpegArguments(tempFilePath, outputPlaylist1200p, 1920, 1200, 2500))
+                };
+                await Task.WhenAll(tasks);
 
                 // Создание мастер-плейлиста с тремя форматами
                 string masterPlaylistPath = Path.Combine(outputFolder, $"{sanitizedTitle}_master.m3u8");
@@ -272,13 +183,11 @@ namespace WebApiVRoom.BLL.Services
                 {
                     video.Tags.Add(await _unitOfWork.Tags.GetById(tagId));
                 }
+                video.ObjectID = Guid.NewGuid().ToString();
 
-                // Сохранение видео
                 await _unitOfWork.Videos.Add(video);
+                await _algoliaService.AddOrUpdateVideoAsync(video);
 
-                // Обновление индекса в Algolia
-                video.ObjectID = await _algoliaService.AddOrUpdateVideoAsync(video);
-                await _unitOfWork.Videos.Update(video);
             }
             catch (Exception ex)
             {
@@ -376,26 +285,6 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
         }
 
-        //public async Task DeleteVideo(int id)
-        //{
-        //    try
-        //    {
-        //        var video = await _unitOfWork.Videos.GetById(id);
-        //        if (video == null)
-        //        {
-        //            throw new KeyNotFoundException("Video not found");
-        //        }
-
-        //        await DeleteFileAsync(video.VideoUrl);
-        //        await _unitOfWork.Videos.Delete(id);
-
-        //        await _algoliaService.DeleteVideoAsync(video.ObjectID);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error while deleting video", ex);
-        //    }
-        //}
 
         public async Task DeleteVideo(int id)
         {
@@ -417,58 +306,6 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        //public async Task UpdateVideo(VideoDTO videoDTO)
-        //{
-        //    try
-        //    {
-        //        var video = await _unitOfWork.Videos.GetById(videoDTO.Id);
-        //        if (video == null)
-        //        {
-        //            throw new KeyNotFoundException("Video not found");
-        //        }
-        //        video.Id = videoDTO.Id;
-        //        video.ObjectID = videoDTO.ObjectID;
-        //        video.Tittle = videoDTO.Tittle;
-        //        video.Description = videoDTO.Description;
-        //        video.UploadDate = videoDTO.UploadDate;
-        //        video.Duration = videoDTO.Duration;
-        //        video.ViewCount = videoDTO.ViewCount;
-        //        video.LikeCount = videoDTO.LikeCount;
-        //        video.DislikeCount = videoDTO.DislikeCount;
-        //        video.IsShort = videoDTO.IsShort;
-        //        try
-        //        {
-        //            video.LastViewedPosition = TimeSpan.Parse((string)videoDTO.LastViewedPosition);
-        //        }
-        //        catch { video.LastViewedPosition = TimeSpan.Parse((string)"00:00:00.00"); }
-
-        //        video.Categories.Clear();
-        //        video.Categories = await _unitOfWork.Categories.GetByIds(videoDTO.CategoryIds);
-        //        video.Tags.Clear();
-        //        video.Tags = await _unitOfWork.Tags.GetByIds(videoDTO.TagIds);
-        //        video.HistoryOfBrowsings.Clear();
-        //        video.HistoryOfBrowsings = await _unitOfWork.HistoryOfBrowsings.GetByIds(videoDTO.TagIds);
-        //        video.CommentVideos.Clear();
-        //        video.CommentVideos = await _unitOfWork.CommentVideos.GetByIds(videoDTO.TagIds);
-        //        video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
-
-        //        if (videoDTO.VideoUrl != null)
-        //        {
-        //            await DeleteFileAsync(video.VideoUrl);
-        //            var newVideoUrl = await UploadFileAsync(videoDTO.VideoUrl);
-        //            video.VideoUrl = newVideoUrl;
-        //        }
-        //        video.VideoUrl = "someURL";
-
-        //        await _unitOfWork.Videos.Update(video);
-
-        //        await _algoliaService.AddOrUpdateVideoAsync(video);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error while updating video", ex);
-        //    }
-        //}
 
         public async Task<VideoDTO> UpdateVideo(VideoDTO videoDTO)
         {
