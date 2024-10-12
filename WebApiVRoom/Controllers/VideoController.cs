@@ -211,7 +211,11 @@ namespace WebApiVRoom.Controllers
             LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
             if (like == null && user_clrekId != us.Clerk_Id)
             {
-                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId };
+                LikesDislikesVDTO likeDto = new() { 
+                    videoId = video_id,
+                    userId = user_clrekId ,
+                    like = true,
+                    likeDate = DateTime.Now};
                 await _likesService.Add(likeDto);
 
                 videoDto.LikeCount += 1;
@@ -241,7 +245,10 @@ namespace WebApiVRoom.Controllers
             LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
             if (like == null && user_clrekId != us.Clerk_Id)
             {
-                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId };
+                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId,
+                    like = false,
+                    likeDate = DateTime.Now
+                };
                 await _likesService.Add(likeDto);
 
                 videoDto.DislikeCount += 1;

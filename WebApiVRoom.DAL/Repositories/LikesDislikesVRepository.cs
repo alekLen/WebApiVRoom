@@ -77,6 +77,7 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.LikesV
                   .Include(v => v.Video)
                   .Where(v => v.userId == userid)
+                  .Where(v => v.like == true)
                   .ToListAsync();
         }
     }
