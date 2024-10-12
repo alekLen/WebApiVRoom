@@ -224,6 +224,7 @@ namespace WebApiVRoom.BLL.Services
                 }
             };
 
+
             process.Start();
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
@@ -380,9 +381,10 @@ namespace WebApiVRoom.BLL.Services
                 video.DislikeCount = videoDTO.DislikeCount;
                 video.IsShort = videoDTO.IsShort;
                 video.Cover= videoDTO.Cover;
+                video.Visibility = videoDTO.Visibility;
 
                 await _unitOfWork.Videos.Update(video);
-                await _algoliaService.AddOrUpdateVideoAsync(video);
+              //  await _algoliaService.AddOrUpdateVideoAsync(video);
 
                 return _mapper.Map<Video, VideoDTO>(video);
             }
