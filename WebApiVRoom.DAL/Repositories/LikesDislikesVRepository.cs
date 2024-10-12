@@ -71,5 +71,13 @@ namespace WebApiVRoom.DAL.Repositories
                    .Where(s => ids.Contains(s.Id))
                    .ToListAsync();
         }
+
+        public async Task<List<LikesDislikesV>> GetLikedVideoByUserId(string userid)
+        {
+            return await db.LikesV
+                  .Include(v => v.Video)
+                  .Where(v => v.userId == userid)
+                  .ToListAsync();
+        }
     }
 }

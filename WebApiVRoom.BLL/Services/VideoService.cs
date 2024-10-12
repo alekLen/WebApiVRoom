@@ -601,5 +601,18 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<List<VideoDTO>> GetLikedVideoInfo(string userid)
+        {
+            var likes = await _unitOfWork.LikesV.GetLikedVideoByUserId(userid);
+            List<Video> v = new List<Video>();
+            foreach (var likedVideo in likes)
+            {
+                Video vid= await _unitOfWork.Videos.GetById(likedVideo.Video.Id);
+                if (vid != null)
+                    v.Add(vid);
+            }
+            return _mapper.Map<List<Video>, List<VideoDTO>>(v);
+        }
+
     }
 }

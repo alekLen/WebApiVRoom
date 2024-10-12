@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Generic;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -68,6 +69,26 @@ namespace WebApiVRoom.Controllers
                 result.Add(vinfo);
             }
             return Ok(result);
+        }
+        [HttpGet("getlikedvideo/{id}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetLikedVideoInfo([FromRoute] string id)
+        {
+            var video = await _videoService.GetLikedVideoInfo(id);
+            if (video == null)
+            {
+                return NotFound();
+            }
+            List<VideoInfoDTO> list = new List<VideoInfoDTO>();
+            foreach (var v in video) {
+                try
+                {
+                    ChannelSettingsDTO ch = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                    VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(v, ch);
+                    list.Add(videoInfoDTO);
+                }
+                catch (Exception ex) { }
+        }
+            return Ok(list);
         }
         private VideoInfoDTO ConvertVideoToVideoInfo(VideoDTO v,ChannelSettingsDTO ch)
         {

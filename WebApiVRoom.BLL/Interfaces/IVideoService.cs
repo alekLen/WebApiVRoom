@@ -23,7 +23,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream();
         Task<VideoDTO> GetVideoInfo(int id);
         Task<VideoDTO> UpdateVideoInfo(VideoDTO videoDTO);
-
+        Task<List<VideoDTO>> GetLikedVideoInfo(string userid);
         Task<List<VideoDTO>> GetVideosByChannelId(int channelId);
         Task<List<VideoDTO>> GetShortVideosByChannelId(int channelId);
 
