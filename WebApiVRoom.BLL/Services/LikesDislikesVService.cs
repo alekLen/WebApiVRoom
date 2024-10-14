@@ -27,7 +27,9 @@ namespace WebApiVRoom.BLL.Services
                 LikesDislikesV like = new()
                 {
                     userId = t.userId,
-                    Video = video
+                    Video = video,
+                    like=t.like,
+                    likeDate = t.likeDate,
                 };
 
                 await db.LikesV.Add(like);
