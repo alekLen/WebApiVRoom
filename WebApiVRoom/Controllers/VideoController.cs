@@ -157,6 +157,27 @@ namespace WebApiVRoom.Controllers
 
 
         }
+        [HttpPut("updatevideoinfo")]
+        public async Task<ActionResult<VideoDTO>> UpdateVideoInfo([FromBody] VideoDTO videoDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var currentVideo = await _videoService.GetVideoInfo(videoDto.Id);
+            if (currentVideo == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                VideoDTO v = await _videoService.UpdateVideoInfo(videoDto);
+                return Ok(v);
+            }
+
+
+        }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteVideo([FromRoute] int id)
@@ -291,18 +312,18 @@ namespace WebApiVRoom.Controllers
                 channelSettingsId =v.ChannelSettingsId,
                 channelName= v.ChannelName,
                 tittle =v.Tittle,
-             description =v.Description,
-             channelBanner=v.ChannelBanner,
-       uploadDate =v.UploadDate,
-        duration = v.Duration,
-       videoUrl = v.VideoUrl,
-        viewCount = v.ViewCount,
-        likeCount = v.LikeCount,
-        dislikeCount = v.DislikeCount,
-        isShort = v.IsShort,
-        cover =v.Cover
-
-    };
+               description =v.Description,
+               channelBanner=v.ChannelBanner,
+               uploadDate =v.UploadDate,
+               duration = v.Duration,
+               videoUrl = v.VideoUrl,
+               viewCount = v.ViewCount,
+               likeCount = v.LikeCount,
+               dislikeCount = v.DislikeCount,
+               isShort = v.IsShort,
+               cover =v.Cover, 
+               visibility = v.Visibility,
+            };
             return obj;
         }
         [HttpGet("getvideosbychannelid/{channelId}")]

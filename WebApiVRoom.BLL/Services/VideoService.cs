@@ -186,7 +186,10 @@ namespace WebApiVRoom.BLL.Services
                 video.ObjectID = Guid.NewGuid().ToString();
 
                 await _unitOfWork.Videos.Add(video);
-                await _algoliaService.AddOrUpdateVideoAsync(video);
+
+                VideoForAlgolia vid = CreateVideoForAlgolia(video);
+                
+                await _algoliaService.AddOrUpdateVideoAsync(vid);
 
             }
             catch (Exception ex)
@@ -236,7 +239,39 @@ namespace WebApiVRoom.BLL.Services
                 throw new Exception($"FFmpeg завершився з помилкою: {errorBuilder}");
             }
         }
+        private List<string> GetTagsOfVideo(Video video)
+        {
+            List<string> tags = new List<string>();
+            foreach(Tag t in video.Tags)
+            {
+                tags.Add(t.Name);
+            }
+            return tags;
+        }
+        private List<string> GetCategoriesOfVideo(Video video)
+        {
+            List<string> categories = new List<string>();
+            foreach (Category c in video.Categories)
+            {
+                categories.Add(c.Name);
+            }
+            return categories;
+        }
+        private VideoForAlgolia CreateVideoForAlgolia(Video video)
+        {
+            List<string> tags = GetTagsOfVideo(video);
+            List<string> categories = GetCategoriesOfVideo(video);
 
+            return new VideoForAlgolia()
+                  {
+                     Id = video.Id,
+                     ObjectID = video.ObjectID,
+                     ChannelName= video.ChannelSettings.ChannelName,
+                     Tittle = video.Tittle,
+                     Tags = tags,
+                     Categories = categories,
+                  };
+        }
 
         public async Task<string> UploadFileAsync(IFormFile file)
         {
@@ -327,6 +362,7 @@ namespace WebApiVRoom.BLL.Services
                 video.DislikeCount = videoDTO.DislikeCount;
                 video.IsShort = videoDTO.IsShort;
                 video.Cover = videoDTO.Cover;
+                video.Visibility = videoDTO.Visibility; 
 
                 video.Categories.Clear();
                 foreach (var categoryId in videoDTO.CategoryIds)
@@ -352,7 +388,10 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 await _unitOfWork.Videos.Update(video);
-                await _algoliaService.AddOrUpdateVideoAsync(video);
+
+                VideoForAlgolia vid = CreateVideoForAlgolia(video);
+
+                await _algoliaService.AddOrUpdateVideoAsync(vid);
 
                 return _mapper.Map<Video, VideoDTO>(video);
             }
@@ -384,7 +423,9 @@ namespace WebApiVRoom.BLL.Services
                 video.Visibility = videoDTO.Visibility;
 
                 await _unitOfWork.Videos.Update(video);
-              //  await _algoliaService.AddOrUpdateVideoAsync(video);
+
+                VideoForAlgolia vid = CreateVideoForAlgolia(video);
+                await _algoliaService.AddOrUpdateVideoAsync(vid);
 
                 return _mapper.Map<Video, VideoDTO>(video);
             }
