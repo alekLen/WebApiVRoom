@@ -75,7 +75,7 @@ namespace WebApiVRoom.Controllers
            PostDTO post = await _postService.AddPost(img,video,req.text,req.id);
             object obj = ConvertObject(post);
             //await WebSocketHelper.SendMessageToAllAsync("new_post", obj);
-            await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_post", payload = obj });
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_post", payload = obj });
             return Ok();
         }
 
@@ -116,7 +116,7 @@ namespace WebApiVRoom.Controllers
             object obj = ConvertObject(post);
 
             //await WebSocketHelper.SendMessageToAllAsync("post_deleted", obj);
-            await _hubContext.Clients.All.SendAsync("postMessage", new { type = "post_deleted", payload = obj });
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "post_deleted", payload = obj });
         
 
             return Ok(post);
@@ -143,7 +143,7 @@ namespace WebApiVRoom.Controllers
                 PostDTO c = await _postService.UpdatePost(ans);
                 object obj = ConvertObject(c);
                 //await WebSocketHelper.SendMessageToAllAsync("new_likepost", obj);
-                await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_likepost", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_likepost", payload = obj });
 
                 return Ok();
             }
@@ -173,7 +173,7 @@ namespace WebApiVRoom.Controllers
                 object obj = ConvertObject(c);
 
                 //await WebSocketHelper.SendMessageToAllAsync("new_dislikepost", obj);
-                await _hubContext.Clients.All.SendAsync("postMessage", new { type = "new_dislikepost", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_dislikepost", payload = obj });
 
                 return Ok();
             }

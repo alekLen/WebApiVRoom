@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebApiVRoom.DAL.Entities;
+using WebApiVRoom.BLL.Interfaces;
 using Algolia.Search.Clients;
 using Algolia.Search.Models.Search;
 using Algolia.Search.Models.Settings;
-using WebApiVRoom.BLL.Interfaces;
+using WebApiVRoom.BLL.DTO;
 
 
 namespace WebApiVRoom.BLL.Services
@@ -24,7 +24,7 @@ namespace WebApiVRoom.BLL.Services
             _index = algoliaClient.InitIndex("videos");// "videos" — имя вашего индекса
         }
 
-        public async Task<string> AddOrUpdateVideoAsync(Video video)
+        public async Task<string> AddOrUpdateVideoAsync(VideoForAlgolia video)
         {
             if (string.IsNullOrEmpty(video.ObjectID))
             {
@@ -43,7 +43,7 @@ namespace WebApiVRoom.BLL.Services
             await _index.DeleteObjectAsync(id);
         }
 
-        public async Task<SearchResponse<Video>> SearchVideosAsync(string query)
+        public async Task<SearchResponse<VideoForAlgolia>> SearchVideosAsync(string query)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace WebApiVRoom.BLL.Services
                 //};
 
             // Выполняем поиск по запросу
-                return await _index.SearchAsync<Video>(algoliaQuery);
+                return await _index.SearchAsync<VideoForAlgolia>(algoliaQuery);
             }
             catch (Exception ex)
             {

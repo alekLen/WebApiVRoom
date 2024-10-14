@@ -53,7 +53,7 @@ namespace WebApiVRoom.Controllers
             object obj=ConvertObject(answer);
 
             //await WebSocketHelper.SendMessageToAllAsync("update_answer", obj);
-            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "update_answer", payload = obj });
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "update_answer", payload = obj });
 
             return Ok(answer);
         }
@@ -71,7 +71,7 @@ namespace WebApiVRoom.Controllers
             object obj = ConvertObject(ans);
 
             //await WebSocketHelper.SendMessageToAllAsync("new_answer", obj);
-            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "new_answer", payload = obj });
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_answer", payload = obj });
 
             return Ok(ans);
         }
@@ -94,7 +94,7 @@ namespace WebApiVRoom.Controllers
             object obj = ConvertObject(ans);
 
             //await WebSocketHelper.SendMessageToAllAsync("delete_answer", obj);
-            await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "delete_answer", payload = obj });
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "delete_answer", payload = obj });
 
             return Ok(ans);
         }
@@ -146,7 +146,7 @@ namespace WebApiVRoom.Controllers
                 object obj = ConvertObject(c);
 
                 //await WebSocketHelper.SendMessageToAllAsync("like_answer", obj);
-                await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "like_answer", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "like_answer", payload = obj });
 
                 return Ok();
             }
@@ -176,7 +176,7 @@ namespace WebApiVRoom.Controllers
                 object obj = ConvertObject(c);
 
                 //await WebSocketHelper.SendMessageToAllAsync("dislike_answer", obj);
-                await _hubContext.Clients.All.SendAsync("answerMessage", new { type = "dislike_answer", payload = obj });
+                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "dislike_answer", payload = obj });
 
                 return Ok();
             }

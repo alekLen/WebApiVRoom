@@ -11,5 +11,7 @@ namespace WebApiVRoom.BLL.DTO
         public int Id { get; set; }
         public int videoId { get; set; }
         public string userId { get; set; }
+        public DateTime likeDate { get; set; }
+        public bool like { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace WebApiVRoom.BLL.DTO
     public class VideoDTO
     {
         public int Id { get; set; }
-        public string ObjectID { get; set; }
+        public string? ObjectID { get; set; } = string.Empty;
         public int ChannelSettingsId { get; set; }
         public string Tittle { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;

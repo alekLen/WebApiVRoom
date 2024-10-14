@@ -11,5 +11,7 @@ namespace WebApiVRoom.DAL.Entities
         public int Id { get; set; }
         public string userId { get; set; }
         public Video Video { get; set; }
+        public DateTime likeDate { get; set; }
+        public bool like {  get; set; }
     }
 }

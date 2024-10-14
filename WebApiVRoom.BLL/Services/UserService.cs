@@ -220,13 +220,9 @@ namespace WebApiVRoom.BLL.Services
             try
             {
 
-                //  Video video = await Database.Videos.GetById(videoId);
-                //ChannelSettings ch = await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
+                Video video = await Database.Videos.GetById(videoId);
+                ChannelSettings ch = await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
 
-
-                //For testing
-                ChannelSettings ch = await Database.ChannelSettings.GetById(1);
-                //
 
                 User user = await Database.Users.GetById(ch.Owner.Id);
                 if (user != null)

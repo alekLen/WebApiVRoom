@@ -11,5 +11,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<List<LikesDislikesV>> GetByIds(List<int> ids);
         Task<LikesDislikesV> Get(int commentId, string userid);
+        Task<List<LikesDislikesV>>  GetLikedVideoByUserId(string userid);
     }
 }
