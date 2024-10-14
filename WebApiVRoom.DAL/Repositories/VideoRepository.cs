@@ -39,7 +39,7 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
-        public async Task<IEnumerable<Video>> GetAll()
+        public async Task<IEnumerable<Video>> GetAll()//видео и короткие видео вмести
         {
             return await _context.Videos
                 .Include(v => v.ChannelSettings)
@@ -48,6 +48,18 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.HistoryOfBrowsings)
                 .Include(v => v.CommentVideos)
                 .Include(v => v.PlayListVideos)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Video>> GetAllVideo()
+        {
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == false)
                 .ToListAsync();
         }
 
@@ -60,6 +72,20 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.HistoryOfBrowsings)
                 .Include(v => v.CommentVideos)
                 .Include(v => v.PlayListVideos)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Video>> GetAllVideoPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort==false)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
