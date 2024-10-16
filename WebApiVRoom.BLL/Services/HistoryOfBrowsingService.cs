@@ -25,7 +25,7 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<HistoryOfBrowsing, HistoryOfBrowsingDTO>()
-                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+                    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Clerk_Id))
                     .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.TimeCode, opt => opt.MapFrom(src => src.TimeCode));
@@ -51,7 +51,7 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                User user = await Database.Users.GetById(hb.UserId);
+                User user = await Database.Users.GetByClerk_Id(hb.UserId);
                 Video video = await Database.Videos.GetById(hb.VideoId);
 
                 HistoryOfBrowsing hbr = new HistoryOfBrowsing()
@@ -77,7 +77,7 @@ namespace WebApiVRoom.BLL.Services
             var hbr = await Database.HistoryOfBrowsings.GetById(hb.Id);
             if (hbr == null)
                 return null;
-            User user = await Database.Users.GetById(hb.UserId);
+            User user = await Database.Users.GetByClerk_Id(hb.UserId);
             Video video = await Database.Videos.GetById(hb.VideoId);
             hbr.User = user;
             hbr.Video = video;

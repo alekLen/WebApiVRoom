@@ -47,7 +47,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getbyuserid/{user_id}")]
-        public async Task<ActionResult<SubscriptionDTO>> GetSubscriptionsByUserId(int user_id)
+        public async Task<ActionResult<SubscriptionDTO>> GetSubscriptionsByUserId(string user_id)
         {
             var subscription = await _subscriptionService.GetSubscriptionsByUserId(user_id);
             if (subscription == null)
@@ -57,16 +57,27 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(subscription);
         }
 
-        [HttpPost("add")]
-        public async Task<ActionResult<SubscriptionDTO>> AddSubscription(SubscriptionDTO subscriptionDTO)
+        [HttpPost("add/{channelid}/{userid}")]
+        public async Task<ActionResult<SubscriptionDTO>> AddSubscription([FromRoute] int channelid, [FromRoute] string userid)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _subscriptionService.AddSubscription(subscriptionDTO);
+            await _subscriptionService.AddSubscription(channelid, userid);
             return Ok();
+        }
+        [HttpGet("isfolowed/{channelid}/{userid}")]
+        public async Task<ActionResult<SubscriptionDTO>> FindSubscription([FromRoute] int channelid, [FromRoute] string userid)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            SubscriptionDTO sub = await _subscriptionService.GetByUserAndChannel(channelid, userid);
+            return Ok(sub);
         }
 
         [HttpPut("update")]
@@ -87,23 +98,13 @@ namespace WebApiVRoom.Controllers
             return Ok(subscription_new);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<SubscriptionDTO>> DeleteSubscription(int id)
+        [HttpDelete("delete/{channelid}/{userid}")]
+        public async Task<ActionResult<SubscriptionDTO>> DeleteSubscription([FromRoute] int channelid, [FromRoute] string userid)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
 
-            SubscriptionDTO subscription = await _subscriptionService.GetSubscription(id);
-            if (subscription == null)
-            {
-                return NotFound();
-            }
+            SubscriptionDTO sub = await _subscriptionService.DeleteSubscription( channelid, userid);
 
-            await _subscriptionService.DeleteSubscription(id);
-
-            return Ok(subscription);
+            return Ok(sub);
         }
     }
 }
