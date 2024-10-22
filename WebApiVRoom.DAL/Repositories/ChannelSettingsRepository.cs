@@ -88,6 +88,35 @@ namespace WebApiVRoom.DAL.Repositories
                 .FirstOrDefaultAsync(cs => cs.Owner.Clerk_Id == ownerId);
                
         }
-       
+        public async Task<ChannelSettings> GetByUrl(string url)
+        {
+            return await db.ChannelSettings
+                .Include(cp => cp.Owner)
+                .Include(cp => cp.Language)
+                .Include(cp => cp.Country)
+                .Include(cp => cp.Videos)
+                .Include(cp => cp.Posts)
+                .Include(cp => cp.Subscriptions)
+                .FirstOrDefaultAsync(cs => cs.Channel_URL == url);
+
+        }
+        public async Task<ChannelSettings> GetByNikName(string nikname)
+        {
+            if (nikname == null)
+            {
+                return await db.ChannelSettings
+                    .Include(cp => cp.Owner)
+                    .Include(cp => cp.Language)
+                    .Include(cp => cp.Country)
+                    .Include(cp => cp.Videos)
+                    .Include(cp => cp.Posts)
+                    .Include(cp => cp.Subscriptions)
+                    .FirstOrDefaultAsync(cs => cs.Channel_URL == nikname);
+            }
+            else
+                return null;
+
+        }
+
     }
 }

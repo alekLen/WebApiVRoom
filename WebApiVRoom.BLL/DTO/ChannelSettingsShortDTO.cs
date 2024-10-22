@@ -11,5 +11,6 @@ namespace WebApiVRoom.BLL.DTO
         public int Id { get; set; }
         public string ChannelName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string? ChannelNikName { get; set; } = string.Empty;
     }
 }

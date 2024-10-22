@@ -44,7 +44,9 @@ namespace WebApiVRoom.Controllers
             {
                 Clerk_Id =u.Clerk_Id,
                 ChannelBanner = ch.ChannelBanner,
-                ChannelName = ch.ChannelName
+                ChannelName = ch.ChannelName,
+                ChannelProfilePhoto = ch.ChannelProfilePhoto,
+
             };
             return new ObjectResult(user);
             }
@@ -78,10 +80,28 @@ namespace WebApiVRoom.Controllers
                 {
                     Clerk_Id = clerkId,
                     ChannelBanner = ch.ChannelBanner,
-                    ChannelName = ch.ChannelName
+                    ChannelName = ch.ChannelName,
+                    ChannelProfilePhoto = ch.ChannelProfilePhoto
                 };
 
                 return new ObjectResult(user);
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
+        }
+
+        [HttpGet("gotochannel/{url}")]
+        public async Task<ActionResult<ChannelSettingsDTO>> GetInfoChannelByURL([FromRoute] string url)
+        {
+            try
+            {
+                var ch = await _chService.GetByUrl(url);
+                if (ch == null)
+                {
+                    return NotFound();
+                }
+
+
+                return new ObjectResult(ch);
             }
             catch (Exception ex) { return BadRequest(ModelState); }
         }

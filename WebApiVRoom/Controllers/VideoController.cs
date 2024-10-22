@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
+using WebApiVRoom.DAL.Entities;
 namespace WebApiVRoom.Controllers
 {
  
@@ -98,7 +99,10 @@ namespace WebApiVRoom.Controllers
                ObjectID =v.ObjectID,
               ChannelSettingsId =ch.Id,
               ChannelName =ch.ChannelName,
-              ChannelBanner = ch.ChannelBanner, 
+              ChannelBanner = ch.ChannelBanner,
+              ChannelProfilePhoto = ch.ChannelProfilePhoto,
+              ChannelNikName = ch.ChannelNikName,
+              Channel_URL = ch.Channel_URL,
               Tittle = v.Tittle,
               Description =v.Description,
               UploadDate =v.UploadDate,
@@ -313,8 +317,11 @@ namespace WebApiVRoom.Controllers
                 channelName= v.ChannelName,
                 tittle =v.Tittle,
                description =v.Description,
-               channelBanner=v.ChannelBanner,
-               uploadDate =v.UploadDate,
+               channelBanner= channelSettings.ChannelBanner,
+                channelProfilePhoto = channelSettings.ChannelProfilePhoto,
+                channelNikName= channelSettings.ChannelNikName,
+                channel_URL = channelSettings.Channel_URL,
+                uploadDate =v.UploadDate,
                duration = v.Duration,
                videoUrl = v.VideoUrl,
                viewCount = v.ViewCount,

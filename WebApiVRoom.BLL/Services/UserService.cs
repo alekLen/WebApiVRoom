@@ -75,9 +75,11 @@ namespace WebApiVRoom.BLL.Services
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
            
             user.ChannelSettings_Id = channelSettings.Id;
-            //user.ChannelName = "VRoom_Channel" + channelSettings.Id + "_created";
+
             await Database.Users.Update(user);
             channelSettings.ChannelName= "VRoom_Channel" + channelSettings.Id + "_created";
+            channelSettings.ChannelNikName = "VRoom_Channel" + channelSettings.Id + "_created";
+            channelSettings.Channel_URL = "http://localhost:3000/gotochannel/" + channelSettings.Id;
             await Database.ChannelSettings.Update(channelSettings);
 
             var mapper = InitializeMapper();

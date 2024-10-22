@@ -14,6 +14,8 @@ namespace WebApiVRoom.DAL.Entities
         public string Description { get; set; } = string.Empty;
         public string ChannelBanner { get; set; } = string.Empty;
         public string ChannelPlofilePhoto { get; set; } = string.Empty;
+        public string Channel_URL { get; set; } = string.Empty;
+        public string? ChannelNikName { get; set; } = string.Empty;
 
         public User Owner { get; set; }
         public Language Language { get; set; }

@@ -37,10 +37,12 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.Language_Id, opt => opt.MapFrom(src => src.Language.Id))
                     .ForMember(dest => dest.Country_Id, opt => opt.MapFrom(src => src.Country.Id))
                     .ForMember(dest => dest.ChannelName, opt => opt.MapFrom(src => src.ChannelName))
+                    .ForMember(dest => dest.ChannelNikName, opt => opt.MapFrom(src => src.ChannelNikName))
+                    .ForMember(dest => dest.Channel_URL, opt => opt.MapFrom(src => src.Channel_URL))
                     .ForMember(dest => dest.DateJoined, opt => opt.MapFrom(src => src.DateJoined))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
-                    .ForMember(dest => dest.ChannelPlofilePhoto, opt => opt.MapFrom(src => src.ChannelPlofilePhoto))//
+                    .ForMember(dest => dest.ChannelProfilePhoto, opt => opt.MapFrom(src => src.ChannelPlofilePhoto))//
                     .ForMember(dest => dest.Notification, opt => opt.MapFrom(src => src.Notification))
                     .ForMember(dest => dest.Videos, opt => opt.MapFrom(src => src.Videos.Select(v => v.Id).ToList()))
                     .ForMember(dest => dest.Posts, opt => opt.MapFrom(src => src.Posts.Select(p => p.Id).ToList()))
@@ -81,6 +83,8 @@ namespace WebApiVRoom.BLL.Services
                     return null;
                 }
                 channelSettings.ChannelName = chDto.ChannelName;
+                channelSettings.ChannelNikName = chDto.ChannelNikName;
+                channelSettings.Channel_URL = chDto.Channel_URL;
                 channelSettings.DateJoined = chDto.DateJoined;
                 channelSettings.Description = chDto.Description;
                 channelSettings.Notification = chDto.Notification;
@@ -130,6 +134,7 @@ namespace WebApiVRoom.BLL.Services
                     return null;
                 }
                 channelSettings.ChannelName = chSDto.ChannelName;
+                channelSettings.ChannelNikName = chSDto.ChannelNikName;
                 channelSettings.Description = chSDto.Description;
 
                 if (channelImg != null)
@@ -197,8 +202,46 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                //User owner=await Database.Users.GetByClerk_Id(clerk_id);
                 var channelSettings = await Database.ChannelSettings.FindByOwner(clerk_id);
+
+                if (channelSettings == null)
+                {
+                    return null;
+                }
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ChannelSettingsDTO> GetByUrl(string url)
+        {
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.GetByUrl(url);
+
+                if (channelSettings == null)
+                {
+                    return null;
+                }
+
+                var mapper = InitializeChannelSettingsMapper();
+                return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        public async Task<ChannelSettingsDTO> GetByNikName(string nik)
+        {
+            try
+            {
+                var channelSettings = await Database.ChannelSettings.GetByNikName(nik);
 
                 if (channelSettings == null)
                 {

@@ -267,6 +267,7 @@ namespace WebApiVRoom.BLL.Services
                      Id = video.Id,
                      ObjectID = video.ObjectID,
                      ChannelName= video.ChannelSettings.ChannelName,
+                     ChannelNikName = video.ChannelSettings.ChannelNikName,
                      Tittle = video.Tittle,
                      Tags = tags,
                      Categories = categories,

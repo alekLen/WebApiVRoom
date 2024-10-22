@@ -13,6 +13,9 @@ namespace WebApiVRoom.BLL.DTO
         public int ChannelSettingsId { get; set; }
         public string ChannelName { get; set; }
         public string ChannelBanner { get; set; }
+        public string ChannelProfilePhoto { get; set; }
+        public string ChannelNikName { get; set; }
+        public string Channel_URL { get; set; }
         public string Tittle { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime UploadDate { get; set; }

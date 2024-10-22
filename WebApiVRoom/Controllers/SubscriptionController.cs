@@ -4,6 +4,7 @@ using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace WebApiVRoom.Controllers
 {
@@ -12,10 +13,12 @@ namespace WebApiVRoom.Controllers
     public class SubscriptionController : ControllerBase
     {
         private ISubscriptionService _subscriptionService;
+        private IChannelSettingsService _channelSettingsService;
 
-        public SubscriptionController(ISubscriptionService subscriptionService)
+        public SubscriptionController(ISubscriptionService subscriptionService, IChannelSettingsService channelSettingsService)
         {
             _subscriptionService = subscriptionService;
+            _channelSettingsService = channelSettingsService;
         }
 
         [HttpGet]
@@ -55,6 +58,23 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             return new ObjectResult(subscription);
+        }
+
+        [HttpGet("findbyuserid/{user_id}")]
+        public async Task<ActionResult<List<ChannelSettingsDTO>> >FindByUserId(string user_id)
+        {
+            List < ChannelSettingsDTO> ch = new List < ChannelSettingsDTO> ();
+            var subscription = await _subscriptionService.GetSubscriptionsByUserId(user_id);
+            if (subscription == null)
+            {
+                return NotFound();
+            }
+            foreach (SubscriptionDTO c in subscription)
+            {
+                ChannelSettingsDTO channel=await _channelSettingsService.GetChannelSettings(c.ChannelSettingId);
+                ch.Add(channel);
+            }
+            return new ObjectResult(ch);
         }
 
         [HttpPost("add/{channelid}/{userid}")]

@@ -14,7 +14,9 @@ namespace WebApiVRoom.BLL.DTO
         public DateTime DateJoined { get; set; }
         public string Description { get; set; } = string.Empty;
         public string ChannelBanner { get; set; } = string.Empty;
-        public string ChannelPlofilePhoto { get; set; } = string.Empty;
+        public string ChannelProfilePhoto { get; set; } = string.Empty;
+        public string Channel_URL { get; set; } = string.Empty;
+        public string? ChannelNikName { get; set; } = string.Empty;
 
         public int Owner_Id { get; set; }
         public int Language_Id { get; set; }
