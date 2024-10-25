@@ -355,6 +355,20 @@ namespace WebApiVRoom.Controllers
         {
             return new ObjectResult(await _videoService.GetShortVideosByChannelId(channelId));
         }
+
+        [HttpGet("getchannelvideos/{channelid}")]
+        public async Task<ActionResult<List<VideoInfoDTO>> >GetChannelVideos([FromRoute] int channelid)
+        {
+            List<VideoDTO> videos = await _videoService.GetByChannelId(channelid);
+            List<VideoInfoDTO> v = new List<VideoInfoDTO>();
+            foreach (var video in videos)
+            {
+                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
+                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
+                v.Add(videoInfo);
+            }
+            return Ok(v);
+        }
     }
 }
 
