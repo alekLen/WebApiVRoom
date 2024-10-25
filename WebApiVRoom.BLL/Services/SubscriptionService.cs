@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Infrastructure;
@@ -176,6 +177,11 @@ namespace WebApiVRoom.BLL.Services
                 return mapper.Map<IEnumerable<Subscription>, IEnumerable<SubscriptionDTO>>(subs);
             }
             catch { return null; }
+        }
+        public async Task<int> Count(int channelid)
+        {
+            var a = await Database.Subscriptions.GetByChannelId(channelid);
+            return a.Count();   
         }
     }
 }

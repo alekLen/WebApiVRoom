@@ -126,5 +126,13 @@ namespace WebApiVRoom.Controllers
 
             return Ok(sub);
         }
+        [HttpGet("countbychannelid/{channelid}")]
+        public async Task<ActionResult<int>> CountSubscribers([FromRoute] int channelid)
+        {
+
+            int sub = await _subscriptionService.Count(channelid);
+           
+            return Ok(sub);
+        }
     }
 }

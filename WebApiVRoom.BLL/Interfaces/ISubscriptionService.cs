@@ -19,6 +19,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<SubscriptionDTO> DeleteSubscription(int channelid, string userid);
         Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserId(string id);
         Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserIdPaginated(int pageNumber, int pageSize, string id);
+        Task<int> Count(int channelid);
 
     }
 }
