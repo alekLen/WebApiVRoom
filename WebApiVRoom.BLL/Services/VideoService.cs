@@ -270,6 +270,15 @@ namespace WebApiVRoom.BLL.Services
             List<string> categories = GetCategoriesOfVideo(video);
 
             return new VideoForAlgolia()
+                  {
+                     Id = video.Id,
+                     ObjectID = video.ObjectID,
+                     ChannelName= video.ChannelSettings.ChannelName,
+                     ChannelNikName = video.ChannelSettings.ChannelNikName,
+                     Tittle = video.Tittle,
+                     Tags = tags,
+                     Categories = categories,
+                  };
             {
                 Id = video.Id,
                 ObjectID = video.ObjectID,

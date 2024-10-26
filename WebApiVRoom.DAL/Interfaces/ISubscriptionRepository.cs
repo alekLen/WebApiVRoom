@@ -10,8 +10,9 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface ISubscriptionRepository: ISetGetRepository<Subscription>
     {
         Task<List<Subscription>> GetByChannelId(int channel_Id);
-        Task<List<Subscription>> GetByUser(int userId);
-        Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize, int userId);
+        Task<List<Subscription>> GetByUser(string userId);
+        Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize, string userId);
         Task<List<Subscription>> GetByIds(List<int> ids);
+        Task<Subscription> GetByUserAndChannel(int channel_Id, string userid);
     }
 }

@@ -14,11 +14,11 @@ namespace WebApiVRoom.BLL.DTO
         public int VideoId { get; set; }
         public string UserName { get; set; }
         public string ChannelBanner { get; set; }
+        public int ChannelId { get; set; }
         public string Comment { get; set; }
         public DateTime Date { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-        //public List<int>? AnswerVideoIds { get; set; } =new List<int>();
         public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
         public List<string>? users { get; set; }=new List<string>();

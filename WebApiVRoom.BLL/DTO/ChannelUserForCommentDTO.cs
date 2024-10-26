@@ -10,6 +10,9 @@ namespace WebApiVRoom.BLL.DTO
     {
         public string Clerk_Id { get; set; }
         public string ChannelName { get; set; }
+        public string ChannelNikName { get; set; }
+        public string Channel_URL { get; set; }
         public string ChannelBanner { get; set; }
+        public string ChannelProfilePhoto { get; set; }
     }
 }

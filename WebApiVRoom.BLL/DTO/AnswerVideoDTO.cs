@@ -13,6 +13,7 @@ namespace WebApiVRoom.BLL.DTO
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string ChannelBanner { get; set; }
+        public int ChannelId { get; set; }
         public int CommentVideo_Id { get; set; }
         public string Text { get; set; }
         public DateTime AnswerDate { get; set; }

@@ -53,6 +53,12 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
         }
+        public async Task<Subscription> GetByUserAndChannel(int channel_Id,string userid)
+        {
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings)
+                .Where(m => m.Subscriber.Clerk_Id == userid)
+                .Where(m => m.ChannelSettings.Id == channel_Id).FirstOrDefaultAsync();
+        }
 
         public async Task<List<Subscription>> GetByChannelId(int channel_Id)
         {
@@ -60,15 +66,15 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(m => m.ChannelSettings.Id == channel_Id).ToListAsync();
         }
 
-        public async Task<List<Subscription>> GetByUser(int userId)
+        public async Task<List<Subscription>> GetByUser(string userId)
         {
-            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).Where(m => m.Subscriber.Id == userId).ToListAsync();
+            return await db.Subscriptions.Include(m => m.Subscriber).Include(m => m.ChannelSettings).Where(m => m.Subscriber.Clerk_Id == userId).ToListAsync();
         }
-        public async Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize,int userId)
+        public async Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize,string userId)
         {
             return await db.Subscriptions.Include(m => m.Subscriber)
                 .Include(m => m.ChannelSettings)
-                .Where(m => m.Subscriber.Id == userId)
+                .Where(m => m.Subscriber.Clerk_Id == userId)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                .ToListAsync();

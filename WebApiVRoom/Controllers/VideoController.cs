@@ -114,6 +114,24 @@ namespace WebApiVRoom.Controllers
         {
             return new VideoInfoDTO
             {
+                Id =v.Id,
+               ObjectID =v.ObjectID,
+              ChannelSettingsId =ch.Id,
+              ChannelName =ch.ChannelName,
+              ChannelBanner = ch.ChannelBanner,
+              ChannelProfilePhoto = ch.ChannelProfilePhoto,
+              ChannelNikName = ch.ChannelNikName,
+              Channel_URL = ch.Channel_URL,
+              Tittle = v.Tittle,
+              Description =v.Description,
+              UploadDate =v.UploadDate,
+              Duration = v.Duration,
+              VideoUrl = v.VideoUrl,
+              ViewCount = v.ViewCount,
+              LikeCount = v.LikeCount,
+              DislikeCount = v.DislikeCount,
+              IsShort =v.IsShort,
+              Cover = v.Cover,
                 Id = v.Id,
                 ObjectID = v.ObjectID,
                 ChannelSettingsId = ch.Id,
@@ -334,6 +352,23 @@ namespace WebApiVRoom.Controllers
             {
                 id = v.Id,
                 objectID = v.ObjectID,
+                channelSettingsId =v.ChannelSettingsId,
+                channelName= v.ChannelName,
+                tittle =v.Tittle,
+               description =v.Description,
+               channelBanner= channelSettings.ChannelBanner,
+                channelProfilePhoto = channelSettings.ChannelProfilePhoto,
+                channelNikName= channelSettings.ChannelNikName,
+                channel_URL = channelSettings.Channel_URL,
+                uploadDate =v.UploadDate,
+               duration = v.Duration,
+               videoUrl = v.VideoUrl,
+               viewCount = v.ViewCount,
+               likeCount = v.LikeCount,
+               dislikeCount = v.DislikeCount,
+               isShort = v.IsShort,
+               cover =v.Cover, 
+               visibility = v.Visibility,
                 channelSettingsId = v.ChannelSettingsId,
                 channelName = v.ChannelName,
                 tittle = v.Tittle,
@@ -372,6 +407,20 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<IEnumerable<VideoDTO>>> GetShortVideosByChannelId(int channelId)
         {
             return new ObjectResult(await _videoService.GetShortVideosByChannelId(channelId));
+        }
+
+        [HttpGet("getchannelvideos/{channelid}")]
+        public async Task<ActionResult<List<VideoInfoDTO>> >GetChannelVideos([FromRoute] int channelid)
+        {
+            List<VideoDTO> videos = await _videoService.GetByChannelId(channelid);
+            List<VideoInfoDTO> v = new List<VideoInfoDTO>();
+            foreach (var video in videos)
+            {
+                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
+                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
+                v.Add(videoInfo);
+            }
+            return Ok(v);
         }
     }
 }
