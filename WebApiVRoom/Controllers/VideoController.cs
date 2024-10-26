@@ -31,7 +31,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getvideosorshortsbychannelidwithfilters")]
-        public async Task<IActionResult> GetVideosOrShortsByChannelIdWithFilters([FromQuery] int id, [FromQuery]bool isShort, [FromQuery] string? copyright, [FromQuery] string? ageRestriction, [FromQuery] string? audience, [FromQuery] string? access, [FromQuery] string? title, [FromQuery] string? description, [FromQuery] int? minViews, [FromQuery] int? maxViews)
+        public async Task<IActionResult> GetVideosOrShortsByChannelIdWithFilters([FromQuery] int id, [FromQuery] bool isShort, [FromQuery] string? copyright, [FromQuery] string? ageRestriction, [FromQuery] string? audience, [FromQuery] string? access, [FromQuery] string? title, [FromQuery] string? description, [FromQuery] int? minViews, [FromQuery] int? maxViews)
         {
             VideoFilter filters = new VideoFilter
             {
@@ -114,29 +114,14 @@ namespace WebApiVRoom.Controllers
         {
             return new VideoInfoDTO
             {
-                Id =v.Id,
-               ObjectID =v.ObjectID,
-              ChannelSettingsId =ch.Id,
-              ChannelName =ch.ChannelName,
-              ChannelBanner = ch.ChannelBanner,
-              ChannelProfilePhoto = ch.ChannelProfilePhoto,
-              ChannelNikName = ch.ChannelNikName,
-              Channel_URL = ch.Channel_URL,
-              Tittle = v.Tittle,
-              Description =v.Description,
-              UploadDate =v.UploadDate,
-              Duration = v.Duration,
-              VideoUrl = v.VideoUrl,
-              ViewCount = v.ViewCount,
-              LikeCount = v.LikeCount,
-              DislikeCount = v.DislikeCount,
-              IsShort =v.IsShort,
-              Cover = v.Cover,
                 Id = v.Id,
                 ObjectID = v.ObjectID,
                 ChannelSettingsId = ch.Id,
                 ChannelName = ch.ChannelName,
                 ChannelBanner = ch.ChannelBanner,
+                ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                ChannelNikName = ch.ChannelNikName,
+                Channel_URL = ch.Channel_URL,
                 Tittle = v.Tittle,
                 Description = v.Description,
                 UploadDate = v.UploadDate,
@@ -147,6 +132,9 @@ namespace WebApiVRoom.Controllers
                 DislikeCount = v.DislikeCount,
                 IsShort = v.IsShort,
                 Cover = v.Cover,
+                IsAgeRestriction = v.IsAgeRestriction,
+                IsCopyright = v.IsCopyright,
+                Audience = v.Audience,
             };
         }
 
@@ -352,28 +340,14 @@ namespace WebApiVRoom.Controllers
             {
                 id = v.Id,
                 objectID = v.ObjectID,
-                channelSettingsId =v.ChannelSettingsId,
-                channelName= v.ChannelName,
-                tittle =v.Tittle,
-               description =v.Description,
-               channelBanner= channelSettings.ChannelBanner,
-                channelProfilePhoto = channelSettings.ChannelProfilePhoto,
-                channelNikName= channelSettings.ChannelNikName,
-                channel_URL = channelSettings.Channel_URL,
-                uploadDate =v.UploadDate,
-               duration = v.Duration,
-               videoUrl = v.VideoUrl,
-               viewCount = v.ViewCount,
-               likeCount = v.LikeCount,
-               dislikeCount = v.DislikeCount,
-               isShort = v.IsShort,
-               cover =v.Cover, 
-               visibility = v.Visibility,
                 channelSettingsId = v.ChannelSettingsId,
                 channelName = v.ChannelName,
                 tittle = v.Tittle,
                 description = v.Description,
-                channelBanner = v.ChannelBanner,
+                channelBanner = channelSettings.ChannelBanner,
+                channelProfilePhoto = channelSettings.ChannelProfilePhoto,
+                channelNikName = channelSettings.ChannelNikName,
+                channel_URL = channelSettings.Channel_URL,
                 uploadDate = v.UploadDate,
                 duration = v.Duration,
                 videoUrl = v.VideoUrl,
@@ -383,6 +357,9 @@ namespace WebApiVRoom.Controllers
                 isShort = v.IsShort,
                 cover = v.Cover,
                 visibility = v.Visibility,
+                IsAgeRestriction = v.IsAgeRestriction,
+                IsCopyright = v.IsCopyright,
+                Audience = v.Audience,
             };
             return obj;
         }
@@ -410,7 +387,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getchannelvideos/{channelid}")]
-        public async Task<ActionResult<List<VideoInfoDTO>> >GetChannelVideos([FromRoute] int channelid)
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetChannelVideos([FromRoute] int channelid)
         {
             List<VideoDTO> videos = await _videoService.GetByChannelId(channelid);
             List<VideoInfoDTO> v = new List<VideoInfoDTO>();

@@ -279,14 +279,6 @@ namespace WebApiVRoom.BLL.Services
                      Tags = tags,
                      Categories = categories,
                   };
-            {
-                Id = video.Id,
-                ObjectID = video.ObjectID,
-                ChannelName = video.ChannelSettings.ChannelName,
-                Tittle = video.Tittle,
-                Tags = tags,
-                Categories = categories,
-            };
         }
 
         public async Task<string> UploadFileAsync(IFormFile file)
