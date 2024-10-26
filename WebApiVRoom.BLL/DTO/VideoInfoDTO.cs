@@ -24,6 +24,9 @@ namespace WebApiVRoom.BLL.DTO
         public bool IsShort { get; set; }
         public string Cover {  get; set; }
         public bool Visibility { get; set; }
+        public bool IsAgeRestriction { get; set; }//Возрастные ограничения --> true = есть, false = нет
+        public bool IsCopyright { get; set; }//Авторские права --> true = есть, false = нет
+        public string Audience { get; set; }//Аудитория --> children = дети, adults = взрослые, all = все
 
     }
 }

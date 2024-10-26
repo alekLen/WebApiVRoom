@@ -9,6 +9,7 @@ using WebApiVRoom.DAL.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Azure.Storage.Blobs;
 using Microsoft.Identity.Client;
+using System.Threading.Channels;
 
 
 namespace WebApiVRoom.DAL.Repositories
@@ -39,6 +40,80 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
+
+        public async Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter)
+        {
+            var query = _context.Videos.Include(v => v.Categories).Include(v => v.Tags)
+                .Include(v => v.CommentVideos).Include(v => v.ChannelSettings).Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == isShort).Where(v => v.ChannelSettings.Id == id).AsQueryable();
+
+
+            if (!string.IsNullOrEmpty(filter.Copyright))
+            {
+                if (filter.Copyright.ToUpper() == "claimed".ToUpper())
+                {
+                    query = query.Where(v => v.IsCopyright == true);
+                }
+                if (filter.Copyright.ToUpper() == "notClaimed".ToUpper())
+                {
+                    query = query.Where(v => v.IsCopyright == false);
+                }
+            }
+
+
+            if (!string.IsNullOrEmpty(filter.AgeRestriction))
+            {
+                if (filter.AgeRestriction.ToUpper() == "true".ToUpper())
+                {
+                    query = query.Where(v => v.IsAgeRestriction == true);
+                }
+                if (filter.AgeRestriction.ToUpper() == "false".ToUpper())
+                {
+                    query = query.Where(v => v.IsAgeRestriction == false);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filter.Audience))
+            {
+                query = query.Where(v => v.Audience.ToUpper() == filter.Audience.ToUpper());
+            }
+
+            if (!string.IsNullOrEmpty(filter.Access))
+            {
+                if (filter.Access.ToUpper() == "true".ToUpper())
+                {
+                    query = query.Where(v => v.Visibility == true);
+                }
+                if (filter.Access.ToUpper() == "false".ToUpper())
+                {
+                    query = query.Where(v => v.Visibility == false);
+                }
+            }
+
+
+            if (!string.IsNullOrEmpty(filter.Title))
+                query = query.Where(v => v.Tittle.Contains(filter.Title));
+
+            if (!string.IsNullOrEmpty(filter.Description))
+                query = query.Where(v => v.Description.Contains(filter.Description));
+
+
+            if (filter.MinViews != 0 && filter.MaxViews != 0)
+            {
+                query = query.Where(v => v.ViewCount >= filter.MinViews && v.ViewCount <= filter.MaxViews);
+            }
+            else if (filter.MinViews != 0)
+            {
+                query = query.Where(v => v.ViewCount >= filter.MinViews);
+            }
+            else if (filter.MaxViews != 0)
+            {
+                query = query.Where(v => v.ViewCount <= filter.MaxViews);
+            }
+
+
+            return await query.ToListAsync();
+        }
         public async Task<IEnumerable<Video>> GetAll()//видео и короткие видео вмести
         {
             return await _context.Videos
@@ -85,7 +160,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.HistoryOfBrowsings)
                 .Include(v => v.CommentVideos)
                 .Include(v => v.PlayListVideos)
-                .Where(v => v.IsShort==false)
+                .Where(v => v.IsShort == false)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -97,8 +172,8 @@ namespace WebApiVRoom.DAL.Repositories
             if (video.UploadDate == default)
                 video.UploadDate = DateTime.UtcNow;
 
-            await _context.Videos.AddAsync(video);  
-            await _context.SaveChangesAsync();  
+            await _context.Videos.AddAsync(video);
+            await _context.SaveChangesAsync();
         }
 
         public async Task Update(Video video)
@@ -177,8 +252,8 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-       
-      
+
+
 
         public async Task<List<Video>> GetMostPopularVideos(int topCount)
         {
@@ -278,7 +353,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.CommentVideos)
                  .Include(v => v.ChannelSettings)
                  .Include(v => v.PlayListVideos)
-                .Where(v => v.IsShort==false).Where(v => v.ChannelSettings.Id == channelId)
+                .Where(v => v.IsShort == false).Where(v => v.ChannelSettings.Id == channelId)
                 .ToListAsync();
         }
 
@@ -405,6 +480,6 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
-        
+
     }
 }

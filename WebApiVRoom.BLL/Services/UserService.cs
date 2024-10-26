@@ -46,6 +46,7 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
+ 
 
         public async Task<UserDTO> GetUser(int id)
         {

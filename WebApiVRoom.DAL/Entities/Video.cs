@@ -22,7 +22,12 @@ namespace WebApiVRoom.DAL.Entities
         public int DislikeCount { get; set; }
         public bool IsShort { get; set; }
         public string Cover { get; set; }
-        public bool Visibility { get; set; }
+        public bool Visibility { get; set; }//true = public, false = private
+        public bool IsAgeRestriction { get; set; }//Возрастные ограничения --> true = есть, false = нет
+        public bool IsCopyright { get; set; }//Авторские права --> true = есть, false = нет
+        public string Audience { get; set; }//Аудитория --> children = дети, adults = взрослые, all = все
+
+
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();

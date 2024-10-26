@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
+using WebApiVRoom.DAL.Entities;
 namespace WebApiVRoom.Controllers
 {
- 
+
 
     [Route("api/[controller]")]
     [ApiController]
@@ -29,6 +30,24 @@ namespace WebApiVRoom.Controllers
             _userService = userService;
         }
 
+        [HttpGet("getvideosorshortsbychannelidwithfilters")]
+        public async Task<IActionResult> GetVideosOrShortsByChannelIdWithFilters([FromQuery] int id, [FromQuery]bool isShort, [FromQuery] string? copyright, [FromQuery] string? ageRestriction, [FromQuery] string? audience, [FromQuery] string? access, [FromQuery] string? title, [FromQuery] string? description, [FromQuery] int? minViews, [FromQuery] int? maxViews)
+        {
+            VideoFilter filters = new VideoFilter
+            {
+                AgeRestriction = ageRestriction,
+                Audience = audience,
+                Access = access,
+                MinViews = minViews,
+                MaxViews = maxViews,
+                Title = title,
+                Description = description,
+                Copyright = copyright
+            };
+
+            var videos = await _videoService.GetFilteredVideosAsync(id, isShort, filters);
+            return Ok(videos);
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<VideoInfoDTO>> GetVideo([FromRoute] int id)
@@ -49,7 +68,7 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
-            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video,ch);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video, ch);
             return Ok(videoInfoDTO);
         }
 
@@ -65,7 +84,7 @@ namespace WebApiVRoom.Controllers
             foreach (var v in video)
             {
                 ChannelSettingsDTO channelSettingsDTO = await _chService.GetChannelSettings(v.ChannelSettingsId);
-                VideoInfoDTO vinfo=ConvertVideoToVideoInfo(v,channelSettingsDTO);
+                VideoInfoDTO vinfo = ConvertVideoToVideoInfo(v, channelSettingsDTO);
                 result.Add(vinfo);
             }
             return Ok(result);
@@ -79,7 +98,8 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
             List<VideoInfoDTO> list = new List<VideoInfoDTO>();
-            foreach (var v in video) {
+            foreach (var v in video)
+            {
                 try
                 {
                     ChannelSettingsDTO ch = await _chService.GetChannelSettings(v.ChannelSettingsId);
@@ -87,28 +107,28 @@ namespace WebApiVRoom.Controllers
                     list.Add(videoInfoDTO);
                 }
                 catch (Exception ex) { }
-        }
+            }
             return Ok(list);
         }
-        private VideoInfoDTO ConvertVideoToVideoInfo(VideoDTO v,ChannelSettingsDTO ch)
+        private VideoInfoDTO ConvertVideoToVideoInfo(VideoDTO v, ChannelSettingsDTO ch)
         {
             return new VideoInfoDTO
             {
-                Id =v.Id,
-               ObjectID =v.ObjectID,
-              ChannelSettingsId =ch.Id,
-              ChannelName =ch.ChannelName,
-              ChannelBanner = ch.ChannelBanner, 
-              Tittle = v.Tittle,
-              Description =v.Description,
-              UploadDate =v.UploadDate,
-              Duration = v.Duration,
-              VideoUrl = v.VideoUrl,
-              ViewCount = v.ViewCount,
-              LikeCount = v.LikeCount,
-              DislikeCount = v.DislikeCount,
-              IsShort =v.IsShort,
-              Cover = v.Cover,
+                Id = v.Id,
+                ObjectID = v.ObjectID,
+                ChannelSettingsId = ch.Id,
+                ChannelName = ch.ChannelName,
+                ChannelBanner = ch.ChannelBanner,
+                Tittle = v.Tittle,
+                Description = v.Description,
+                UploadDate = v.UploadDate,
+                Duration = v.Duration,
+                VideoUrl = v.VideoUrl,
+                ViewCount = v.ViewCount,
+                LikeCount = v.LikeCount,
+                DislikeCount = v.DislikeCount,
+                IsShort = v.IsShort,
+                Cover = v.Cover,
             };
         }
 
@@ -188,7 +208,7 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            await _videoService.DeleteVideo(id); 
+            await _videoService.DeleteVideo(id);
             return NoContent();
         }
 
@@ -208,7 +228,7 @@ namespace WebApiVRoom.Controllers
         [HttpGet("{userId}/history")]
         public async Task<ActionResult<IEnumerable<HistoryOfBrowsingDTO>>> GetUserVideoHistory([FromRoute] int userId)
         {
-            var history = await _videoService.GetUserVideoHistory(userId); 
+            var history = await _videoService.GetUserVideoHistory(userId);
             if (history == null || !history.Any())
             {
                 return NotFound();
@@ -228,22 +248,24 @@ namespace WebApiVRoom.Controllers
             {
                 return NotFound();
             }
-            UserDTO us = await  _userService.GetUserByVideoId(video_id);
+            UserDTO us = await _userService.GetUserByVideoId(video_id);
             LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
             if (like == null && user_clrekId != us.Clerk_Id)
             {
-                LikesDislikesVDTO likeDto = new() { 
+                LikesDislikesVDTO likeDto = new()
+                {
                     videoId = video_id,
-                    userId = user_clrekId ,
+                    userId = user_clrekId,
                     like = true,
-                    likeDate = DateTime.Now};
+                    likeDate = DateTime.Now
+                };
                 await _likesService.Add(likeDto);
 
                 videoDto.LikeCount += 1;
 
                 VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
-                object obj= await ConvertObject(vid);
-                
+                object obj = await ConvertObject(vid);
+
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "up_video", payload = obj });
                 return Ok();
             }
@@ -266,7 +288,10 @@ namespace WebApiVRoom.Controllers
             LikesDislikesVDTO like = await _likesService.Get(video_id, user_clrekId);
             if (like == null && user_clrekId != us.Clerk_Id)
             {
-                LikesDislikesVDTO likeDto = new() { videoId = video_id, userId = user_clrekId,
+                LikesDislikesVDTO likeDto = new()
+                {
+                    videoId = video_id,
+                    userId = user_clrekId,
                     like = false,
                     likeDate = DateTime.Now
                 };
@@ -293,36 +318,36 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-                videoDto.ViewCount += 1;
+            videoDto.ViewCount += 1;
 
-                VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
-                object obj = await ConvertObject(vid);
+            VideoDTO vid = await _videoService.UpdateVideoInfo(videoDto);
+            object obj = await ConvertObject(vid);
 
-                await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "viewed_video", payload = obj });
-                return Ok();
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "viewed_video", payload = obj });
+            return Ok();
         }
-        private async Task< object> ConvertObject(VideoDTO video)
+        private async Task<object> ConvertObject(VideoDTO video)
         {
             ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
-            VideoInfoDTO v= ConvertVideoToVideoInfo(video,channelSettings);  
+            VideoInfoDTO v = ConvertVideoToVideoInfo(video, channelSettings);
             object obj = new
             {
                 id = v.Id,
                 objectID = v.ObjectID,
-                channelSettingsId =v.ChannelSettingsId,
-                channelName= v.ChannelName,
-                tittle =v.Tittle,
-               description =v.Description,
-               channelBanner=v.ChannelBanner,
-               uploadDate =v.UploadDate,
-               duration = v.Duration,
-               videoUrl = v.VideoUrl,
-               viewCount = v.ViewCount,
-               likeCount = v.LikeCount,
-               dislikeCount = v.DislikeCount,
-               isShort = v.IsShort,
-               cover =v.Cover, 
-               visibility = v.Visibility,
+                channelSettingsId = v.ChannelSettingsId,
+                channelName = v.ChannelName,
+                tittle = v.Tittle,
+                description = v.Description,
+                channelBanner = v.ChannelBanner,
+                uploadDate = v.UploadDate,
+                duration = v.Duration,
+                videoUrl = v.VideoUrl,
+                viewCount = v.ViewCount,
+                likeCount = v.LikeCount,
+                dislikeCount = v.DislikeCount,
+                isShort = v.IsShort,
+                cover = v.Cover,
+                visibility = v.Visibility,
             };
             return obj;
         }

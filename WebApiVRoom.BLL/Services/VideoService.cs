@@ -24,7 +24,7 @@ namespace WebApiVRoom.BLL.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly BlobServiceClient _blobServiceClient;
-        private readonly string _containerName ;
+        private readonly string _containerName;
         private readonly IAlgoliaService _algoliaService;
         private readonly IBlobStorageService _blobStorageService;
 
@@ -52,6 +52,10 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
                     .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
                      .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
+                     .ForMember(dest => dest.Visibility, opt => opt.MapFrom(src => src.Visibility))
+                   .ForMember(dest => dest.IsAgeRestriction, opt => opt.MapFrom(src => src.IsAgeRestriction))
+                   .ForMember(dest => dest.IsCopyright, opt => opt.MapFrom(src => src.IsCopyright))
+                   .ForMember(dest => dest.Audience, opt => opt.MapFrom(src => src.Audience))
                     .ForMember(dest => dest.LastViewedPosition, opt => opt.MapFrom(src => src.LastViewedPosition.ToString()))
                     .ForMember(dest => dest.CategoryIds, opt => opt.MapFrom(src => src.Categories.Select(s => s.Id).ToList()))
                     .ForMember(dest => dest.TagIds, opt => opt.MapFrom(src => src.Tags.Select(p => p.Id).ToList()))
@@ -72,13 +76,16 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.IsShort, opt => opt.MapFrom(src => src.IsShort))
                    .ForMember(dest => dest.Cover, opt => opt.MapFrom(src => src.Cover))
                    .ForMember(dest => dest.Visibility, opt => opt.MapFrom(src => src.Visibility))
+                   .ForMember(dest => dest.IsAgeRestriction, opt => opt.MapFrom(src => src.IsAgeRestriction))
+                   .ForMember(dest => dest.IsCopyright, opt => opt.MapFrom(src => src.IsCopyright))
+                   .ForMember(dest => dest.Audience, opt => opt.MapFrom(src => src.Audience))
                   .ForMember(dest => dest.LastViewedPosition, opt => opt.Ignore())
-                  .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore()) 
-                  .ForMember(dest => dest.Categories, opt => opt.Ignore()) 
-                  .ForMember(dest => dest.Tags, opt => opt.Ignore()) 
+                  .ForMember(dest => dest.ChannelSettings, opt => opt.Ignore())
+                  .ForMember(dest => dest.Categories, opt => opt.Ignore())
+                  .ForMember(dest => dest.Tags, opt => opt.Ignore())
                   .ForMember(dest => dest.HistoryOfBrowsings, opt => opt.Ignore())
-                  .ForMember(dest => dest.PlayListVideos, opt => opt.Ignore()) 
-                  .ForMember(dest => dest.CommentVideos, opt => opt.Ignore()); 
+                  .ForMember(dest => dest.PlayListVideos, opt => opt.Ignore())
+                  .ForMember(dest => dest.CommentVideos, opt => opt.Ignore());
             });
             _mapper = new Mapper(config);
         }
@@ -188,7 +195,7 @@ namespace WebApiVRoom.BLL.Services
                 await _unitOfWork.Videos.Add(video);
 
                 VideoForAlgolia vid = CreateVideoForAlgolia(video);
-                
+
                 await _algoliaService.AddOrUpdateVideoAsync(vid);
 
             }
@@ -242,7 +249,7 @@ namespace WebApiVRoom.BLL.Services
         private List<string> GetTagsOfVideo(Video video)
         {
             List<string> tags = new List<string>();
-            foreach(Tag t in video.Tags)
+            foreach (Tag t in video.Tags)
             {
                 tags.Add(t.Name);
             }
@@ -263,14 +270,14 @@ namespace WebApiVRoom.BLL.Services
             List<string> categories = GetCategoriesOfVideo(video);
 
             return new VideoForAlgolia()
-                  {
-                     Id = video.Id,
-                     ObjectID = video.ObjectID,
-                     ChannelName= video.ChannelSettings.ChannelName,
-                     Tittle = video.Tittle,
-                     Tags = tags,
-                     Categories = categories,
-                  };
+            {
+                Id = video.Id,
+                ObjectID = video.ObjectID,
+                ChannelName = video.ChannelSettings.ChannelName,
+                Tittle = video.Tittle,
+                Tags = tags,
+                Categories = categories,
+            };
         }
 
         public async Task<string> UploadFileAsync(IFormFile file)
@@ -307,7 +314,7 @@ namespace WebApiVRoom.BLL.Services
         public async Task<VideoDTO> GetVideoInfo(int id)
         {
             var video = await _unitOfWork.Videos.GetById(id);
-            return _mapper.Map<Video,VideoDTO>(video);
+            return _mapper.Map<Video, VideoDTO>(video);
         }
         public async Task<IEnumerable<VideoDTO>> GetAllVideos()
         {
@@ -362,7 +369,10 @@ namespace WebApiVRoom.BLL.Services
                 video.DislikeCount = videoDTO.DislikeCount;
                 video.IsShort = videoDTO.IsShort;
                 video.Cover = videoDTO.Cover;
-                video.Visibility = videoDTO.Visibility; 
+                video.Visibility = videoDTO.Visibility;
+                video.IsAgeRestriction = videoDTO.IsAgeRestriction;
+                video.IsCopyright = videoDTO.IsCopyright;
+                video.Audience = videoDTO.Audience;
 
                 video.Categories.Clear();
                 foreach (var categoryId in videoDTO.CategoryIds)
@@ -419,8 +429,11 @@ namespace WebApiVRoom.BLL.Services
                 video.LikeCount = videoDTO.LikeCount;
                 video.DislikeCount = videoDTO.DislikeCount;
                 video.IsShort = videoDTO.IsShort;
-                video.Cover= videoDTO.Cover;
+                video.Cover = videoDTO.Cover;
                 video.Visibility = videoDTO.Visibility;
+                video.IsAgeRestriction = videoDTO.IsAgeRestriction;
+                video.IsCopyright = videoDTO.IsCopyright;
+                video.Audience = videoDTO.Audience;
 
                 await _unitOfWork.Videos.Update(video);
 
@@ -521,14 +534,14 @@ namespace WebApiVRoom.BLL.Services
                         });
                     }
                 }
-                return list;    
+                return list;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while retrieving video", ex);
             }
         }
-    
+
         public async Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId)
         {
             try
@@ -611,6 +624,13 @@ namespace WebApiVRoom.BLL.Services
             var videos = await _unitOfWork.Videos.GetVideosByChannelIdVisibility(channelId, visibility);
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
+
+        public async Task<IEnumerable<VideoDTO>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter)
+        {
+            var videos = await _unitOfWork.Videos.GetFilteredVideosAsync(id, isShort, filter);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+
         public async Task<IEnumerable<VideoDTO>> GetUserVideoHistory(int userId)
         {
             try
@@ -649,11 +669,11 @@ namespace WebApiVRoom.BLL.Services
             List<Video> v = new List<Video>();
             foreach (var likedVideo in sortedList)
             {
-                Video vid= await _unitOfWork.Videos.GetById(likedVideo.Video.Id);
+                Video vid = await _unitOfWork.Videos.GetById(likedVideo.Video.Id);
                 if (vid != null)
                     v.Add(vid);
             }
-           
+
             return _mapper.Map<List<Video>, List<VideoDTO>>(v);
         }
 

@@ -28,6 +28,10 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetVideosByChannelIdVisibility(int channelId, bool visibility);
 
         Task<List<Video>> GetVideosByChannelId(int channelId);
-        
+
+
+
+        Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter);
+
     }
 }
