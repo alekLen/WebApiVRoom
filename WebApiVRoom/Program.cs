@@ -80,6 +80,7 @@ builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
 builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
 builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
+builder.Services.AddSingleton<LiveStreamingService>(provider =>new LiveStreamingService("AIzaSyDvXp8Wi0-Y6BPC55SDA953CFIid2g6TtY"));
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
 
