@@ -14,6 +14,9 @@ namespace WebApiVRoom.DAL.Entities
         public DateTime Date { get; set; }
         public string? Photo { get; set; }
         public string? Video { get; set; }
+        public string? Type { get; set; }
+        public List<OptionsForPost>? Options { get; set; } = new List<OptionsForPost>();
+        public List<Vote>? Voutes { get; set; } = new List<Vote>();
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
         public List<CommentPost> CommentPosts { get; set; } = new List<CommentPost>();

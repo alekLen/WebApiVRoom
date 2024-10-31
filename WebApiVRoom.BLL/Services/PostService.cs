@@ -19,12 +19,16 @@ namespace WebApiVRoom.BLL.Services
         IUnitOfWork Database { get; set; }
         private readonly IBlobStorageService _blobStorageService;
         private readonly IVideoService _videoService;
+        //private readonly IOptionsForPostService _opService;
+        //private readonly IVouteService _vouteService;
 
-        public PostService(IUnitOfWork database, IBlobStorageService blobStorageService, IVideoService videoService)
+        public PostService(IUnitOfWork database, IBlobStorageService blobStorageService,  IVideoService videoService)
         {
             Database = database;
             _blobStorageService= blobStorageService;
             _videoService = videoService;
+            //_opService= opService;
+            //_vouteService = vouteService;
         }
         public static IMapper InitializeMapper()
         {
@@ -35,11 +39,13 @@ namespace WebApiVRoom.BLL.Services
                        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                        .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                        .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
-                       .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id));
+                       .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                       .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
+                       .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options.Select(ch =>  ch.Name ))); 
             });
             return new Mapper(config);
         }
-        public async Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id)
+        public async Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id, string type, string op)
         {
             try
             {
@@ -52,6 +58,7 @@ namespace WebApiVRoom.BLL.Services
                 post.Date = DateTime.Now;
                 post.LikeCount = 0;
                 post.DislikeCount = 0;
+                post.Type = type;
 
                     if (img != null)
                     {
@@ -62,11 +69,22 @@ namespace WebApiVRoom.BLL.Services
                     {
                         post.Video = await _videoService.UploadFileAsync(video);
                     }
-
-
                 await Database.Posts.Add(post);
+                string[] strings = op.Split(", ") ;
+
+                foreach (string item in strings)
+                {
+                    OptionsForPost options = new OptionsForPost();
+                    options.Name = item;
+                    options.Post = post;
+                    await Database.Options.Add(options);
+                    post.Options.Add(options);
+                }
+
+                await Database.Posts.Update(post);
+                Post p= await Database.Posts.GetById(post.Id);
                 IMapper mapper = InitializeMapper();
-                return mapper.Map<Post, PostDTO>(post);
+                return mapper.Map<Post, PostDTO>(p);
 
             }
             catch (Exception ex)
@@ -129,7 +147,11 @@ namespace WebApiVRoom.BLL.Services
             post.DislikeCount = a.DislikeCount;
             post.LikeCount = a.LikeCount;
             post.ChannelSettingsId = a.ChannelSettings.Id;
-
+            foreach(var o in a.Options)
+            {
+                post.Options.Add(o.Name);
+            }
+            post.Type = a.Type;
 
             return post;
         }
@@ -181,15 +203,17 @@ namespace WebApiVRoom.BLL.Services
             PostDTO post = new PostDTO();
             post.Id = a.Id;
             post.Text = a.Text;
-
-            var channelSettings = await Database.ChannelSettings.GetById(a.Id);
-            post.ChannelSettingsId = channelSettings.Id;
-
-            //post.CommentPostsId = new List<int>();
-            //foreach (CommentPost comment in a.CommentPosts)
-            //{
-            //    post.CommentPostsId.Add(comment.Id);
-            //}
+            post.ChannelSettingsId = a.ChannelSettings.Id;
+            post.Date = a.Date;
+            post.Photo = a.Photo;
+            post.Video = a.Video;
+            post.DislikeCount = a.DislikeCount;
+            post.LikeCount = a.LikeCount;
+            foreach (var o in a.Options)
+            {
+                post.Options.Add(o.Name);
+            }
+            post.Type = a.Type;
 
             return post;
         }
@@ -219,5 +243,7 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
+
+  
     }
 }

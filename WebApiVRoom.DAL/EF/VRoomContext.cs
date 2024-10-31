@@ -44,6 +44,8 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesAP> LikesAP { get; set; }
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
+        public DbSet<OptionsForPost> Options { get; set; }
+        public DbSet<Vote> Voutes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,48 +79,16 @@ namespace WebApiVRoom.DAL.EF
                 .HasForeignKey(pv => pv.VideoId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Vote>()
+                .HasOne(pv => pv.Post)
+                .WithMany(v => v.Voutes)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            //modelBuilder.Entity<Post>()
-            //   .HasOne(pv => pv.ChannelSettings)
-            //   .WithMany(v => v.Posts)
-            //   .HasForeignKey(pv => pv.channelSettingsId)
-            //   .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<Vote>()
+               .HasOne(pv => pv.Option)
+               .WithMany(v => v.Voutes)
+               .OnDelete(DeleteBehavior.NoAction);
 
-            //       modelBuilder.Entity<LikesDislikesP>()
-            //   .HasOne(ld => ld.Post)
-            //   .WithMany() // Связь "многие ко многим" или "один ко многим"
-            //   .HasForeignKey(ld => ld.Post.Id) // Указываем внешний ключ
-            //   .OnDelete(DeleteBehavior.NoAction);
-
-            //       modelBuilder.Entity<LikesDislikesV>()
-            // .HasOne(ld => ld.Video)
-            // .WithMany() // Связь "многие ко многим" или "один ко многим"
-            // .HasForeignKey(ld => ld.Video.Id) // Указываем внешний ключ
-            // .OnDelete(DeleteBehavior.NoAction);
-
-            //       modelBuilder.Entity<LikesDislikesCP>()
-            // .HasOne(ld => ld.commentPost)
-            // .WithMany() // Связь "многие ко многим" или "один ко многим"
-            // .HasForeignKey(ld => ld.commentPost.Id) // Указываем внешний ключ
-            // .OnDelete(DeleteBehavior.NoAction);
-
-            //       modelBuilder.Entity<LikesDislikesAP>()
-            // .HasOne(ld => ld.answerPost)
-            // .WithMany() // Связь "многие ко многим" или "один ко многим"
-            // .HasForeignKey(ld => ld.answerPost.Id) // Указываем внешний ключ
-            // .OnDelete(DeleteBehavior.NoAction);
-
-            //       modelBuilder.Entity<LikesDislikesCV>()
-            // .HasOne(ld => ld.commentVideo)
-            // .WithMany() // Связь "многие ко многим" или "один ко многим"
-            // .HasForeignKey(ld => ld.commentVideo.Id) // Указываем внешний ключ
-            // .OnDelete(DeleteBehavior.NoAction);
-
-            //       modelBuilder.Entity<LikesDislikesAV>()
-            //.HasOne(ld => ld.answerVideo)
-            //.WithMany() // Связь "многие ко многим" или "один ко многим"
-            //.HasForeignKey(ld => ld.answerVideo.Id) // Указываем внешний ключ
-            //.OnDelete(DeleteBehavior.NoAction);
 
         }
     }

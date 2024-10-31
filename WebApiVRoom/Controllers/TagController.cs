@@ -48,7 +48,7 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(tag);
         }
 
-        // GET: CategoryController/Create
+       
         [HttpPost("add")]
         public async Task<ActionResult<TagDTO>> AddTag(TagDTO tagDTO)
         {

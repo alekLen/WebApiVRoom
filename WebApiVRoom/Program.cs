@@ -80,6 +80,8 @@ builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
 builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
 builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
+builder.Services.AddScoped<IVoteService, VoteService>();
+builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
