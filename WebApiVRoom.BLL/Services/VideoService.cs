@@ -47,6 +47,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate))
                     .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
                     .ForMember(dest => dest.VideoUrl, opt => opt.MapFrom(src => src.VideoUrl))
+                    .ForMember(dest => dest.VRoomVideoUrl, opt => opt.MapFrom(src => src.VRoomVideoUrl))
                     .ForMember(dest => dest.ViewCount, opt => opt.MapFrom(src => src.ViewCount))
                     .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                     .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
@@ -70,6 +71,7 @@ namespace WebApiVRoom.BLL.Services
                   .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadDate))
                   .ForMember(dest => dest.Duration, opt => opt.MapFrom(src => src.Duration))
                   .ForMember(dest => dest.VideoUrl, opt => opt.MapFrom(src => src.VideoUrl))
+                  .ForMember(dest => dest.VRoomVideoUrl, opt => opt.MapFrom(src => src.VRoomVideoUrl))
                   .ForMember(dest => dest.ViewCount, opt => opt.MapFrom(src => src.ViewCount))
                   .ForMember(dest => dest.LikeCount, opt => opt.MapFrom(src => src.LikeCount))
                   .ForMember(dest => dest.DislikeCount, opt => opt.MapFrom(src => src.DislikeCount))
@@ -198,6 +200,16 @@ namespace WebApiVRoom.BLL.Services
 
                 await _algoliaService.AddOrUpdateVideoAsync(vid);
 
+
+                var temp_video = await _unitOfWork.Videos.GetById(video.Id);
+
+                temp_video.VRoomVideoUrl = $"http://localhost:3000/shorts/{temp_video.Id}";
+
+                if (temp_video.IsShort == false)
+                {
+                    temp_video.VRoomVideoUrl = $"http://localhost:3000/watch/{temp_video.Id}";
+                }
+                await _unitOfWork.Videos.Update(video);
             }
             catch (Exception ex)
             {
@@ -312,11 +324,6 @@ namespace WebApiVRoom.BLL.Services
             throw new NotImplementedException();
         }
 
-        public async Task<VideoDTO> GetVideoInfo(int id)
-        {
-            var video = await _unitOfWork.Videos.GetById(id);
-            return _mapper.Map<Video, VideoDTO>(video);
-        }
         public async Task<IEnumerable<VideoDTO>> GetAllVideos()
         {
             var videos = await _unitOfWork.Videos.GetAll();
@@ -398,6 +405,15 @@ namespace WebApiVRoom.BLL.Services
                     }
                 }
 
+
+                video.VRoomVideoUrl = $"http://localhost:3000/shorts/{video.Id}";
+
+                if (videoDTO.IsShort == false)
+                {
+                    video.VRoomVideoUrl = $"http://localhost:3000/watch/{video.Id}";
+                }
+
+
                 await _unitOfWork.Videos.Update(video);
 
                 VideoForAlgolia vid = CreateVideoForAlgolia(video);
@@ -436,6 +452,13 @@ namespace WebApiVRoom.BLL.Services
                 video.IsCopyright = videoDTO.IsCopyright;
                 video.Audience = videoDTO.Audience;
 
+                video.VRoomVideoUrl = $"http://localhost:3000/shorts/{video.Id}";
+
+                if (videoDTO.IsShort == false)
+                {
+                    video.VRoomVideoUrl = $"http://localhost:3000/watch/{video.Id}";
+                }
+
                 await _unitOfWork.Videos.Update(video);
 
                 VideoForAlgolia vid = CreateVideoForAlgolia(video);
@@ -447,6 +470,13 @@ namespace WebApiVRoom.BLL.Services
             {
                 throw new Exception("Error while updating video", ex);
             }
+        }
+
+
+        public async Task<VideoDTO> GetVideoInfo(int id)
+        {
+            var video = await _unitOfWork.Videos.GetById(id);
+            return _mapper.Map<Video, VideoDTO>(video);
         }
 
         public async Task<VideoWithStreamDTO> GetVideo(int id)
