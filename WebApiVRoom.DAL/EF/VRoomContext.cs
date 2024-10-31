@@ -44,6 +44,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesAP> LikesAP { get; set; }
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
+        public DbSet<Broadcast> Broadcasts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
