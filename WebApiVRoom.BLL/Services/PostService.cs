@@ -70,17 +70,19 @@ namespace WebApiVRoom.BLL.Services
                         post.Video = await _videoService.UploadFileAsync(video);
                     }
                 await Database.Posts.Add(post);
-                string[] strings = op.Split(", ") ;
-
-                foreach (string item in strings)
+                if (op != null)
                 {
-                    OptionsForPost options = new OptionsForPost();
-                    options.Name = item;
-                    options.Post = post;
-                    await Database.Options.Add(options);
-                    post.Options.Add(options);
-                }
+                    string[] strings = op.Split(", ");
 
+                    foreach (string item in strings)
+                    {
+                        OptionsForPost options = new OptionsForPost();
+                        options.Name = item;
+                        options.Post = post;
+                        await Database.Options.Add(options);
+                        post.Options.Add(options);
+                    }
+                }
                 await Database.Posts.Update(post);
                 Post p= await Database.Posts.GetById(post.Id);
                 IMapper mapper = InitializeMapper();
