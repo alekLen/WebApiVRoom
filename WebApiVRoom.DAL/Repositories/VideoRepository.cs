@@ -23,23 +23,6 @@ namespace WebApiVRoom.DAL.Repositories
             _context = context;
         }
 
-        public async Task<Video> GetById(int id)
-        {
-            var video = await _context.Videos
-                .Include(v => v.ChannelSettings)
-                .Include(v => v.Categories)
-                .Include(v => v.Tags)
-                .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.CommentVideos)
-                .Include(v => v.PlayListVideos)
-                .FirstOrDefaultAsync(v => v.Id == id);
-
-            if (video == null)
-                throw new KeyNotFoundException("Video not found");
-
-            return video;
-        }
-
 
         public async Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter)
         {
@@ -480,6 +463,23 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
+
+        public async Task<Video> GetById(int id)
+        {
+            var video = await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
+            if (video == null)
+                throw new KeyNotFoundException("Video not found");
+
+            return video;
+        }
 
     }
 }
