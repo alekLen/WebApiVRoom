@@ -94,6 +94,11 @@ namespace WebApiVRoom.BLL.Services
         {
             return $"-i \"{inputFilePath}\" -vf scale={width}:{height} -c:v libx264 -b:v {bitrate}k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputFilePath}\"";
         }
+        private string GetFaststartArguments(string inputFilePath, string outputFilePath)
+        {
+            return $"-i \"{inputFilePath}\" -c copy -movflags +faststart \"{outputFilePath}\"";
+        }
+
         public async Task AddVideo(VideoDTO videoDTO, Stream fileStream)
         {
             try
@@ -114,7 +119,8 @@ namespace WebApiVRoom.BLL.Services
                 {
                     await fileStream.CopyToAsync(fileStreamOutput);
                 }
-
+                //string optimizedFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_optimized.mp4");
+                //await RunFfmpegCommand(GetFaststartArguments(tempFilePath, optimizedFilePath));
                 // Генерация аргументов для FFmpeg
                 var tasks = new List<Task>
                 {
