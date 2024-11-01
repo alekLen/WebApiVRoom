@@ -480,6 +480,23 @@ namespace WebApiVRoom.DAL.Repositories
 
             return video;
         }
+        public async Task<Video> GetByVRoomVideoUrl(string url)
+        {
+            var video = await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .FirstOrDefaultAsync(v => v.VRoomVideoUrl == url);
+
+            if (video == null)
+                throw new KeyNotFoundException("Video not found");
+
+            return video;
+        }
+
 
     }
 }

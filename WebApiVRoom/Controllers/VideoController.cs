@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
+using System.Web;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -165,6 +166,20 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<VideoInfoDTO>> GetVideoInfo([FromRoute] int id)
         {
             var video = await _videoService.GetVideoInfo(id);
+            if (video == null)
+            {
+                return NotFound();
+            }
+            ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video, ch);
+            return Ok(videoInfoDTO);
+        }
+
+        [HttpGet("getvideoinfobyvideourl/{url}")]
+        public async Task<ActionResult<VideoInfoDTO>> GetVideoInfoByUrl([FromRoute] string url)
+        {
+            string decodedUrl = HttpUtility.UrlDecode(url);
+            var video = await _videoService.GetVideoInfoByVRoomVideoUrl(decodedUrl);
             if (video == null)
             {
                 return NotFound();

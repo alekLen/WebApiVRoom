@@ -45,7 +45,7 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
-        public async Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id, string type, string op)
+        public async Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id, string type, string op,string? link)
         {
             try
             {
@@ -69,6 +69,10 @@ namespace WebApiVRoom.BLL.Services
                     {
                         post.Video = await _videoService.UploadFileAsync(video);
                     }
+                if (link != null)
+                {
+                    post.Video=link;
+                }
                 await Database.Posts.Add(post);
                 if (op != null)
                 {

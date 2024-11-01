@@ -11,6 +11,7 @@ namespace WebApiVRoom.BLL.DTO
         public string id {  get; set; }
         public string text { get; set; }
         public string? type { get; set; }
-        public string? options { get; set; } 
+        public string? options { get; set; }
+        public string? VideoLink { get; set; }
     }
 }

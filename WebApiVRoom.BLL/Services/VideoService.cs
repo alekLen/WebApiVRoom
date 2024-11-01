@@ -478,6 +478,11 @@ namespace WebApiVRoom.BLL.Services
             var video = await _unitOfWork.Videos.GetById(id);
             return _mapper.Map<Video, VideoDTO>(video);
         }
+        public async Task<VideoDTO> GetVideoInfoByVRoomVideoUrl(string url)
+        {
+            var video = await _unitOfWork.Videos.GetByVRoomVideoUrl(url);
+            return _mapper.Map<Video, VideoDTO>(video);
+        }
 
         public async Task<VideoWithStreamDTO> GetVideo(int id)
         {
