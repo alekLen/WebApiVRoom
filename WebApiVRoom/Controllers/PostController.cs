@@ -72,9 +72,8 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-           PostDTO post = await _postService.AddPost(img,video,req.text,req.id);
+           PostDTO post = await _postService.AddPost(img,video,req.text,req.id,req.type,req.options,req.VideoLink);
             object obj = ConvertObject(post);
-            //await WebSocketHelper.SendMessageToAllAsync("new_post", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_post", payload = obj });
             return Ok();
         }
@@ -191,19 +190,12 @@ namespace WebApiVRoom.Controllers
                 photo=ans.Photo,
                 video=ans.Video,
                 likeCount=ans.LikeCount,
-                dislikeCount=ans.DislikeCount
+                dislikeCount=ans.DislikeCount,
+                type=ans.Type,
+                options=ans.Options,
             };
             return obj;
         }
-
-        public int Id { get; set; }
-        public string Text { get; set; }
-        public int ChannelSettingsId { get; set; }
-        public DateTime Date { get; set; }
-        public string? Photo { get; set; }
-        public string? Video { get; set; }
-        public int LikeCount { get; set; }
-        public int DislikeCount { get; set; }
 
     }
 }

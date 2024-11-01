@@ -38,12 +38,33 @@ namespace WebApiVRoom.DAL.Repositories
         private LikesDislikesAPRepository likesDislikesRepositoryAP;
         private LikesDislikesVRepository likesDislikesRepositoryV;
         private LikesDislikesPRepository likesDislikesRepositoryP;
+        private OptionsForPostRepository optionsForPostRepository;
+        private VoteRepository vouteRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
         }
 
+        public IVoteRepository Votes
+        {
+            get
+            {
+                if (vouteRepository == null)
+                    vouteRepository = new VoteRepository(db);
+                return vouteRepository;
+            }
+        }
+
+        public IOptionsForPostRepository Options
+        {
+            get
+            {
+                if (optionsForPostRepository == null)
+                    optionsForPostRepository = new OptionsForPostRepository(db);
+                return optionsForPostRepository;
+            }
+        }
 
         public ILikesDislikesCVRepository LikesCV
         {

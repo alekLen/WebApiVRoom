@@ -14,6 +14,7 @@ namespace WebApiVRoom.DAL.Entities
         //public string? ChannelName { get; set; }
         //public string ChannelBanner { get; set; }
         public bool IsPremium { get; set; } = false;
+       // public List<Voute>? Voutes { get; set; } = new List<Voute>();
         //public int SubscriptionCount { get; set; } = 0;
         //public List<Subscription> Subscriptions { get; set; } =new List<Subscription>();
         //public List<PlayList> PlayLists { get; set; } = new List<PlayList>();

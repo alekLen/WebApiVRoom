@@ -17,7 +17,8 @@ namespace WebApiVRoom.BLL.DTO
         public string Description { get; set; } = string.Empty;
         public DateTime UploadDate { get; set; }
         public int Duration { get; set; }
-        public string VideoUrl { get; set; } = string.Empty;
+        public string VideoUrl { get; set; } = string.Empty; 
+        public string VRoomVideoUrl { get; set; } = string.Empty;
         public int ViewCount { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }

@@ -15,6 +15,8 @@ namespace WebApiVRoom.BLL.DTO
         public DateTime Date { get; set; }
         public string? Photo { get; set; }
         public string? Video { get; set; }
+        public string? Type { get; set; }
+        public List<string>? Options { get; set; } = new List<string>();
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
   

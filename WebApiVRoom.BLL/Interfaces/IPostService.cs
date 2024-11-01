@@ -15,7 +15,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<List<PostDTO>> GetPostByChannellIdPaginated(int pageNumber, int pageSize, int channelSettingsId);
         Task<IEnumerable<PostDTO>> GetAllPosts();
         Task<PostDTO> GetPostByText(string text);
-        Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id);
+        Task<PostDTO> AddPost(IFormFile? img, IFormFile? video, string text, string id, string type, string op, string? link);
         Task<PostDTO> UpdatePost(PostDTO postDTO);
         Task DeletePost(int id);
 
