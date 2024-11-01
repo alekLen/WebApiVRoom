@@ -25,23 +25,31 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                Category category = new Category();
-
-                category.Id = categoryDTO.Id;
-                category.Name = categoryDTO.Name;
-                List<Video> list = new();
-
-                foreach (int id in categoryDTO.VideosId)
+                if (string.IsNullOrWhiteSpace(categoryDTO.Name))
                 {
-                    list.Add(await Database.Videos.GetById(id));
+                    throw new ArgumentException("Category name is required");
                 }
 
+                Category category = new Category
+                {
+                    Id = categoryDTO.Id,
+                    Name = categoryDTO.Name
+                };
+
+                List<Video> list = new();
+                foreach (int id in categoryDTO.VideosId)
+                {
+                    var video = await Database.Videos.GetById(id);
+                    if (video != null) list.Add(video);
+                }
                 category.Videos = list;
 
                 await Database.Categories.Add(category);
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error adding category: " + ex.Message);
+                throw; // Повторне викидання помилки для відстеження
             }
         }
 

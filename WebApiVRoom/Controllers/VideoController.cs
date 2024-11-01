@@ -157,7 +157,6 @@ namespace WebApiVRoom.Controllers
                 {
                     return BadRequest("Invalid base64 string.");
                 }
-
                 var videoBytes = Convert.FromBase64String(videoDto.VideoUrl);
                 using (var stream = new MemoryStream(videoBytes))
                 {
