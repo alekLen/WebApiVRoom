@@ -257,7 +257,11 @@ namespace WebApiVRoom.Controllers
                 Audience = v.Audience,
             };
         }
-
+        private bool IsBase64String(string base64)
+        {
+            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
+            return Convert.TryFromBase64String(base64, buffer, out _);
+        }
         [HttpPost("add")]
         public async Task<ActionResult<VideoDTO>> AddVideo([FromForm] VideoDTO videoDto, IFormFile file)
         {
@@ -265,11 +269,16 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
+         
 
             try
             {
-
-                using (var stream = file.OpenReadStream())
+                if (!IsBase64String(videoDto.VideoUrl))
+                {
+                    return BadRequest("Invalid base64 string.");
+                }
+                var videoBytes = Convert.FromBase64String(videoDto.VideoUrl);
+                using (var stream = new MemoryStream(videoBytes))
                 {
                     await _videoService.AddVideo(videoDto, stream);
                 }
