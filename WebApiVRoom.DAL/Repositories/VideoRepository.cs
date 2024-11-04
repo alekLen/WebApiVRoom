@@ -148,6 +148,20 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<List<Video>> GetAllShortsPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == true)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task Add(Video video)
         {
             ValidateVideo(video);

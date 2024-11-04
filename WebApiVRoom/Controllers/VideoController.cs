@@ -368,6 +368,11 @@ namespace WebApiVRoom.Controllers
             };
             return obj;
         }
+        [HttpGet("getallvideopaginated/{pageNumber}/{pageSize}")]
+        public async Task<ActionResult<List<Video>>> GetAllShortsPaginated(int pageNumber, int pageSize)
+        {
+            return new ObjectResult(await _videoService.GetAllShortsPaginated(pageNumber, pageSize));
+        }
         [HttpGet("getvideosbychannelid/{channelId}")]
         public async Task<ActionResult<IEnumerable<VideoDTO>>> GetVideosByChannelId(int channelId)
         {
