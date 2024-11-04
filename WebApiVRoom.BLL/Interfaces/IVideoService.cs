@@ -27,15 +27,10 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<List<VideoDTO>> GetLikedVideoInfo(string userid);
         Task<List<VideoDTO>> GetVideosByChannelId(int channelId);
         Task<List<VideoDTO>> GetShortVideosByChannelId(int channelId);
-
         Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility);
-
         Task<IEnumerable<VideoDTO>> GetShortVideosByChannelIdPaginated(int channelId, bool visibility);
         Task<IEnumerable<VideoDTO>> GetVideosByChannelIdVisibility(int channelId, bool visibility);
-
-
-
-
         Task<IEnumerable<VideoDTO>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter);
+        Task<VideoDTO> GetVideoInfoByVRoomVideoUrl(string url);
     }
 }

@@ -51,7 +51,8 @@ namespace WebApiVRoom.BLL.Services
 
 
                 await Database.Subscriptions.Add(subscription);
-
+                channelSettings.SubscriptionCount = channelSettings.SubscriptionCount+1;
+                await Database.ChannelSettings.Update(channelSettings);
                 var mapper = InitializeMapper();
                 var adedSubscriptionDto = mapper.Map<Subscription, SubscriptionDTO>(subscription);
 
@@ -139,8 +140,12 @@ namespace WebApiVRoom.BLL.Services
             Subscription sub = await Database.Subscriptions.GetByUserAndChannel(channelid,userid);
             if (sub == null)
                 throw new KeyNotFoundException("Video not found");
+            var channelSettings = await Database.ChannelSettings.GetById(channelid);
 
             await Database.Subscriptions.Delete(sub.Id);
+
+            channelSettings.SubscriptionCount = channelSettings.SubscriptionCount - 1;
+            await Database.ChannelSettings.Update(channelSettings);
 
             var mapper = InitializeMapper();
             var deletedSubscriptionDto = mapper.Map<Subscription, SubscriptionDTO>(sub);

@@ -45,29 +45,30 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<IEnumerable<Post>> GetAll()
         {
-            return await db.Posts.Include(m => m.ChannelSettings).ToListAsync();
+            return await db.Posts.Include(m => m.ChannelSettings).Include(m => m.Options).ToListAsync();
         }
 
        
         public async Task<Post> GetById(int id)
         {
-            return await db.Posts.Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Id == id);
+            return await db.Posts.Include(m => m.ChannelSettings).Include(m => m.Options).FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<Post> GetByText(string text)
         {
-            return await db.Posts.Include(m => m.ChannelSettings).FirstOrDefaultAsync(m => m.Text == text);
+            return await db.Posts.Include(m => m.ChannelSettings).Include(m => m.Options).FirstOrDefaultAsync(m => m.Text == text);
         }
 
         public async Task<IEnumerable<Post>> GetByChannellId(int channelSettingsId)
         {
-            return await db.Posts.Include(m => m.ChannelSettings).Where(m => m.ChannelSettings.Id == channelSettingsId)
+            return await db.Posts.Include(m => m.ChannelSettings).Include(m => m.Options).Where(m => m.ChannelSettings.Id == channelSettingsId)
                 .ToListAsync();
         }
         public async Task<IEnumerable<Post>> GetByChannellIdPaginated(int pageNumber, int pageSize, int channelSettingsId)
         {
             return await db.Posts
                 .Include(m => m.ChannelSettings)
+                .Include(m => m.Options)
                 .Where(m => m.ChannelSettings.Id == channelSettingsId)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

@@ -40,6 +40,7 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.ChannelNikName, opt => opt.MapFrom(src => src.ChannelNikName))
                     .ForMember(dest => dest.Channel_URL, opt => opt.MapFrom(src => src.Channel_URL))
                     .ForMember(dest => dest.DateJoined, opt => opt.MapFrom(src => src.DateJoined))
+                    .ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
                     .ForMember(dest => dest.ChannelProfilePhoto, opt => opt.MapFrom(src => src.ChannelPlofilePhoto))//
@@ -88,7 +89,7 @@ namespace WebApiVRoom.BLL.Services
                 channelSettings.DateJoined = chDto.DateJoined;
                 channelSettings.Description = chDto.Description;
                 channelSettings.Notification = chDto.Notification;
-
+                channelSettings.SubscriptionCount = chDto.SubscriptionCount;
                 //channelSettings.ChannelBanner = chDto.ChannelBanner;
                 //channelSettings.ChannelPlofilePhoto = chDto.ChannelPlofilePhoto;
                 if (channelImg != null)

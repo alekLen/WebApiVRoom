@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Generic;
+using System.Web;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -9,6 +10,108 @@ using WebApiVRoom.DAL.Entities;
 namespace WebApiVRoom.Controllers
 {
 
+
+    //public class VideoController : ControllerBase
+    //{
+    //    private readonly IVideoService _videoService;
+
+    //    public VideoController(IVideoService videoService)
+    //    {
+    //        _videoService = videoService;
+    //    }
+
+
+    //    [HttpGet("{id}")]
+    //    public async Task<ActionResult<VideoDTO>> GetVideo([FromRoute] int id)
+    //    {
+    //        var video = await _videoService.GetVideo(id);
+    //        if (video == null)
+    //        {
+    //            return NotFound();
+    //        }
+    //        return Ok(video);
+    //    }
+
+    //    [HttpPost("add")]
+    //    public async Task<ActionResult<VideoDTO>> AddVideo([FromBody] VideoDTO videoDto)
+    //    {
+    //        if (!ModelState.IsValid)
+    //        {
+    //            return BadRequest(ModelState);
+    //        }
+
+    //        try
+    //        {
+    //            await _videoService.AddVideo(videoDto);
+    //            //return CreatedAtAction(nameof(GetVideo), new { id = videoDto.Id }, videoDto);
+    //            return Ok( videoDto);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            return StatusCode(StatusCodes.Status500InternalServerError, $"Error while adding video: {ex.Message}");
+    //        }
+    //    }
+
+    //    [HttpPut("update")]
+    //    public async Task<ActionResult<VideoDTO>> UpdateVideo([FromBody] VideoDTO videoDto)
+    //    {
+    //        if (!ModelState.IsValid)
+    //        {
+    //            return BadRequest(ModelState);
+    //        }
+
+    //        var currentVideo = await _videoService.GetVideo(videoDto.Id);
+    //        if (currentVideo == null)
+    //        {
+    //            return NotFound();
+    //        }
+    //        else
+    //        {
+    //            await _videoService.UpdateVideo(videoDto);
+    //            return Ok(currentVideo);
+    //        }
+
+
+    //    }
+
+    //    [HttpDelete("{id}")]
+    //    public async Task<ActionResult> DeleteVideo([FromRoute] int id)
+    //    {
+    //        var video = await _videoService.GetVideo(id);
+    //        if (video == null)
+    //        {
+    //            return NotFound();
+    //        }
+    //        else { 
+    //            await _videoService.DeleteVideo(id);
+    //            return NoContent();
+    //        }
+    //    }
+
+
+    //    [HttpGet("{id}/comments")]
+    //    public async Task<ActionResult<IEnumerable<CommentVideoDTO>>> GetVideoComments([FromRoute] int id)
+    //    {
+    //        var comments = await _videoService.GetCommentsByVideoId(id);
+    //        if (comments == null || !comments.Any())
+    //        {
+    //            return NotFound();
+    //        }
+    //        return Ok(comments);
+    //    }
+
+
+    //    [HttpGet("{userId}/history")]
+    //    public async Task<ActionResult<IEnumerable<HistoryOfBrowsingDTO>>> GetUserVideoHistory([FromRoute] int userId)
+    //    {
+    //        var history = await _videoService.GetCommentsByVideoId(userId);
+    //        if (history == null || !history.Any())
+    //        {
+    //            return NotFound();
+    //        }
+    //        return Ok(history);
+    //    }
+    // }
 
     [Route("api/[controller]")]
     [ApiController]
@@ -63,6 +166,20 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<VideoInfoDTO>> GetVideoInfo([FromRoute] int id)
         {
             var video = await _videoService.GetVideoInfo(id);
+            if (video == null)
+            {
+                return NotFound();
+            }
+            ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video, ch);
+            return Ok(videoInfoDTO);
+        }
+
+        [HttpGet("getvideoinfobyvideourl/{url}")]
+        public async Task<ActionResult<VideoInfoDTO>> GetVideoInfoByUrl([FromRoute] string url)
+        {
+            string decodedUrl = HttpUtility.UrlDecode(url);
+            var video = await _videoService.GetVideoInfoByVRoomVideoUrl(decodedUrl);
             if (video == null)
             {
                 return NotFound();
@@ -140,7 +257,11 @@ namespace WebApiVRoom.Controllers
                 Audience = v.Audience,
             };
         }
-
+        private bool IsBase64String(string base64)
+        {
+            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
+            return Convert.TryFromBase64String(base64, buffer, out _);
+        }
         [HttpPost("add")]
         public async Task<ActionResult<VideoDTO>> AddVideo([FromForm] VideoDTO videoDto, IFormFile file)
         {
@@ -148,11 +269,16 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
+         
 
             try
             {
-
-                using (var stream = file.OpenReadStream())
+                if (!IsBase64String(videoDto.VideoUrl))
+                {
+                    return BadRequest("Invalid base64 string.");
+                }
+                var videoBytes = Convert.FromBase64String(videoDto.VideoUrl);
+                using (var stream = new MemoryStream(videoBytes))
                 {
                     await _videoService.AddVideo(videoDto, stream);
                 }
@@ -286,6 +412,8 @@ namespace WebApiVRoom.Controllers
         {
             if (!ModelState.IsValid)
             {
+
+       
                 return BadRequest(ModelState);
             }
             VideoDTO videoDto = await _videoService.GetVideoInfo(video_id);
