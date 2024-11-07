@@ -18,5 +18,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId, string lang);
         Task<ChannelSettingsDTO> GetByUrl(string url);
         Task<ChannelSettingsDTO> GetByNikName(string nik);
+        Task<bool> IsNickNameUnique(string nickName, int chSettingsId);
     }
 }

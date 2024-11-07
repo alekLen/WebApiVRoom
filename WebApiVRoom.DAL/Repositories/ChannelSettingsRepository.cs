@@ -111,12 +111,15 @@ namespace WebApiVRoom.DAL.Repositories
                     .Include(cp => cp.Videos)
                     .Include(cp => cp.Posts)
                     .Include(cp => cp.Subscriptions)
-                    .FirstOrDefaultAsync(cs => cs.Channel_URL == nikname);
+                    .FirstOrDefaultAsync(cs => cs.ChannelNikName == nikname);
             }
             else
                 return null;
 
         }
-
+        public async Task<bool> IsNickNameUnique(string nickName, int chSettingsId)
+        {
+            return !await db.ChannelSettings.AnyAsync(u => u.ChannelNikName == nickName && u.Id != chSettingsId);
+        }
     }
 }
