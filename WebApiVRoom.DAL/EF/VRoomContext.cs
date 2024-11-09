@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +17,42 @@ namespace WebApiVRoom.DAL.EF
         {
             if (Database.EnsureCreated())
             {
+                var tags = new List<Tag>
+                {
+                     new Tag { Name = "Music" },
+                     new Tag { Name = "Video" },
+                     new Tag { Name = "Comedy" },
+                     new Tag { Name = "Science" },
+                     new Tag { Name = "History" },
+                     new Tag { Name = "Wild animals" },
+                     new Tag { Name = "Travel" },
+                     new Tag { Name = "Nature" },
+                     new Tag { Name = "Films" },
+                     new Tag { Name = "Summer" },
+                     new Tag { Name = "News" },
+                     new Tag { Name = "Cooking" },
+                     new Tag { Name = "Good Weater" },
+                     new Tag { Name = "Pets" },
+                     new Tag { Name = "Sport" },
+                     new Tag { Name = "Dreams" },
+                     new Tag { Name = "Beautiful place" },
+                     new Tag { Name = "Education" }
+                };
+                Tags.AddRange(tags);
+                SaveChanges();
 
-
+                var categories = new List<Category>
+                {
+                    new Category{ Name = "Music"},
+                    new Category{ Name = "Trending"},
+                    new Category{ Name = "News"},
+                    new Category{ Name = "Games"},
+                    new Category{ Name = "Sport"},
+                    new Category{ Name = "Films"},
+                    new Category{ Name = "Education"},
+                };
+                Categories.AddRange(categories);
+                SaveChanges();
             }
         }
 
@@ -45,7 +80,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
-        public DbSet<Vote> Voutes { get; set; }
+        public DbSet<Vote> Votes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,12 +93,12 @@ namespace WebApiVRoom.DAL.EF
             modelBuilder.Entity<CommentVideo>()
                     .HasOne(cp => cp.Video)
                     .WithMany(p => p.CommentVideos)
-                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+                    .OnDelete(DeleteBehavior.NoAction); 
 
             modelBuilder.Entity<HistoryOfBrowsing>()
                    .HasOne(cp => cp.Video)
                    .WithMany(p => p.HistoryOfBrowsings)
-                   .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+                   .OnDelete(DeleteBehavior.NoAction); 
 
             modelBuilder.Entity<PlayListVideo>()
          .HasKey(pv => new { pv.PlayListId, pv.VideoId }); // Первичный ключ составной

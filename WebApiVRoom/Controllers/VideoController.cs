@@ -532,6 +532,25 @@ namespace WebApiVRoom.Controllers
             }
             return Ok(v);
         }
+
+        [HttpGet("getvideolistbytag/{name}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetVideoListByTag([FromRoute] string name)
+        {
+            var video = await _videoService.GetAllVideos();
+            List<VideoInfoDTO> result = new List<VideoInfoDTO>();
+            if (video == null)
+            {
+                return NotFound();
+            }
+            foreach (var v in video)
+            {
+                ChannelSettingsDTO channelSettingsDTO = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                VideoInfoDTO vinfo = ConvertVideoToVideoInfo(v, channelSettingsDTO);
+                result.Add(vinfo);
+            }
+            return Ok(result);
+        }
+       
     }
 }
 
