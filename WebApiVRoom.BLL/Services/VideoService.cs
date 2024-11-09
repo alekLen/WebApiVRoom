@@ -187,6 +187,7 @@ namespace WebApiVRoom.BLL.Services
                 // Привязка настроек канала и категорий
                 video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
 
+
                 video.Categories = new List<Category>();
                 foreach (var categoryId in videoDTO.CategoryIds)
                 {
@@ -334,6 +335,7 @@ namespace WebApiVRoom.BLL.Services
         {
             var videos = await _unitOfWork.Videos.GetAll();
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
+           
         }
 
         public async Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
