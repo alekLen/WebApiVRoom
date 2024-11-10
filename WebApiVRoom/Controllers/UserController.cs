@@ -69,7 +69,7 @@ namespace WebApiVRoom.Controllers
         {
             try
             {
-                string SigningSecret = _configuration["Clerk:WebhookSecret"]; //  секретный ключ
+                string SigningSecret = _configuration["Clerk:WebhookSecret"]; 
             Request.EnableBuffering();
 
             string requestBody;
