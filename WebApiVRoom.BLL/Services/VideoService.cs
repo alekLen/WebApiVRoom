@@ -27,6 +27,7 @@ namespace WebApiVRoom.BLL.Services
         private readonly string _containerName;
         private readonly IAlgoliaService _algoliaService;
         private readonly IBlobStorageService _blobStorageService;
+        private VideoDTO videoDto;
 
         public VideoService(IUnitOfWork unitOfWork, BlobServiceClient blobServiceClient, IAlgoliaService algoliaService,
                             IBlobStorageService blobStorageService, IConfiguration configuration)
@@ -334,6 +335,7 @@ namespace WebApiVRoom.BLL.Services
         public async Task<IEnumerable<VideoDTO>> GetAllVideos()
         {
             var videos = await _unitOfWork.Videos.GetAll();
+            
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
            
         }
@@ -502,14 +504,18 @@ namespace WebApiVRoom.BLL.Services
                     throw new KeyNotFoundException("Video not found");
                 }
 
-                var videoDto = _mapper.Map<Video, VideoDTO>(video);
+                var videoUrl = video.VideoUrl;
+                if (string.IsNullOrEmpty(videoUrl))
+                {
+                    throw new InvalidOperationException("Video URL is not available");
+                }
 
-                var blobInfo = await _blobStorageService.DownloadFileAsync(video.VideoUrl);
-
+                var blobInfo = await _blobStorageService.DownloadFileAsync(videoUrl);
                 if (blobInfo == null || blobInfo.Size == 0)
                 {
                     throw new InvalidOperationException("Failed to download video from Blob Storage.");
                 }
+
                 var videoStream = await new HttpClient().GetStreamAsync(blobInfo.FileUrl);
 
                 if (videoStream == null)
