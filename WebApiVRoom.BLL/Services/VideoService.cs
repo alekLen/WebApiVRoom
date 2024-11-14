@@ -504,7 +504,7 @@ namespace WebApiVRoom.BLL.Services
                     throw new KeyNotFoundException("Video not found");
                 }
 
-                var videoUrl = video.VideoUrl;
+                var videoUrl = video.VideoUrl; 
                 if (string.IsNullOrEmpty(videoUrl))
                 {
                     throw new InvalidOperationException("Video URL is not available");
@@ -516,30 +516,23 @@ namespace WebApiVRoom.BLL.Services
                     throw new InvalidOperationException("Failed to download video from Blob Storage.");
                 }
 
-                var videoStream = await new HttpClient().GetStreamAsync(blobInfo.FileUrl);
-
-                if (videoStream == null)
+                return new VideoWithStreamDTO
                 {
-                    throw new InvalidOperationException("Failed to retrieve video stream.");
-                }
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    await videoStream.CopyToAsync(memoryStream);
-                    byte[] videoBytes = memoryStream.ToArray();
-
-                    return new VideoWithStreamDTO
+                    Metadata = new VideoDTO
                     {
-                        Metadata = videoDto,
-                        VideoStream = videoBytes
-                    };
-                }
+                        Id = video.Id,
+                        Tittle = video.Tittle,
+                        Description = video.Description,
+                    },
+                    VideoUrl = blobInfo.FileUrl
+                };
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while retrieving video", ex);
             }
         }
+
 
         public async Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream()
         {
@@ -572,17 +565,11 @@ namespace WebApiVRoom.BLL.Services
 
 
 
-                    using (var memoryStream = new MemoryStream())
+                    list.Add(new VideoWithStreamDTO
                     {
-                        await videoStream.CopyToAsync(memoryStream);
-                        byte[] videoBytes = memoryStream.ToArray();
-
-                        list.Add(new VideoWithStreamDTO
-                        {
-                            Metadata = videoDto,
-                            VideoStream = videoBytes
-                        });
-                    }
+                        Metadata = videoDto,
+                        VideoUrl = blobInfo.FileUrl 
+                    });
                 }
                 return list;
             }
