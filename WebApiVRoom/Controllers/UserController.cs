@@ -182,9 +182,204 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(user);
         }
 
+        [HttpPut("subscribeonmysubscriptionchannelactivity/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnMySubscriptionChannelActivity([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
 
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnMySubscriptionChannelActivity = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+
+        [HttpPut("subscribeonactivityonmychannel/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnActivityOnMyChannel([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnActivityOnMyChannel = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonrecomendedvideo/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnRecomendedVideo([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnRecomendedVideo = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonactivityonmycomments/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnActivityOnMyComments([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnOnActivityOnMyComments = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonothersmentiononmychannel/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnOthersMentionOnMyChannel([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnOthersMentionOnMyChannel = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonsharemycontent/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnShareMyContent([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnShareMyContent = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonpromotionalcontent/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribeOnPromotionalContent([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnPromotionalContent = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+
+        [HttpPut("emailsubscribeonmysubscriptionchannelactivity/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnMySubscriptionChannelActivity([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnMySubscriptionChannelActivity = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+
+        [HttpPut("emailsubscribeonactivityonmychannel/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnActivityOnMyChannel([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnActivityOnMyChannel = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("emailsubscribeonrecomendedvideo/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnRecomendedVideo([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnRecomendedVideo = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("emailsubscribeonactivityonmycomments/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnActivityOnMyComments([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnOnActivityOnMyComments = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("emailsubscribeonothersmentiononmychannel/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnOthersMentionOnMyChannel([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnOthersMentionOnMyChannel = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("emailsubscribeonsharemycontent/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnShareMyContent([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnShareMyContent = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("emailsubscribeonpromotionalcontent/{clerkId}/{subs}")]
+        public async Task<ActionResult> EmailSubscribeOnPromotionalContent([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.EmailSubscribedOnPromotionalContent = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
+        [HttpPut("subscribeonmainemailnotifications/{clerkId}/{subs}")]
+        public async Task<ActionResult> SubscribedOnMainEmailNotifications([FromRoute] string clerkId, [FromRoute] bool subs)
+        {
+
+            var user = await _userService.GetUserByClerkId(clerkId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            user.SubscribedOnMainEmailNotifications = subs;
+            await _userService.UpdateUser(user);
+            return Ok();
+        }
     }
-     
-
-   
+        
 }

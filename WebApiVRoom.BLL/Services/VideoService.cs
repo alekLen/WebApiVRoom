@@ -16,6 +16,8 @@ using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
+using static WebApiVRoom.BLL.DTO.AddUserRequest;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -217,6 +219,8 @@ namespace WebApiVRoom.BLL.Services
                     temp_video.VRoomVideoUrl = $"http://localhost:3000/watch/{temp_video.Id}";
                 }
                 await _unitOfWork.Videos.Update(video);
+
+               await SendNotificationsToSubscribers(video);
             }
             catch (Exception ex)
             {
@@ -725,7 +729,21 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<List<Video>, List<VideoDTO>>(v);
         }
 
-       
+       public async Task SendNotificationsToSubscribers( Video video)
+        {
+            List<Subscription> subscriptions = await _unitOfWork.Subscriptions.GetByChannelId(video.ChannelSettings.Id);
+            foreach (var subscription in subscriptions) {
+                if (subscription.Subscriber.SubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Notification notification = new Notification();
+                    notification.Date = DateTime.Now;
+                    notification.User = subscription.Subscriber;
+                    notification.IsRead = false;
+                    notification.Message = video.ChannelSettings.ChannelNikName + " new video " + video.VRoomVideoUrl; 
+                    await _unitOfWork.Notifications.Add(notification);
+                }
+            }
+        }
 
     }
 }
