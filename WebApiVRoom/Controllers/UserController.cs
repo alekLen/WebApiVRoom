@@ -13,6 +13,9 @@ using Svix;
 using Svix.Exceptions;
 using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
+using MimeKit;
+using MailKit.Net.Smtp;
+using static WebApiVRoom.BLL.DTO.AddUserRequest;
 
 namespace WebApiVRoom.Controllers
 {
@@ -25,13 +28,16 @@ namespace WebApiVRoom.Controllers
         private IVideoService _videoService;
         private INotificationService _notificationService;
         private IConfiguration _configuration;
+        private IEmailService _emailService;
 
-        public UserController(IUserService userService,IVideoService video,INotificationService notificationService, IConfiguration configuration)
+        public UserController(IUserService userService,IVideoService video,INotificationService notificationService,
+            IConfiguration configuration, IEmailService emailService)
         {
             _userService = userService;
             _notificationService = notificationService;
             _configuration = configuration;
             _videoService = video;
+            _emailService = emailService;
         }
         
 
@@ -93,7 +99,22 @@ namespace WebApiVRoom.Controllers
             if (request.type == "user.created")
             {
                 UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
+                    foreach (var item in request.data.email_addresses)
+                    {
+                        EmailDTO email = new EmailDTO();
+                        email.EmailAddress=item.email_address;
+                        email.UserClerkId=user.Clerk_Id;
+                        if(item.id== request.data.primary_email_address_id)
+                        {
+                            email.IsPrimary = true;
+                            SendWellcomeMessage(request.data.first_name + " " + request.data.last_name, item.email_address);
+                        }
+                        else
+                            email.IsPrimary = false;
+                        await _emailService.AddEmail(email);
+                    }
                     await AddNotification(user, "Добро пожаловать на на сайт!");
+
                 return Ok(user);             
             }
             if (request.type == "user.deleted")
@@ -108,6 +129,24 @@ namespace WebApiVRoom.Controllers
                 UserDTO user2 = await _userService.Delete(request.data.id);              
                 return Ok(user2);
             }
+                if (request.type == "user.updated")
+                {
+                    IEnumerable<EmailDTO> ems = await _emailService.GetAllEmailsByUser(request.data.id);
+                    foreach(var email in ems){
+                        await _emailService.DeleteEmail(email.Id);
+                    }
+                    foreach (var item in request.data.email_addresses)
+                    {
+                        EmailDTO email = new EmailDTO();
+                        email.EmailAddress = item.email_address;
+                        email.UserClerkId = request.data.id;
+                        if (item.id == request.data.primary_email_address_id)
+                            email.IsPrimary = true;
+                        else
+                            email.IsPrimary = false;
+                        await _emailService.AddEmail(email);
+                    }
+                }
             }
             catch (Exception ex) { return BadRequest(ModelState); }
 
@@ -379,6 +418,38 @@ namespace WebApiVRoom.Controllers
             user.SubscribedOnMainEmailNotifications = subs;
             await _userService.UpdateUser(user);
             return Ok();
+        }
+
+        private  void SendWellcomeMessage(string userName, string userEmail)
+        {
+            try
+            {
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("VRoom Team", "vroomteamit@gmail.com"));
+                message.To.Add(new MailboxAddress(userName, userEmail));
+                message.Subject = "Wellcome to VRoom";
+
+                message.Body = new TextPart("plain")
+                {
+                    Text = userName+", Wellcome to VRoom! Your regestration on VRoom is successful."
+                };
+
+                using (var client = new SmtpClient())
+                {
+                    // Подключение к SMTP-серверу
+                    client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    // Аутентификация
+                    client.Authenticate("vroomteamit@gmail.com", "mrmb yara ecfw loqt");
+                   // client.Authenticate("vroomteamit@gmail.com", "Qwerty-123");
+                    // Отправка сообщения
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка отправки email: {ex.Message}");
+            }
         }
     }
         

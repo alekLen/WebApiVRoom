@@ -40,12 +40,22 @@ namespace WebApiVRoom.DAL.Repositories
         private LikesDislikesPRepository likesDislikesRepositoryP;
         private OptionsForPostRepository optionsForPostRepository;
         private VoteRepository vouteRepository;
+        private EmailRepository emailRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
         }
 
+        public IEmailRepository Emails
+        {
+            get
+            {
+                if (emailRepository == null)
+                    emailRepository = new EmailRepository(db);
+                return emailRepository;
+            }
+        }
         public IVoteRepository Votes
         {
             get
