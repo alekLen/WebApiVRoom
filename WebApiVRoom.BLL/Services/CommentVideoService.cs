@@ -150,8 +150,8 @@ namespace WebApiVRoom.BLL.Services
 
         public async Task SendNotificationsOfComments(Video video)
         {
-           
-                if (video.ChannelSettings.Owner.SubscribedOnMySubscriptionChannelActivity == true)
+               ChannelSettings ch= await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
+                if (ch.Owner.SubscribedOnMySubscriptionChannelActivity == true)
                 {
                     Notification notification = new Notification();
                     notification.Date = DateTime.Now;
