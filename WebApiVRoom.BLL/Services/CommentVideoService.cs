@@ -9,6 +9,7 @@ using WebApiVRoom.BLL.Infrastructure;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using WebApiVRoom.DAL.Repositories;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -95,14 +96,12 @@ namespace WebApiVRoom.BLL.Services
             commentVideo.User = user;
             commentVideo.clerkId = commentVideoDTO.UserId;           
             commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
-            //if ( commentVideoDTO.AnswerVideoIds != null && commentVideoDTO.AnswerVideoIds.Count > 0)
-            //{
-            //    commentVideo.AnswerVideos = await Database.AnswerVideos.GetByIds(commentVideoDTO.AnswerVideoIds);
-            //}
-
+            
             await Database.CommentVideos.Add(commentVideo);
             CommentVideoDTO com= Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
-           
+            await SendNotificationsOfComments(commentVideo.Video);
+
+
             return com;
         }
 
@@ -147,6 +146,21 @@ namespace WebApiVRoom.BLL.Services
         {
             var commentVideos = await Database.CommentVideos.GetByUserPaginated(pageNumber, pageSize, userId);
             return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
+        }
+
+        public async Task SendNotificationsOfComments(Video video)
+        {
+           
+                if (video.ChannelSettings.Owner.SubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Notification notification = new Notification();
+                    notification.Date = DateTime.Now;
+                    notification.User = video.ChannelSettings.Owner;
+                    notification.IsRead = false;
+                    notification.Message =  " new comment to video " + video.VRoomVideoUrl;
+                    await Database.Notifications.Add(notification);
+                }
+            
         }
     }
 }
