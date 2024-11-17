@@ -107,7 +107,8 @@ namespace WebApiVRoom.Controllers
                         if(item.id== request.data.primary_email_address_id)
                         {
                             email.IsPrimary = true;
-                            SendWellcomeMessage(request.data.first_name + " " + request.data.last_name, item.email_address);
+                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                                item.email_address, ", Wellcome to VRoom! Your regestration on VRoom is successful.");
                         }
                         else
                             email.IsPrimary = false;
@@ -126,7 +127,15 @@ namespace WebApiVRoom.Controllers
                     {
                         await _videoService.DeleteVideo(video.Id);
                     }
-                UserDTO user2 = await _userService.Delete(request.data.id);              
+                    foreach (var item in request.data.email_addresses)
+                    {
+                        if (item.id == request.data.primary_email_address_id)
+                        {
+                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                                item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
+                        }
+                    }
+                    UserDTO user2 = await _userService.Delete(request.data.id);              
                 return Ok(user2);
             }
                 if (request.type == "user.updated")
@@ -420,7 +429,7 @@ namespace WebApiVRoom.Controllers
             return Ok();
         }
 
-        private  void SendWellcomeMessage(string userName, string userEmail)
+        private void SendEmailMessage(string userName, string userEmail,string text)
         {
             try
             {
@@ -431,17 +440,13 @@ namespace WebApiVRoom.Controllers
 
                 message.Body = new TextPart("plain")
                 {
-                    Text = userName+", Wellcome to VRoom! Your regestration on VRoom is successful."
+                    Text = userName + text
                 };
 
                 using (var client = new SmtpClient())
                 {
-                    // Подключение к SMTP-серверу
                     client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                    // Аутентификация
                     client.Authenticate("vroomteamit@gmail.com", "mrmb yara ecfw loqt");
-                   // client.Authenticate("vroomteamit@gmail.com", "Qwerty-123");
-                    // Отправка сообщения
                     client.Send(message);
                     client.Disconnect(true);
                 }
