@@ -162,6 +162,42 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<List<Video>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null)
+        {
+            // Сначала получаем одно видео с конкретным id (если оно указано)
+            Video specificVideo = null;
+            int count = pageSize;
+
+            if (videoId.HasValue && videoId.Value != 0)
+            {
+                specificVideo = await _context.Videos.Include(v => v.ChannelSettings).Include(v => v.Categories)
+                    .Include(v => v.Tags).Include(v => v.HistoryOfBrowsings).Include(v => v.CommentVideos)
+                    .Include(v => v.PlayListVideos).Where(v => v.IsShort == true && v.Id == videoId.Value)
+                    .FirstOrDefaultAsync();
+                count--;
+            }
+
+
+            // Затем получаем остальные видео с пагинацией, исключая видео с конкретным id (если оно было найдено)
+            var remainingVideosQuery = _context.Videos.Include(v => v.ChannelSettings).Include(v => v.Categories)
+                .Include(v => v.Tags).Include(v => v.HistoryOfBrowsings).Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos).Where(v => v.IsShort == true && v.Id != videoId.Value);
+
+            if (videoId.HasValue && specificVideo != null)
+            {
+                remainingVideosQuery = remainingVideosQuery.Where(v => v.Id != videoId.Value);
+            }
+            
+            var remainingVideos = await remainingVideosQuery.Skip((pageNumber - 1) * count).Take(count).ToListAsync();
+
+            // Если видео с конкретным id существует, добавляем его в начало списка
+            if (specificVideo != null)
+            {
+                remainingVideos.Insert(0, specificVideo);
+            }
+
+            return remainingVideos;
+        }
         public async Task Add(Video video)
         {
             ValidateVideo(video);

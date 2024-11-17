@@ -27,8 +27,7 @@ namespace WebApiVRoom.BLL.Services
                        .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                         .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
-                       .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select
-                       (ch => new CommentPost { Id = ch.VideoId })));
+                       .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId).ToList()));
 
             });
             return new Mapper(config);

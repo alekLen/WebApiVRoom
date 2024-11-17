@@ -341,9 +341,16 @@ namespace WebApiVRoom.BLL.Services
             var videos = await _unitOfWork.Videos.GetAllPaginated(pageNumber, pageSize);
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
         }
+
+
         public async Task<List<VideoDTO>> GetAllShortsPaginated(int pageNumber, int pageSize)
         {
             var videos = await _unitOfWork.Videos.GetAllShortsPaginated(pageNumber, pageSize);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+        public async Task<List<VideoDTO>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null)
+        {
+            var videos = await _unitOfWork.Videos.GetAllShortsPaginatedWith1VById(pageNumber, pageSize, videoId);
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
 
