@@ -26,18 +26,13 @@ namespace WebApiVRoom.BLL.Services
             try
             {
                 Tag tag = new Tag();
-                tag.Id = tagDTO.Id;
-
-                tag.Name = tagDTO.Name;
-                List<Video> list = new();
-
-                foreach (int id in tagDTO.VideosId)
+               Tag t = await Database.Tags.GetByName(tagDTO.Name);
+                if (t == null)
                 {
-                    list.Add(await Database.Videos.GetById(id));
-                }
-                tag.Videos = list;
+                    tag.Name = tagDTO.Name;
 
-                await Database.Tags.Add(tag);
+                    await Database.Tags.Add(tag);
+                }
                
             }
             catch (Exception ex)
@@ -62,8 +57,7 @@ namespace WebApiVRoom.BLL.Services
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Tag, TagDTO>()
-                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                        .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.Videos.Select(ch => new Video { Id = ch.Id})));
+                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
                 });
 
                 var mapper = new Mapper(config);
@@ -79,8 +73,7 @@ namespace WebApiVRoom.BLL.Services
                 var config = new MapperConfiguration(cfg =>
                 {
                     cfg.CreateMap<Tag, TagDTO>()
-                        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                        .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.Videos.Select(ch => new Video { Id = ch.Id})));
+                        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
                 });
 
                 var mapper = new Mapper(config);
@@ -100,12 +93,6 @@ namespace WebApiVRoom.BLL.Services
             tag.Id = a.Id;
 
             tag.Name = a.Name;
-            tag.VideosId = new List<int>();
-
-            foreach (Video video in a.Videos)
-            {
-                tag.VideosId.Add(video.Id);
-            }
 
             return tag;
         }
@@ -121,12 +108,6 @@ namespace WebApiVRoom.BLL.Services
             tag.Id = a.Id;
 
             tag.Name = a.Name;
-            tag.VideosId = new List<int>();
-
-            foreach (Video video in a.Videos)
-            {
-                tag.VideosId.Add(video.Id);
-            }
 
             return tag;
         }
@@ -141,10 +122,6 @@ namespace WebApiVRoom.BLL.Services
                 tag.Name = tagDTO.Name;
 
                 tag.Videos = new List<Video>();
-                foreach (int id in tagDTO.VideosId)
-                {
-                    tag.Videos.Add(await Database.Videos.GetById(id));
-                }
 
                 await Database.Tags.Update(tag);
                 return tagDTO;

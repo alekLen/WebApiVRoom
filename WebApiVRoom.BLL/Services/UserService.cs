@@ -32,17 +32,22 @@ namespace WebApiVRoom.BLL.Services
                 cfg.CreateMap<User, UserDTO>()
                     .ForMember(dest => dest.Clerk_Id, opt => opt.MapFrom(src => src.Clerk_Id))
                     .ForMember(dest => dest.ChannelSettings_Id, opt => opt.MapFrom(src => src.ChannelSettings_Id))
-                    //.ForMember(dest => dest.ChannelName, opt => opt.MapFrom(src => src.ChannelName))
-                    // .ForMember(dest => dest.ChannelBanner, opt => opt.MapFrom(src => src.ChannelBanner))
+                    .ForMember(dest => dest.SubscribedOnMySubscriptionChannelActivity, opt => opt.MapFrom(src => src.SubscribedOnMySubscriptionChannelActivity))
+                    .ForMember(dest => dest.SubscribedOnActivityOnMyChannel, opt => opt.MapFrom(src => src.SubscribedOnActivityOnMyChannel))
+                    .ForMember(dest => dest.SubscribedOnRecomendedVideo, opt => opt.MapFrom(src => src.SubscribedOnRecomendedVideo))
+                    .ForMember(dest => dest.SubscribedOnOnActivityOnMyComments, opt => opt.MapFrom(src => src.SubscribedOnOnActivityOnMyComments))
+                    .ForMember(dest => dest.SubscribedOnOthersMentionOnMyChannel, opt => opt.MapFrom(src => src.SubscribedOnOthersMentionOnMyChannel))
+                    .ForMember(dest => dest.SubscribedOnShareMyContent, opt => opt.MapFrom(src => src.SubscribedOnShareMyContent))
+                    .ForMember(dest => dest.SubscribedOnPromotionalContent, opt => opt.MapFrom(src => src.SubscribedOnPromotionalContent))
+                    .ForMember(dest => dest.EmailSubscribedOnMySubscriptionChannelActivity, opt => opt.MapFrom(src => src.EmailSubscribedOnMySubscriptionChannelActivity))
+                    .ForMember(dest => dest.EmailSubscribedOnActivityOnMyChannel, opt => opt.MapFrom(src => src.EmailSubscribedOnActivityOnMyChannel))
+                    .ForMember(dest => dest.EmailSubscribedOnRecomendedVideo, opt => opt.MapFrom(src => src.EmailSubscribedOnRecomendedVideo))
+                    .ForMember(dest => dest.EmailSubscribedOnOnActivityOnMyComments, opt => opt.MapFrom(src => src.EmailSubscribedOnOnActivityOnMyComments))
+                    .ForMember(dest => dest.EmailSubscribedOnOthersMentionOnMyChannel, opt => opt.MapFrom(src => src.EmailSubscribedOnOthersMentionOnMyChannel))
+                    .ForMember(dest => dest.EmailSubscribedOnShareMyContent, opt => opt.MapFrom(src => src.EmailSubscribedOnShareMyContent))
+                    .ForMember(dest => dest.EmailSubscribedOnPromotionalContent, opt => opt.MapFrom(src => src.EmailSubscribedOnPromotionalContent))
+                    .ForMember(dest => dest.SubscribedOnMainEmailNotifications, opt => opt.MapFrom(src => src.SubscribedOnMainEmailNotifications))
                     .ForMember(dest => dest.IsPremium, opt => opt.MapFrom(src => src.IsPremium));
-                    //.ForMember(dest => dest.SubscriptionCount, opt => opt.MapFrom(src => src.SubscriptionCount))
-                    //.ForMember(dest => dest.Subscriptions, opt => opt.MapFrom(src => src.Subscriptions.Select(s => s.Id).ToList()))
-                    //.ForMember(dest => dest.PlayLists, opt => opt.MapFrom(src => src.PlayLists.Select(p => p.Id).ToList()))
-                    //.ForMember(dest => dest.HistoryOfBrowsing, opt => opt.MapFrom(src => src.HistoryOfBrowsing.Select(h => h.Id).ToList()))
-                    //.ForMember(dest => dest.CommentPosts, opt => opt.MapFrom(src => src.CommentPosts.Select(c => c.Id).ToList()))
-                    //.ForMember(dest => dest.CommentVideos, opt => opt.MapFrom(src => src.CommentVideos.Select(c => c.Id).ToList()))
-                    //.ForMember(dest => dest.AnswerPosts, opt => opt.MapFrom(src => src.AnswerPosts.Select(a => a.Id).ToList()))
-                    //.ForMember(dest => dest.AnswerVideos, opt => opt.MapFrom(src => src.AnswerVideos.Select(a => a.Id).ToList()));
             });
             return new Mapper(config);
         }
@@ -66,7 +71,21 @@ namespace WebApiVRoom.BLL.Services
             User user = new()
             {
                 Clerk_Id = clerk_id,
-                //ChannelBanner = imgurl
+                SubscribedOnRecomendedVideo =true,
+                SubscribedOnMySubscriptionChannelActivity = true,
+                SubscribedOnActivityOnMyChannel = true,
+                SubscribedOnOnActivityOnMyComments = true,
+                SubscribedOnOthersMentionOnMyChannel = true,
+                SubscribedOnShareMyContent = true,
+                SubscribedOnPromotionalContent = true,
+                EmailSubscribedOnMySubscriptionChannelActivity = false,
+                EmailSubscribedOnActivityOnMyChannel = false,
+                EmailSubscribedOnRecomendedVideo = false,
+                EmailSubscribedOnOnActivityOnMyComments = false,
+                EmailSubscribedOnOthersMentionOnMyChannel = false,
+                EmailSubscribedOnShareMyContent = false,
+                EmailSubscribedOnPromotionalContent = false,
+                SubscribedOnMainEmailNotifications = true,
             };
             await Database.Users.Add(user);
 
@@ -165,17 +184,24 @@ namespace WebApiVRoom.BLL.Services
                 user.Clerk_Id = userDto.Clerk_Id;
                 user.ChannelSettings_Id = userDto.ChannelSettings_Id;
                 user.IsPremium = userDto.IsPremium;
-                //user.SubscriptionCount = userDto.SubscriptionCount;
+                user.SubscribedOnMySubscriptionChannelActivity = userDto.SubscribedOnMySubscriptionChannelActivity;
+                user.SubscribedOnActivityOnMyChannel = userDto.SubscribedOnActivityOnMyChannel;
+                user.SubscribedOnRecomendedVideo = userDto.SubscribedOnRecomendedVideo;
+                user.SubscribedOnOnActivityOnMyComments = userDto.SubscribedOnOnActivityOnMyComments;
+                user.SubscribedOnOthersMentionOnMyChannel = userDto.SubscribedOnOthersMentionOnMyChannel;
+                user.SubscribedOnShareMyContent = userDto.SubscribedOnShareMyContent;
+                user.SubscribedOnPromotionalContent = userDto.SubscribedOnPromotionalContent;
+                user.EmailSubscribedOnMySubscriptionChannelActivity = userDto.EmailSubscribedOnMySubscriptionChannelActivity;
+                user.EmailSubscribedOnActivityOnMyChannel = userDto.EmailSubscribedOnActivityOnMyChannel;
+                user.EmailSubscribedOnRecomendedVideo = userDto.EmailSubscribedOnRecomendedVideo;
+                user.EmailSubscribedOnOnActivityOnMyComments = userDto.EmailSubscribedOnOnActivityOnMyComments;
+                user.EmailSubscribedOnOthersMentionOnMyChannel = userDto.EmailSubscribedOnOthersMentionOnMyChannel;
+                user.EmailSubscribedOnShareMyContent = userDto.EmailSubscribedOnShareMyContent;
+                user.EmailSubscribedOnPromotionalContent = userDto.EmailSubscribedOnPromotionalContent;
+                user.SubscribedOnMainEmailNotifications = userDto.SubscribedOnMainEmailNotifications;
 
-                //user.Subscriptions = await Database.Subscriptions.GetByIds(userDto.Subscriptions);
-                //user.PlayLists = await Database.PlayLists.GetByIds(userDto.PlayLists);
-                //user.HistoryOfBrowsing = await Database.HistoryOfBrowsings.GetByIds(userDto.HistoryOfBrowsing);
-                //user.CommentPosts = await Database.CommentPosts.GetByIds(userDto.CommentPosts);
-                //user.CommentVideos = await Database.CommentVideos.GetByIds(userDto.CommentVideos);
-                //user.AnswerPosts = await Database.AnswerPosts.GetByIds(userDto.AnswerPosts);
-                //user.AnswerVideos = await Database.AnswerVideos.GetByIds(userDto.AnswerVideos);
 
-                await Database.Users.Update(user);
+        await Database.Users.Update(user);
 
                 var mapper = InitializeMapper();
                 var updatedUserDto = mapper.Map<User, UserDTO>(user);

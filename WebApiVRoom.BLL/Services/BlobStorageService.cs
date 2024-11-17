@@ -223,12 +223,7 @@ namespace WebApiVRoom.BLL.Services
 
             if (await blobClient.ExistsAsync())
             {
-                var response = await blobClient.DownloadAsync();
                 var blobProperties = await blobClient.GetPropertiesAsync();
-
-                using var memoryStream = new MemoryStream();
-                await response.Value.Content.CopyToAsync(memoryStream);
-
                 return new BlobStorageDTO
                 {
                     FileUrl = blobClient.Uri.ToString(),
@@ -242,6 +237,7 @@ namespace WebApiVRoom.BLL.Services
 
             throw new FileNotFoundException("The specified file was not found in blob storage.");
         }
+
 
         public async Task<IEnumerable<BlobStorageDTO>> ListBlobsAsync()
         {

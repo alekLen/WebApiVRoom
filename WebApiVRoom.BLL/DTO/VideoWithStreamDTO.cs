@@ -11,7 +11,7 @@ namespace WebApiVRoom.BLL.DTO
         public class VideoWithStreamDTO
         {
             public VideoDTO Metadata { get; set; }
-            public byte[] VideoStream { get; set; }
+            public string VideoUrl { get; set; }
         }
     }
 }
