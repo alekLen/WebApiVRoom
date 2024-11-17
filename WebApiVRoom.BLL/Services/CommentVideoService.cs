@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Infrastructure;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
@@ -151,16 +152,22 @@ namespace WebApiVRoom.BLL.Services
         public async Task SendNotificationsOfComments(Video video)
         {
                ChannelSettings ch= await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
-                if (ch.Owner.SubscribedOnMySubscriptionChannelActivity == true)
+                if (ch.Owner.SubscribedOnActivityOnMyChannel  == true)
                 {
                     Notification notification = new Notification();
                     notification.Date = DateTime.Now;
                     notification.User = video.ChannelSettings.Owner;
                     notification.IsRead = false;
-                    notification.Message =  " new comment to video " + video.VRoomVideoUrl;
+                    notification.Message =  "A new comment to your video ";
                     await Database.Notifications.Add(notification);
                 }
-            
+               if (ch.Owner.EmailSubscribedOnActivityOnMyChannel == true)
+               {
+                   Email email = await Database.Emails.GetByUserPrimary(ch.Owner.Clerk_Id);
+                   ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(ch.Owner.Clerk_Id);
+                   SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName, email.EmailAddress,
+                     "A new comment to your video ");
+               }
         }
     }
 }

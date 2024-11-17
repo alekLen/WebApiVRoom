@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Infrastructure;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using WebApiVRoom.DAL.Repositories;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -89,6 +91,7 @@ namespace WebApiVRoom.BLL.Services
                 }
                 await Database.Posts.Update(post);
                 Post p= await Database.Posts.GetById(post.Id);
+                 await SendNotificationsToSubscribers(p);
                 IMapper mapper = InitializeMapper();
                 return mapper.Map<Post, PostDTO>(p);
 
@@ -250,6 +253,29 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-  
+        public async Task SendNotificationsToSubscribers(Post post)
+        {
+            List<Subscription> subscriptions = await Database.Subscriptions.GetByChannelId(post.ChannelSettings.Id);
+            foreach (var subscription in subscriptions)
+            {
+                if (subscription.Subscriber.SubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Notification notification = new Notification();
+                    notification.Date = DateTime.Now;
+                    notification.User = subscription.Subscriber;
+                    notification.IsRead = false;
+                    notification.Message = post.ChannelSettings.ChannelNikName + " new post" ;
+                    await Database.Notifications.Add(notification);
+                }
+                if (subscription.Subscriber.EmailSubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Email email = await Database.Emails.GetByUserPrimary(subscription.Subscriber.Clerk_Id);
+                    ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(subscription.Subscriber.Clerk_Id);
+                    SendEmailHelper.SendEmailMessage(channelSettings.ChannelName, email.EmailAddress,
+                        post.ChannelSettings.ChannelNikName + " new post");
+                }
+            }
+        }
+
     }
 }

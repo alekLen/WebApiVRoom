@@ -13,9 +13,8 @@ using Svix;
 using Svix.Exceptions;
 using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
-using MimeKit;
-using MailKit.Net.Smtp;
 using static WebApiVRoom.BLL.DTO.AddUserRequest;
+using WebApiVRoom.BLL.Helpers;
 
 namespace WebApiVRoom.Controllers
 {
@@ -107,7 +106,7 @@ namespace WebApiVRoom.Controllers
                         if(item.id== request.data.primary_email_address_id)
                         {
                             email.IsPrimary = true;
-                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
                                 item.email_address, ", Wellcome to VRoom! Your regestration on VRoom is successful.");
                         }
                         else
@@ -131,7 +130,7 @@ namespace WebApiVRoom.Controllers
                     {
                         if (item.id == request.data.primary_email_address_id)
                         {
-                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
                                 item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
                         }
                     }
@@ -429,33 +428,6 @@ namespace WebApiVRoom.Controllers
             return Ok();
         }
 
-        private void SendEmailMessage(string userName, string userEmail,string text)
-        {
-            try
-            {
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("VRoom Team", "vroomteamit@gmail.com"));
-                message.To.Add(new MailboxAddress(userName, userEmail));
-                message.Subject = "Wellcome to VRoom";
-
-                message.Body = new TextPart("plain")
-                {
-                    Text = userName + text
-                };
-
-                using (var client = new SmtpClient())
-                {
-                    client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                    client.Authenticate("vroomteamit@gmail.com", "mrmb yara ecfw loqt");
-                    client.Send(message);
-                    client.Disconnect(true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка отправки email: {ex.Message}");
-            }
-        }
     }
         
 }
