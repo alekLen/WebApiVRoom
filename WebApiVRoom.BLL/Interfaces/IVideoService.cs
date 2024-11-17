@@ -16,6 +16,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task DeleteVideo(int id);
         Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<List<VideoDTO>> GetAllShortsPaginated(int pageNumber, int pageSize);
+        Task<List<VideoDTO>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null);
         Task<IEnumerable<VideoDTO>> GetAllVideos();
         Task<VideoWithStreamDTO> GetVideo(int id);
         Task<VideoDTO> UpdateVideo(VideoDTO videoDTO);
