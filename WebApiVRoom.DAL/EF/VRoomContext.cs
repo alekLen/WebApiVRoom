@@ -24,18 +24,18 @@ namespace WebApiVRoom.DAL.EF
                      new Tag { Name = "Comedy" },
                      new Tag { Name = "Science" },
                      new Tag { Name = "History" },
-                     new Tag { Name = "Wild animals" },
+                     new Tag { Name = "Wild_animals" },
                      new Tag { Name = "Travel" },
                      new Tag { Name = "Nature" },
                      new Tag { Name = "Films" },
                      new Tag { Name = "Summer" },
                      new Tag { Name = "News" },
                      new Tag { Name = "Cooking" },
-                     new Tag { Name = "Good Weater" },
+                     new Tag { Name = "Good_weather" },
                      new Tag { Name = "Pets" },
                      new Tag { Name = "Sport" },
                      new Tag { Name = "Dreams" },
-                     new Tag { Name = "Beautiful place" },
+                     new Tag { Name = "Beautiful_place" },
                      new Tag { Name = "Education" }
                 };
                 Tags.AddRange(tags);
@@ -43,13 +43,13 @@ namespace WebApiVRoom.DAL.EF
 
                 var categories = new List<Category>
                 {
-                    new Category{ Name = "Music"},
-                    new Category{ Name = "Trending"},
-                    new Category{ Name = "News"},
-                    new Category{ Name = "Games"},
-                    new Category{ Name = "Sport"},
-                    new Category{ Name = "Films"},
-                    new Category{ Name = "Education"},
+                    new Category{ Name = "music"},
+                    new Category{ Name = "trending"},
+                    new Category{ Name = "news"},
+                    new Category{ Name = "games"},
+                    new Category{ Name = "sport"},
+                    new Category{ Name = "films"},
+                    new Category{ Name = "education"},
                 };
                 Categories.AddRange(categories);
                 SaveChanges();
