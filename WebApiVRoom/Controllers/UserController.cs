@@ -107,7 +107,7 @@ namespace WebApiVRoom.Controllers
                         {
                             email.IsPrimary = true;
                             SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
-                                item.email_address, ", Wellcome to VRoom! Your regestration on VRoom is successful.");
+                                item.email_address, " Wellcome to VRoom! Your regestration is successful.");
                         }
                         else
                             email.IsPrimary = false;
