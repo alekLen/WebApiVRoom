@@ -97,8 +97,8 @@ namespace WebApiVRoom.BLL.Services
             user.ChannelSettings_Id = channelSettings.Id;
 
             await Database.Users.Update(user);
-            channelSettings.ChannelName= "VRoom_Channel" + channelSettings.Id + "_created";
-            channelSettings.ChannelNikName = "VRoom_Channel" + channelSettings.Id + "_created";
+            channelSettings.ChannelName = "VRoom_Channel" + (channelSettings.Id + 1000);
+            channelSettings.ChannelNikName = "VRoom_Channel" +( channelSettings.Id+1000) ;
             channelSettings.Channel_URL = "http://localhost:3000/gotochannel/" + channelSettings.Id;
             await Database.ChannelSettings.Update(channelSettings);
 

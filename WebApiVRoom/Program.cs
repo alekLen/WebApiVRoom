@@ -11,6 +11,8 @@ using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
+using Google;
+using WebApiVRoom.DAL.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +20,12 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-builder.Services.AddVRoomContext(connection);
+
+//builder.Services.AddVRoomContext(connection);
+builder.Services.AddDbContext<VRoomContext>(options =>
+    options.UseSqlServer(
+       connection, b => b.MigrationsAssembly("WebApiVRoom.DAL")
+    ));
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton(x => {
     string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
