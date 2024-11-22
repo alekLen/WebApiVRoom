@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebApiVRoom.DAL.Entities
+namespace WebApiVRoom.BLL.DTO
 {
-    public class VideoView
+    public class VideoViewDTO
     {
         public int Id { get; set; }
-        public Video Video { get; set; }
-        public User User { get; set; }
+        public int VideoId { get; set; }
+        public string ClerkId { get; set; }
         public string? Location { get; set; }
         public int Duration { get; set; }
         public int? UserAge { get; set; }
-        public DateTime Date {  get; set; }
-
+        public DateTime Date { get; set; }
     }
 }

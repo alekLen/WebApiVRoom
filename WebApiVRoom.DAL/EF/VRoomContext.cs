@@ -83,6 +83,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<OptionsForPost> Options { get; set; }
         public DbSet<Vote> Votes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
+        public DbSet<VideoView> VideoViews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
