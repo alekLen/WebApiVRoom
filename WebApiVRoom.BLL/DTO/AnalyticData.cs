@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebApiVRoom.BLL.DTO
 {
-    public class UserRegistrationData
+    public class AnalyticData
     {
         public DateTime Date { get; set; }
         public int Count { get; set; }

@@ -122,6 +122,21 @@ namespace WebApiVRoom.DAL.Repositories
             return !await db.ChannelSettings.AnyAsync(u => u.ChannelNikName == nickName && u.Id != chSettingsId);
         }
 
- 
+        public async Task<List<DateTime>> GetUploadVideosCountByDiapasonAndChannel(DateTime start, DateTime end,int chId)
+        {
+            return await db.Videos
+               .Where(u => u.UploadDate>= start && u.UploadDate <= end)
+               .Where(u => u.ChannelSettings.Id == chId)
+               .Select(u => u.UploadDate)
+               .ToListAsync();
+        }
+        public async Task<List<DateTime>> GetUploadVideosCountByDiapason(DateTime start, DateTime end)
+        {
+            return await db.Videos
+               .Where(u => u.UploadDate >= start && u.UploadDate <= end)
+               .Select(u => u.UploadDate)
+               .ToListAsync();
+        }
+       
     }
 }

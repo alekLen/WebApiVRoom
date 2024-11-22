@@ -12,39 +12,60 @@ namespace WebApiVRoom.Controllers
     public class AnalyticVRoomController : Controller
     {
         private IUserService _userService;
-        public AnalyticVRoomController(IUserService userService)
+        private IChannelSettingsService _chService;
+        public AnalyticVRoomController(IUserService userService, IChannelSettingsService chService)
         {
             _userService = userService;
+            _chService = chService;
         }
 
         [HttpGet("getusersregistrations/{diapason}")]
-        public async Task<ActionResult<List<UserRegistrationData>> > GetUsersRegistrations( string diapason)
+        public async Task<ActionResult<List<AnalyticData>> > GetUsersRegistrations([FromRoute] string diapason)
         {
             DateTime start = AnalyticHelper.getStartDate(diapason);   
             List<DateTime> userDates = await _userService.GetUsersByDateDiapason(start,DateTime.Now);
-            List<UserRegistrationData> data= new List<UserRegistrationData>();
 
             if (AnalyticHelper.IsMoreThanThreeMonthsByYearsAndMonths(start, DateTime.Now))
-                data = AnalyticHelper.getByMonth(userDates, start, DateTime.Now);
+                return AnalyticHelper.getByMonth(userDates, start, DateTime.Now);
             else
-                data = AnalyticHelper.getByDays( userDates, start, DateTime.Now);
+                return AnalyticHelper.getByDays(userDates, start, DateTime.Now);
 
-            return new ObjectResult(data);
         }
 
         [HttpGet("getusersregistrationsbydays/{start}/{end}")]
-        public async Task<ActionResult<List<UserRegistrationData>>> GetUsersRegistrationsByDays([FromRoute] DateTime start, [FromRoute] DateTime end)
+        public async Task<ActionResult<List<AnalyticData>>> GetUsersRegistrationsByDays([FromRoute] DateTime start, [FromRoute] DateTime end)
         {
             List<DateTime> userDates = await _userService.GetUsersByDateDiapason(start, end);
-            List<UserRegistrationData> data = new();
+
+            if (AnalyticHelper.IsMoreThanThreeMonthsByYearsAndMonths(start, end))
+                return AnalyticHelper.getByMonth(userDates, start, end);
+            else
+                return AnalyticHelper.getByDays(userDates, start, end);
+
+        }
+
+        [HttpGet("getuploadvideoscount/{diapason}")]
+        public async Task<ActionResult<List<AnalyticData>>> GetUploadVideosCount([FromRoute] string diapason)
+        {
+            DateTime start = AnalyticHelper.getStartDate(diapason);
+            List<DateTime> userDates = await _chService.GetUploadVideosCountByDateDiapason(start, DateTime.Now);
 
             if (AnalyticHelper.IsMoreThanThreeMonthsByYearsAndMonths(start, DateTime.Now))
-                data = AnalyticHelper.getByMonth(userDates, start, DateTime.Now);
+                return AnalyticHelper.getByMonth(userDates, start, DateTime.Now);
             else
-                data = AnalyticHelper.getByDays(userDates, start, DateTime.Now);
-            return new ObjectResult(data);
-        }
- 
+                return AnalyticHelper.getByDays(userDates, start, DateTime.Now);
 
+        }
+
+        [HttpGet("getuploadvideoscountbydays/{start}/{end}")]
+        public async Task<ActionResult<List<AnalyticData>>> GetUploadVideosCountByDays([FromRoute] DateTime start, [FromRoute] DateTime end)
+        {
+            List<DateTime> userDates = await _chService.GetUploadVideosCountByDateDiapason(start, end);
+
+            if (AnalyticHelper.IsMoreThanThreeMonthsByYearsAndMonths(start, end))
+                return AnalyticHelper.getByMonth(userDates, start, end);
+            else
+                return AnalyticHelper.getByDays(userDates, start, end);
+        }
     }
 }

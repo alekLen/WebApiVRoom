@@ -27,9 +27,9 @@ namespace WebApiVRoom.Helpers
 
             return totalMonthsDifference > 3;
         }
-        public static List<UserRegistrationData> getByDays(List<DateTime> userDates, DateTime start, DateTime end)
+        public static List<AnalyticData> getByDays(List<DateTime> userDates, DateTime start, DateTime end)
         {
-            List<UserRegistrationData> data = new();
+            List<AnalyticData> data = new();
 
             var userCountByDate = new Dictionary<DateTime, int>();
 
@@ -46,13 +46,13 @@ namespace WebApiVRoom.Helpers
                 }
             }
             data = userCountByDate
-            .Select(entry => new UserRegistrationData { Date = entry.Key, Count = entry.Value })
+            .Select(entry => new AnalyticData { Date = entry.Key, Count = entry.Value })
             .ToList();
             return data;
         }
-        public static List<UserRegistrationData> getByMonth(List<DateTime> userDates, DateTime start, DateTime end)
+        public static List<AnalyticData> getByMonth(List<DateTime> userDates, DateTime start, DateTime end)
         {
-            List<UserRegistrationData> data = new();
+            List<AnalyticData> data = new();
 
             var userCountByDate = new Dictionary<string, int>();
 
@@ -72,7 +72,7 @@ namespace WebApiVRoom.Helpers
             }
 
             data = userCountByDate
-                .Select(entry => new UserRegistrationData
+                .Select(entry => new AnalyticData
                 {
                     Date = DateTime.Parse($"{entry.Key}-01"),
                     Count = entry.Value
