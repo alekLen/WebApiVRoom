@@ -121,5 +121,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             return !await db.ChannelSettings.AnyAsync(u => u.ChannelNikName == nickName && u.Id != chSettingsId);
         }
+
+ 
     }
 }
