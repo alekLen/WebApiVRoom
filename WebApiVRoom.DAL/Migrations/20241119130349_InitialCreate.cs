@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using WebApiVRoom.DAL.Entities;
 
 #nullable disable
 
@@ -172,7 +173,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,7 +199,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "ChannelSettings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -224,7 +225,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "ChannelSettings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -360,7 +361,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.answerPostId,
                         principalTable: "AnswerPosts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -380,7 +381,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.answerVideoId,
                         principalTable: "AnswerVideos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -407,7 +408,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "ChannelSettings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_CommentPosts_Posts_PostId",
                         column: x => x.PostId,
@@ -432,7 +433,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -452,7 +453,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -476,7 +477,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.VideosId,
                         principalTable: "Videos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -503,7 +504,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "ChannelSettings",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_CommentVideos_Videos_VideoId",
                         column: x => x.VideoId,
@@ -536,7 +537,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_HistoryOfBrowsings_Videos_VideoId",
                         column: x => x.VideoId,
@@ -563,7 +564,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.VideoId,
                         principalTable: "Videos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -592,7 +593,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_PlayLists_Videos_VideoId",
                         column: x => x.VideoId,
@@ -609,19 +610,19 @@ namespace WebApiVRoom.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TagVideo", x => new { x.TagsId, x.VideosId });
+                     table.PrimaryKey("PK_TagVideo", x => new { x.TagsId, x.VideosId });
                     table.ForeignKey(
                         name: "FK_TagVideo_Tags_TagsId",
                         column: x => x.TagsId,
                         principalTable: "Tags",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_TagVideo_Videos_VideosId",
                         column: x => x.VideosId,
                         principalTable: "Videos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -641,7 +642,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.commentPostId,
                         principalTable: "CommentPosts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -672,7 +673,7 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -698,19 +699,21 @@ namespace WebApiVRoom.DAL.Migrations
                         column: x => x.commentVideoId,
                         principalTable: "CommentVideos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
                 name: "PlayListVideo",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PlayListId = table.Column<int>(type: "int", nullable: false),
                     VideoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlayListVideo", x => new { x.PlayListId, x.VideoId });
+                    table.PrimaryKey("PK_PlayListVideo", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PlayListVideo_PlayLists_PlayListId",
                         column: x => x.PlayListId,
@@ -902,6 +905,62 @@ namespace WebApiVRoom.DAL.Migrations
                 name: "IX_Votes_UserId",
                 table: "Votes",
                 column: "UserId");
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "music" },
+                    {2,  "trending" },
+                    { 3,"news" },
+                    {4,"games" },
+                    {5, "sport" },
+                    { 6,"films" },
+                    {7, "education" },
+
+                 });
+
+            migrationBuilder.InsertData(
+                table: "Tags",
+                columns: new[] { "Name" },
+                values: new object[,]
+                {
+                    { "Music" },
+                    { "Video" },
+                    { "Comedy" },
+                    { "Science" },
+                    { "History" },
+                    { "Wild_animals" },
+                    { "Travel" },
+                    { "Nature" },
+                    { "Films" },
+                    { "Summer" },
+                    { "News" },
+                    { "Cooking" },
+                    { "Good_weather" },
+                    { "Pets" },
+                    { "Sport" },
+                    { "Dreams" },
+                    { "Beautiful_place" },
+                    { "Education" },
+
+                 });
+
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Name" },
+                values: new object[,]
+                {
+                    { "music" },
+                    { "trending" },
+                    { "news" },
+                    {"games" },
+                    { "sport" },
+                    { "films" },
+                    { "education" },
+
+                 });
         }
 
         /// <inheritdoc />
