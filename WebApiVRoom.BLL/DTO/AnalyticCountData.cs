@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace WebApiVRoom.BLL.DTO
 {
-    public class AnalyticData
+    public class AnalyticCountData
     {
-        public DateTime Date { get; set; }
-        public int Count { get; set; }
+        public string Name { get; set; }
+        public double Percentage { get; set; }
     }
 }

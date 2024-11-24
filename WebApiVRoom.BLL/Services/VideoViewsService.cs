@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -102,6 +103,34 @@ namespace WebApiVRoom.BLL.Services
                 return vDTO;
             }
             catch  { return null; }
+        }
+        public async Task<List<AnalyticDatesData>> GetDurationViewsOfVideoByVideoIdByDiapason(DateTime start, DateTime end, int videoId)
+        {
+            var list = await Database.VideoViews.GetDurationViewsOfVideoByVideoIdByDiapason(start, end, videoId);
+            return list
+                .Select(item => new AnalyticDatesData { Date = item.Date, Count = item.Count }).ToList();
+        }
+        public async Task<List<AnalyticDatesData>> GetDurationViewsOfAllVideosOfChannelByDiapason(DateTime start, DateTime end, int ChannelId)
+        {
+            var list = await Database.VideoViews.GetDurationViewsOfAllVideosOfChannelByDiapason(start, end, ChannelId);
+            return list
+                .Select(item => new AnalyticDatesData { Date = item.Date, Count = item.Count }).ToList(); ;
+        }
+
+        public async Task<List<AnalyticDatesData>> GetDurationViewsOfAllVideosByDiapason(DateTime start, DateTime end)
+        {
+            var list = await Database.VideoViews.GetDurationViewsOfAllVideosByDiapason(start, end );
+            return list
+                .Select(item => new AnalyticDatesData { Date = item.Date, Count = item.Count }).ToList(); ;
+        }
+
+        public async Task<List<string>> GetLocationViewsOfAllVideosOfChannel(int chId)
+        {
+            return await Database.VideoViews.GetLocationViewsOfAllVideosOfChannel( chId);
+        }
+        public async Task<List<string>> GetLocationViewsOfAllVideos()
+        {
+            return await Database.VideoViews.GetLocationViewsOfAllVideos();
         }
     }
 }

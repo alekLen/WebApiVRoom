@@ -1,4 +1,5 @@
 ﻿using WebApiVRoom.BLL.DTO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApiVRoom.Helpers
 {
@@ -27,9 +28,9 @@ namespace WebApiVRoom.Helpers
 
             return totalMonthsDifference > 3;
         }
-        public static List<AnalyticData> getByDays(List<DateTime> userDates, DateTime start, DateTime end)
+        public static List<AnalyticDatesData> getByDays(List<DateTime> userDates, DateTime start, DateTime end)
         {
-            List<AnalyticData> data = new();
+            List<AnalyticDatesData> data = new();
 
             var userCountByDate = new Dictionary<DateTime, int>();
 
@@ -46,13 +47,13 @@ namespace WebApiVRoom.Helpers
                 }
             }
             data = userCountByDate
-            .Select(entry => new AnalyticData { Date = entry.Key, Count = entry.Value })
+            .Select(entry => new AnalyticDatesData { Date = entry.Key, Count = entry.Value })
             .ToList();
             return data;
         }
-        public static List<AnalyticData> getByMonth(List<DateTime> userDates, DateTime start, DateTime end)
+        public static List<AnalyticDatesData> getByMonth(List<DateTime> userDates, DateTime start, DateTime end)
         {
-            List<AnalyticData> data = new();
+            List<AnalyticDatesData> data = new();
 
             var userCountByDate = new Dictionary<string, int>();
 
@@ -72,7 +73,7 @@ namespace WebApiVRoom.Helpers
             }
 
             data = userCountByDate
-                .Select(entry => new AnalyticData
+                .Select(entry => new AnalyticDatesData
                 {
                     Date = DateTime.Parse($"{entry.Key}-01"),
                     Count = entry.Value
@@ -80,6 +81,36 @@ namespace WebApiVRoom.Helpers
                 .ToList();
 
             return data;
+        }
+        public static List<AnalyticDatesData> groupByMonth(List<AnalyticDatesData> data)
+        {
+            return data
+                .GroupBy(item => new { item.Date.Year, item.Date.Month }) // Группируем по году и месяцу
+                .Select(group => new AnalyticDatesData
+                {
+                     Date = new DateTime(group.Key.Year, group.Key.Month, 1), // Дата: начало месяца
+                     Count = group.Sum(item => item.Count) // Суммируем Count в группе
+                })
+                .OrderBy(item => item.Date) // Сортируем по дате
+                .ToList();
+        }
+        public static List<AnalyticCountData> groupByName(List<string> data)
+        {
+            if (data == null || data.Count == 0)
+            {
+                return new List<AnalyticCountData>();
+            }
+
+            int totalCount = data.Count; // Общее количество элементов
+
+            return data
+                .GroupBy(Name => Name) // Группируем по названию
+                .Select(group => new AnalyticCountData
+                {
+                    Name = group.Key,
+                    Percentage = Math.Round((group.Count() / (double)totalCount) * 100, 2) 
+                })
+                .ToList();
         }
     }
 }

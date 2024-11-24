@@ -15,5 +15,10 @@ namespace WebApiVRoom.BLL.Interfaces
         Task AddVideoView(VideoViewDTO vDTO);
         Task<VideoViewDTO> UpdateVideoView(VideoViewDTO vDTO);
         Task DeleteVideoView(int id);
+        Task<List<AnalyticDatesData>> GetDurationViewsOfVideoByVideoIdByDiapason(DateTime start, DateTime end, int videoId);
+        Task<List<AnalyticDatesData>> GetDurationViewsOfAllVideosOfChannelByDiapason(DateTime start, DateTime end, int ChannelId);
+        Task<List<AnalyticDatesData>> GetDurationViewsOfAllVideosByDiapason(DateTime start, DateTime end);
+        Task<List<string>> GetLocationViewsOfAllVideosOfChannel(int chId);
+        Task<List<string>> GetLocationViewsOfAllVideos();
     }
 }

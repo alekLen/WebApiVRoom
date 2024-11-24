@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WebApiVRoom.DAL.EF;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebApiVRoom.DAL.Repositories
 {
@@ -86,6 +87,50 @@ namespace WebApiVRoom.DAL.Repositories
                .Where(u => u.Video.Id == videoId)
                .Where(u => u.User.Clerk_Id == clerkId)
                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<AnalyticData>> GetDurationViewsOfVideoByVideoIdByDiapason(DateTime start, DateTime end, int videoId)
+        {
+            return await db.VideoViews
+               .Where(u => u.Date >= start && u.Date <= end)
+               .Where(u => u.Video.Id == videoId)
+               .Select(u => new AnalyticData { Date = u.Date, Count = u.Duration })
+               .ToListAsync();
+        }
+        public async Task<List<AnalyticData>> GetDurationViewsOfAllVideosOfChannelByDiapason(DateTime start, DateTime end, int ChannelId)
+        {
+            return await db.VideoViews
+            .Where(u => u.Date >= start && u.Date <= end)
+            .Where(u => u.Video.ChannelSettings.Id == ChannelId)
+            .Select(u => new AnalyticData { Date = u.Date,Count =  u.Duration }) 
+            .ToListAsync();
+        }
+
+        public async Task<List<AnalyticData>> GetDurationViewsOfAllVideosByDiapason(DateTime start, DateTime end)
+        {
+            return await db.VideoViews
+            .Where(u => u.Date >= start && u.Date <= end)
+            .Select(u => new AnalyticData { Date = u.Date, Count = u.Duration })
+            .ToListAsync();
+        }
+        public async Task<List<string>> GetLocationViewsOfAllVideos( )
+        {
+            return await db.VideoViews
+            .Select(u => u.Location)
+            .ToListAsync();
+        }
+        public async Task<List<string>> GetLocationViewsOfAllVideosOfChannel(int chId)
+        {
+            return await db.VideoViews
+            .Where(u => u.User.ChannelSettings_Id== chId)
+            .Select(u => u.Location)
+            .ToListAsync();
+        }
+
+        public class AnalyticData
+        {
+            public DateTime Date { get; set; }
+            public int Count { get; set; }
         }
     }
 }
