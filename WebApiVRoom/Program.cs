@@ -89,6 +89,7 @@ builder.Services.AddSingleton<LiveStreamingService>(provider =>new LiveStreaming
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVideoViewsService, VideoViewsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

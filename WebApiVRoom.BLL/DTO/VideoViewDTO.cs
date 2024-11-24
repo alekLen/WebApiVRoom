@@ -12,7 +12,7 @@ namespace WebApiVRoom.BLL.DTO
         public int VideoId { get; set; }
         public string ClerkId { get; set; }
         public string? Location { get; set; }
-        public int Duration { get; set; }
+        public int Duration { get; set; } = 0;
         public int? UserAge { get; set; }
         public DateTime Date { get; set; }
     }
