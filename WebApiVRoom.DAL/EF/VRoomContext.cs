@@ -47,6 +47,9 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<OptionsForPost> Options { get; set; }
         public DbSet<Vote> Voutes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
+        public DbSet<ContentReport> ContentReports { get; set; }
+        public DbSet<Ad> Ads { get; set; }
+        public DbSet<AdminLog> AdminLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,7 +92,6 @@ namespace WebApiVRoom.DAL.EF
                .HasOne(pv => pv.Option)
                .WithMany(v => v.Voutes)
                .OnDelete(DeleteBehavior.NoAction);
-
 
         }
     }

@@ -11,6 +11,7 @@ using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
+using WebApiVRoom.DAL.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +59,9 @@ builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider 
 });
 
 // Scoped services
+builder.Services.AddScoped<IContentReportService, ContentReportService>();
+builder.Services.AddScoped<IAdService, AdService>();
+builder.Services.AddScoped<IAdminLogService, AdminLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -83,6 +87,7 @@ builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddSingleton<LiveStreamingService>(provider =>new LiveStreamingService("AIzaSyDvXp8Wi0-Y6BPC55SDA953CFIid2g6TtY"));
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
+
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

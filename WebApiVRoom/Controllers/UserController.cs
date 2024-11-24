@@ -35,7 +35,7 @@ namespace WebApiVRoom.Controllers
         }
         
 
-            [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
         {
 
@@ -46,6 +46,7 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+
         [HttpPut("update")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO u)
         {
@@ -53,11 +54,14 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             UserDTO user = await _userService.GetUser(u.Id);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             UserDTO usernew=await _userService.UpdateUser(u);
 
             return Ok(usernew);
@@ -70,44 +74,45 @@ namespace WebApiVRoom.Controllers
             try
             {
                 string SigningSecret = _configuration["Clerk:WebhookSecret"]; //  секретный ключ
-            Request.EnableBuffering();
+                Request.EnableBuffering();
 
-            string requestBody;
-            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
-            {
-                requestBody = await reader.ReadToEndAsync();
-                Request.Body.Position = 0;
-            }
+                string requestBody;
+                using (var reader = new StreamReader(Request.Body, leaveOpen: true))
+                {
+                    requestBody = await reader.ReadToEndAsync();
+                    Request.Body.Position = 0;
+                }
 
-            var headers = new WebHeaderCollection();
-            headers.Set("svix-id", Request.Headers["svix-id"]);
-            headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
-            headers.Set("svix-signature", Request.Headers["svix-signature"]);
+                var headers = new WebHeaderCollection();
+                headers.Set("svix-id", Request.Headers["svix-id"]);
+                headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
+                headers.Set("svix-signature", Request.Headers["svix-signature"]);
           
-            var wh= new Webhook(SigningSecret);
+                var wh= new Webhook(SigningSecret);
            
                 wh.Verify(requestBody,headers);
            
                 var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
            
-            if (request.type == "user.created")
-            {
-                UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
-                    await AddNotification(user, "Добро пожаловать на на сайт!");
-                return Ok(user);             
-            }
-            if (request.type == "user.deleted")
-            {
-                    UserDTO user = await _userService.GetUserByClerkId(request.data.id);
+                if (request.type == "user.created")
+                {
+                    UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
+                        await AddNotification(user, "Добро пожаловать на на сайт!");
+                    return Ok(user);             
+                }
 
-                    List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
-                    foreach (VideoDTO video in videos)
-                    {
-                        await _videoService.DeleteVideo(video.Id);
-                    }
-                UserDTO user2 = await _userService.Delete(request.data.id);              
-                return Ok(user2);
-            }
+                if (request.type == "user.deleted")
+                {
+                        UserDTO user = await _userService.GetUserByClerkId(request.data.id);
+
+                        List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+                        foreach (VideoDTO video in videos)
+                        {
+                            await _videoService.DeleteVideo(video.Id);
+                        }
+                    UserDTO user2 = await _userService.Delete(request.data.id);              
+                    return Ok(user2);
+                }
             }
             catch (Exception ex) { return BadRequest(ModelState); }
 
