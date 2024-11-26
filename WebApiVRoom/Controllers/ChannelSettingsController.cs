@@ -175,5 +175,12 @@ namespace WebApiVRoom.Controllers
 
             return Ok(chDto);
         }
+
+        [HttpGet("checknicknameunique/{nickName}/{chSettingsId}")]
+        public async Task<IActionResult> CheckNickNameUnique([FromRoute] string nickName, [FromRoute] int chSettingsId)
+        {
+            bool isUnique = await _chService.IsNickNameUnique(nickName, chSettingsId);
+            return new ObjectResult(new { isUnique });
+        }
     }
 }

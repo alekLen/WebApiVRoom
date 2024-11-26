@@ -98,6 +98,13 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }
-
+        public async Task<List<DateTime>> GetSubscriptionsByDiapasonAndChannel(DateTime start, DateTime end, int chId)
+        {
+            return await db.Subscriptions
+               .Where(u => u.Date >= start && u.Date <= end)
+               .Where(u => u.ChannelSettings.Id == chId)
+               .Select(u => u.Date)
+               .ToListAsync();
+        }
     }
 }

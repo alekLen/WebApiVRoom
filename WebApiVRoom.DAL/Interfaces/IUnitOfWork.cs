@@ -32,6 +32,8 @@ namespace WebApiVRoom.DAL.Interfaces
         ILikesDislikesPRepository LikesP { get; }
         IOptionsForPostRepository Options {  get; }
         IVoteRepository Votes { get; }
+        IEmailRepository Emails { get; }
+        IVideoViewsRepository VideoViews { get; }
         IAdRepository Ads { get; }
         IContentReportRepository ContentReports { get; }
 

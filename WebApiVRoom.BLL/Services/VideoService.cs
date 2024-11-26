@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using System.Xml.Linq;
+using WebApiVRoom.BLL.Helpers;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -27,6 +27,7 @@ namespace WebApiVRoom.BLL.Services
         private readonly string _containerName;
         private readonly IAlgoliaService _algoliaService;
         private readonly IBlobStorageService _blobStorageService;
+        private VideoDTO videoDto;
 
         public VideoService(IUnitOfWork unitOfWork, BlobServiceClient blobServiceClient, IAlgoliaService algoliaService,
                             IBlobStorageService blobStorageService, IConfiguration configuration)
@@ -96,6 +97,11 @@ namespace WebApiVRoom.BLL.Services
         {
             return $"-i \"{inputFilePath}\" -vf scale={width}:{height} -c:v libx264 -b:v {bitrate}k -c:a aac -strict -2 -hls_time 10 -hls_list_size 0 -f hls \"{outputFilePath}\"";
         }
+        private string GetFaststartArguments(string inputFilePath, string outputFilePath)
+        {
+            return $"-i \"{inputFilePath}\" -c copy -movflags +faststart \"{outputFilePath}\"";
+        }
+
         public async Task AddVideo(VideoDTO videoDTO, Stream fileStream)
         {
             try
@@ -116,7 +122,8 @@ namespace WebApiVRoom.BLL.Services
                 {
                     await fileStream.CopyToAsync(fileStreamOutput);
                 }
-
+                //string optimizedFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_optimized.mp4");
+                //await RunFfmpegCommand(GetFaststartArguments(tempFilePath, optimizedFilePath));
                 // Генерация аргументов для FFmpeg
                 var tasks = new List<Task>
                 {
@@ -181,6 +188,7 @@ namespace WebApiVRoom.BLL.Services
                 // Привязка настроек канала и категорий
                 video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
 
+
                 video.Categories = new List<Category>();
                 foreach (var categoryId in videoDTO.CategoryIds)
                 {
@@ -210,6 +218,8 @@ namespace WebApiVRoom.BLL.Services
                     temp_video.VRoomVideoUrl = $"http://localhost:3000/watch/{temp_video.Id}";
                 }
                 await _unitOfWork.Videos.Update(video);
+
+               await SendNotificationsToSubscribers(video);
             }
             catch (Exception ex)
             {
@@ -327,7 +337,9 @@ namespace WebApiVRoom.BLL.Services
         public async Task<IEnumerable<VideoDTO>> GetAllVideos()
         {
             var videos = await _unitOfWork.Videos.GetAll();
+            
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
+           
         }
 
         public async Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize)
@@ -336,6 +348,17 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<IEnumerable<Video>, IEnumerable<VideoDTO>>(videos);
         }
 
+
+        public async Task<List<VideoDTO>> GetAllShortsPaginated(int pageNumber, int pageSize)
+        {
+            var videos = await _unitOfWork.Videos.GetAllShortsPaginated(pageNumber, pageSize);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
+        public async Task<List<VideoDTO>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null)
+        {
+            var videos = await _unitOfWork.Videos.GetAllShortsPaginatedWith1VById(pageNumber, pageSize, videoId);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
 
         public async Task DeleteVideo(int id)
         {
@@ -478,6 +501,11 @@ namespace WebApiVRoom.BLL.Services
             var video = await _unitOfWork.Videos.GetById(id);
             return _mapper.Map<Video, VideoDTO>(video);
         }
+        public async Task<VideoDTO> GetVideoInfoByVRoomVideoUrl(string url)
+        {
+            var video = await _unitOfWork.Videos.GetByVRoomVideoUrl(url);
+            return _mapper.Map<Video, VideoDTO>(video);
+        }
 
         public async Task<VideoWithStreamDTO> GetVideo(int id)
         {
@@ -489,38 +517,35 @@ namespace WebApiVRoom.BLL.Services
                     throw new KeyNotFoundException("Video not found");
                 }
 
-                var videoDto = _mapper.Map<Video, VideoDTO>(video);
+                var videoUrl = video.VideoUrl; 
+                if (string.IsNullOrEmpty(videoUrl))
+                {
+                    throw new InvalidOperationException("Video URL is not available");
+                }
 
-                var blobInfo = await _blobStorageService.DownloadFileAsync(video.VideoUrl);
-
+                var blobInfo = await _blobStorageService.DownloadFileAsync(videoUrl);
                 if (blobInfo == null || blobInfo.Size == 0)
                 {
                     throw new InvalidOperationException("Failed to download video from Blob Storage.");
                 }
-                var videoStream = await new HttpClient().GetStreamAsync(blobInfo.FileUrl);
 
-                if (videoStream == null)
+                return new VideoWithStreamDTO
                 {
-                    throw new InvalidOperationException("Failed to retrieve video stream.");
-                }
-
-                using (var memoryStream = new MemoryStream())
-                {
-                    await videoStream.CopyToAsync(memoryStream);
-                    byte[] videoBytes = memoryStream.ToArray();
-
-                    return new VideoWithStreamDTO
+                    Metadata = new VideoDTO
                     {
-                        Metadata = videoDto,
-                        VideoStream = videoBytes
-                    };
-                }
+                        Id = video.Id,
+                        Tittle = video.Tittle,
+                        Description = video.Description,
+                    },
+                    VideoUrl = blobInfo.FileUrl
+                };
             }
             catch (Exception ex)
             {
                 throw new Exception("Error while retrieving video", ex);
             }
         }
+
 
         public async Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream()
         {
@@ -553,17 +578,11 @@ namespace WebApiVRoom.BLL.Services
 
 
 
-                    using (var memoryStream = new MemoryStream())
+                    list.Add(new VideoWithStreamDTO
                     {
-                        await videoStream.CopyToAsync(memoryStream);
-                        byte[] videoBytes = memoryStream.ToArray();
-
-                        list.Add(new VideoWithStreamDTO
-                        {
-                            Metadata = videoDto,
-                            VideoStream = videoBytes
-                        });
-                    }
+                        Metadata = videoDto,
+                        VideoUrl = blobInfo.FileUrl 
+                    });
                 }
                 return list;
             }
@@ -706,6 +725,29 @@ namespace WebApiVRoom.BLL.Services
             }
 
             return _mapper.Map<List<Video>, List<VideoDTO>>(v);
+        }
+
+        public async Task SendNotificationsToSubscribers( Video video)
+        {
+            List<Subscription> subscriptions = await _unitOfWork.Subscriptions.GetByChannelId(video.ChannelSettings.Id);
+            foreach (var subscription in subscriptions) {
+                if (subscription.Subscriber.SubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Notification notification = new Notification();
+                    notification.Date = DateTime.Now;
+                    notification.User = subscription.Subscriber;
+                    notification.IsRead = false;
+                    notification.Message = video.ChannelSettings.ChannelNikName + " new video " + video.VRoomVideoUrl; 
+                    await _unitOfWork.Notifications.Add(notification);
+                }
+                if (subscription.Subscriber.EmailSubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Email email = await _unitOfWork.Emails.GetByUserPrimary(subscription.Subscriber.Clerk_Id);
+                    ChannelSettings channelSettings = await _unitOfWork.ChannelSettings.FindByOwner(subscription.Subscriber.Clerk_Id);
+                    SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName,  email.EmailAddress, 
+                        video.ChannelSettings.ChannelNikName + " new video " + video.VRoomVideoUrl);
+                }
+            }
         }
 
     }

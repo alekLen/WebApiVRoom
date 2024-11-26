@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Infrastructure;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using WebApiVRoom.DAL.Repositories;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -95,14 +97,12 @@ namespace WebApiVRoom.BLL.Services
             commentVideo.User = user;
             commentVideo.clerkId = commentVideoDTO.UserId;           
             commentVideo.Video = await Database.Videos.GetById(commentVideoDTO.VideoId);
-            //if ( commentVideoDTO.AnswerVideoIds != null && commentVideoDTO.AnswerVideoIds.Count > 0)
-            //{
-            //    commentVideo.AnswerVideos = await Database.AnswerVideos.GetByIds(commentVideoDTO.AnswerVideoIds);
-            //}
-
+            
             await Database.CommentVideos.Add(commentVideo);
             CommentVideoDTO com= Mapper.Map<CommentVideo, CommentVideoDTO>(commentVideo);
-           
+            await SendNotificationsOfComments(commentVideo.Video);
+
+
             return com;
         }
 
@@ -147,6 +147,27 @@ namespace WebApiVRoom.BLL.Services
         {
             var commentVideos = await Database.CommentVideos.GetByUserPaginated(pageNumber, pageSize, userId);
             return Mapper.Map<IEnumerable<CommentVideo>, IEnumerable<CommentVideoDTO>>(commentVideos).ToList();
+        }
+
+        public async Task SendNotificationsOfComments(Video video)
+        {
+               ChannelSettings ch= await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
+                if (ch.Owner.SubscribedOnActivityOnMyChannel  == true)
+                {
+                    Notification notification = new Notification();
+                    notification.Date = DateTime.Now;
+                    notification.User = video.ChannelSettings.Owner;
+                    notification.IsRead = false;
+                    notification.Message =  "A new comment to your video ";
+                    await Database.Notifications.Add(notification);
+                }
+               if (ch.Owner.EmailSubscribedOnActivityOnMyChannel == true)
+               {
+                   Email email = await Database.Emails.GetByUserPrimary(ch.Owner.Clerk_Id);
+                   ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(ch.Owner.Clerk_Id);
+                   SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName, email.EmailAddress,
+                     "A new comment to your video ");
+               }
         }
     }
 }

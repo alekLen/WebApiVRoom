@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Google.Apis.YouTube.v3.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Web;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -117,19 +120,22 @@ namespace WebApiVRoom.Controllers
     public class VideoController : ControllerBase
     {
         private readonly IVideoService _videoService;
+        private readonly IVideoViewsService _videoViewsService;
         private readonly IChannelSettingsService _chService;
         private ILikesDislikesVService _likesService;
         private readonly IHubContext<ChatHub> _hubContext;
         private IUserService _userService;
 
         public VideoController(IVideoService videoService, IChannelSettingsService _ch,
-            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService)
+            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext,
+            IUserService userService, IVideoViewsService videoViewsService)
         {
             _videoService = videoService;
             _chService = _ch;
             _hubContext = hubContext;
             _likesService = likesService;
             _userService = userService;
+            _videoViewsService = videoViewsService;
         }
 
         [HttpGet("getvideosorshortsbychannelidwithfilters")]
@@ -165,6 +171,20 @@ namespace WebApiVRoom.Controllers
         public async Task<ActionResult<VideoInfoDTO>> GetVideoInfo([FromRoute] int id)
         {
             var video = await _videoService.GetVideoInfo(id);
+            if (video == null)
+            {
+                return NotFound();
+            }
+            ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video, ch);
+            return Ok(videoInfoDTO);
+        }
+
+        [HttpGet("getvideoinfobyvideourl/{url}")]
+        public async Task<ActionResult<VideoInfoDTO>> GetVideoInfoByUrl([FromRoute] string url)
+        {
+            string decodedUrl = HttpUtility.UrlDecode(url);
+            var video = await _videoService.GetVideoInfoByVRoomVideoUrl(decodedUrl);
             if (video == null)
             {
                 return NotFound();
@@ -230,6 +250,7 @@ namespace WebApiVRoom.Controllers
                 Duration = v.Duration,
                 VideoUrl = v.VideoUrl,
                 VRoomVideoUrl = v.VRoomVideoUrl,
+                ChannelSubscriptionCount = ch.SubscriptionCount,
                 ViewCount = v.ViewCount,
                 LikeCount = v.LikeCount,
                 CommentCount = v.CommentVideoIds.Count,
@@ -242,7 +263,11 @@ namespace WebApiVRoom.Controllers
                 Audience = v.Audience,
             };
         }
-
+        private bool IsBase64String(string base64)
+        {
+            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
+            return Convert.TryFromBase64String(base64, buffer, out _);
+        }
         [HttpPost("add")]
         public async Task<ActionResult<VideoDTO>> AddVideo([FromForm] VideoDTO videoDto, IFormFile file)
         {
@@ -251,10 +276,15 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
+
             try
             {
-
-                using (var stream = file.OpenReadStream())
+                if (!IsBase64String(videoDto.VideoUrl))
+                {
+                    return BadRequest("Invalid base64 string.");
+                }
+                var videoBytes = Convert.FromBase64String(videoDto.VideoUrl);
+                using (var stream = new MemoryStream(videoBytes))
                 {
                     await _videoService.AddVideo(videoDto, stream);
                 }
@@ -389,7 +419,7 @@ namespace WebApiVRoom.Controllers
             if (!ModelState.IsValid)
             {
 
-       
+
                 return BadRequest(ModelState);
             }
             VideoDTO videoDto = await _videoService.GetVideoInfo(video_id);
@@ -439,6 +469,23 @@ namespace WebApiVRoom.Controllers
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "viewed_video", payload = obj });
             return Ok();
         }
+        [HttpPost("viewingduration")]
+        public async Task<ActionResult> ViewingDurationVideo([FromForm] ViewDurationRequest videoView)
+        {
+            try
+            {
+                VideoViewDTO v = new VideoViewDTO();
+                v.VideoId = int.Parse(videoView.VideoId);
+                v.ClerkId = videoView.ClerkId;
+                v.Duration = int.Parse(videoView.Duration);
+                v.Location = videoView.Location;
+                v.Date = DateTime.Parse(videoView.Date);
+                await _videoViewsService.AddVideoView(v);
+                return Ok();
+            }
+            catch { return BadRequest(); }
+           
+        }
         private async Task<object> ConvertObject(VideoDTO video)
         {
             ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
@@ -459,6 +506,7 @@ namespace WebApiVRoom.Controllers
                 duration = v.Duration,
                 videoUrl = v.VideoUrl,
                 vRoomVideoUrl = v.VRoomVideoUrl,
+                channelSubscriptionCount = v.ChannelSubscriptionCount,
                 viewCount = v.ViewCount,
                 likeCount = v.LikeCount,
                 dislikeCount = v.DislikeCount,
@@ -472,6 +520,58 @@ namespace WebApiVRoom.Controllers
             };
             return obj;
         }
+
+
+        [HttpGet("getallvideopaginated/{pageNumber}/{pageSize}")]
+        public async Task<ActionResult<List<VideoDTO>>> GetAllShortsPaginated(int pageNumber, int pageSize)
+        {
+            return new ObjectResult(await _videoService.GetAllShortsPaginated(pageNumber, pageSize));
+        }
+        [HttpGet("getallvideoinfopaginated/{pageNumber}/{pageSize}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetAllShortsInfoPaginated(int pageNumber, int pageSize)
+        {
+            var video = await _videoService.GetAllShortsPaginated(pageNumber, pageSize);
+            if (video == null)
+            {
+                return NotFound();
+            }
+
+            List<VideoInfoDTO> list = new List<VideoInfoDTO>();
+            foreach (var v in video)
+            {
+                try
+                {
+                    ChannelSettingsDTO ch = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                    VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(v, ch);
+                    list.Add(videoInfoDTO);
+                }
+                catch (Exception ex) { }
+            }
+            return new ObjectResult(list);
+        }
+        [HttpGet("getallvideoinfopaginatedwith1vbyid/{pageNumber}/{pageSize}/{videoId}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null)
+        {
+            var video = await _videoService.GetAllShortsPaginatedWith1VById(pageNumber, pageSize, videoId);
+            if (video == null)
+            {
+                return NotFound();
+            }
+
+            List<VideoInfoDTO> list = new List<VideoInfoDTO>();
+            foreach (var v in video)
+            {
+                try
+                {
+                    ChannelSettingsDTO ch = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                    VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(v, ch);
+                    list.Add(videoInfoDTO);
+                }
+                catch (Exception ex) { }
+            }
+            return new ObjectResult(list);
+        }
+
         [HttpGet("getvideosbychannelid/{channelId}")]
         public async Task<ActionResult<IEnumerable<VideoDTO>>> GetVideosByChannelId(int channelId)
         {
@@ -508,6 +608,25 @@ namespace WebApiVRoom.Controllers
             }
             return Ok(v);
         }
+
+        [HttpGet("getvideolistbytag/{name}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetVideoListByTag([FromRoute] string name)
+        {
+            var video = await _videoService.GetAllVideos();
+            List<VideoInfoDTO> result = new List<VideoInfoDTO>();
+            if (video == null)
+            {
+                return NotFound();
+            }
+            foreach (var v in video)
+            {
+                ChannelSettingsDTO channelSettingsDTO = await _chService.GetChannelSettings(v.ChannelSettingsId);
+                VideoInfoDTO vinfo = ConvertVideoToVideoInfo(v, channelSettingsDTO);
+                result.Add(vinfo);
+            }
+            return Ok(result);
+        }
+       
     }
 }
 

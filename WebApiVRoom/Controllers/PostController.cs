@@ -72,9 +72,8 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-           PostDTO post = await _postService.AddPost(img,video,req.text,req.id,req.type,req.options);
+           PostDTO post = await _postService.AddPost(img,video,req.text,req.id,req.type,req.options,req.VideoLink);
             object obj = ConvertObject(post);
-            //await WebSocketHelper.SendMessageToAllAsync("new_post", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_post", payload = obj });
             return Ok();
         }

@@ -22,12 +22,13 @@ namespace WebApiVRoom.BLL.DTO
         public int Duration { get; set; }
         public string VideoUrl { get; set; } = string.Empty;
         public string VRoomVideoUrl { get; set; } = string.Empty;
+        public int ChannelSubscriptionCount { get; set; } = 0;
         public int ViewCount { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
         public int CommentCount { get; set; }
         public bool IsShort { get; set; }
-        public string Cover {  get; set; }
+        public byte[] Cover {  get; set; }
         public bool Visibility { get; set; }
         public bool IsAgeRestriction { get; set; }//Возрастные ограничения --> true = есть, false = нет
         public bool IsCopyright { get; set; }//Авторские права --> true = есть, false = нет

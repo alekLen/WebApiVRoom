@@ -11,7 +11,8 @@ using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
-using WebApiVRoom.DAL.Interfaces;
+using Google;
+using WebApiVRoom.DAL.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,31 +20,19 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-builder.Services.AddVRoomContext(connection);
+
+//builder.Services.AddVRoomContext(connection);
+builder.Services.AddDbContext<VRoomContext>(options =>
+    options.UseSqlServer(
+       connection, b => b.MigrationsAssembly("WebApiVRoom.DAL")
+    ));
 builder.Services.AddUnitOfWorkService();
+
 builder.Services.AddSingleton(x => {
     string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
     return new BlobServiceClient(connectionString);
 });
 
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ICountryService, CountryService>();
-builder.Services.AddTransient<ICategoryService, CategoryService>();
-builder.Services.AddTransient<ILanguageService, LanguageService>();
-builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
-builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
-builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
-//builder.Services.AddTransient<ICommentPostService, CommentPostService>();
-//builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
-builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
-builder.Services.AddTransient<IPlayListService, PlayListService>();
-builder.Services.AddTransient<IPostService, PostService>();
-builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
-builder.Services.AddTransient<ITagService, TagService>();
-builder.Services.AddTransient<IVideoService, VideoService>();
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
@@ -84,9 +73,14 @@ builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
 builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
 builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
+builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddSingleton<LiveStreamingService>(provider =>new LiveStreamingService("AIzaSyDvXp8Wi0-Y6BPC55SDA953CFIid2g6TtY"));
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVideoViewsService, VideoViewsService>();
+
+
 
 
 builder.Services.AddControllers();
@@ -110,6 +104,19 @@ builder.Services.AddAzureClients(clientBuilder =>
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<VRoomContext>();
+        context.Database.Migrate(); // Применение миграций
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Ошибка применения миграций: {ex.Message}");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

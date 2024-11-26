@@ -43,6 +43,8 @@ namespace WebApiVRoom.DAL.Repositories
         private ContentReportRepository contentReportsRepository;
         private AdRepository adRepository;
         private AdminLogRepository adminLogRepository;
+        private EmailRepository emailRepository;
+        private VideoViewsRepository videoViewsRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
@@ -79,6 +81,15 @@ namespace WebApiVRoom.DAL.Repositories
             }
         }
 
+        public IEmailRepository Emails
+        {
+            get
+            {
+                if (emailRepository == null)
+                    emailRepository = new EmailRepository(db);
+                return emailRepository;
+            }
+        }
         public IVoteRepository Votes
         {
             get
@@ -295,6 +306,15 @@ namespace WebApiVRoom.DAL.Repositories
                 if (videoRepository == null)
                     videoRepository = new VideoRepository(db);
                 return videoRepository;
+            }
+        }
+        public IVideoViewsRepository VideoViews
+        {
+            get
+            {
+                if (videoViewsRepository == null)
+                    videoViewsRepository = new VideoViewsRepository(db);
+                return videoViewsRepository;
             }
         }
     }

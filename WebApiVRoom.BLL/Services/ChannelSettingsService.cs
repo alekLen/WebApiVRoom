@@ -73,6 +73,12 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
+        public async Task<bool> IsNickNameUnique(string nickName, int chSettingsId)
+        {
+            
+            return await Database.ChannelSettings.IsNickNameUnique(nickName, chSettingsId);
+        }
+
         public async Task<ChannelSettingsDTO> UpdateChannelSettings(ChannelSettingsDTO chDto, IFormFileCollection channelImg)
         {
             try
@@ -186,7 +192,7 @@ namespace WebApiVRoom.BLL.Services
 
                 await Database.ChannelSettings.Delete(channelSettings.Id);
 
-                
+
                 await _blobStorageService.DeleteImgAsync(channelSettings.ChannelBanner);//удаляем старый баннер
                 await _blobStorageService.DeleteImgAsync(channelSettings.ChannelPlofilePhoto);//удаляем старое фото профиля канала
 
@@ -278,6 +284,17 @@ namespace WebApiVRoom.BLL.Services
             var mapper = InitializeChannelSettingsMapper();
             return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
 
+        }
+
+        public async Task<List<DateTime>> GetUploadVideosCountByDateDiapasonAndChannel(DateTime start, DateTime end, int chId)
+        {
+            var users = await Database.ChannelSettings.GetUploadVideosCountByDiapasonAndChannel(start, end, chId);
+            return users;
+        }
+        public async Task<List<DateTime>> GetUploadVideosCountByDateDiapason(DateTime start, DateTime end)
+        {
+            var users = await Database.ChannelSettings.GetUploadVideosCountByDiapason(start, end);
+            return users;
         }
     }
 }
