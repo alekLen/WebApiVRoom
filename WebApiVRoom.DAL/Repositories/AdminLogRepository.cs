@@ -48,9 +48,9 @@ namespace WebApiVRoom.DAL.Repositories
             await db.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery)
+        public async Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string type, string? searchQuery)
         {
-            return await db.AdminLogs.Where(x => x.Action.Contains(searchQuery) || x.Description.Contains(searchQuery)).OrderByDescending(x => x.Date).Skip((page - 1) * perPage).Take(perPage).ToListAsync();
+            return await db.AdminLogs.Where(x => x.Action.Contains(searchQuery) || x.Action == type || x.Description.Contains(searchQuery)).OrderByDescending(x => x.Date).Skip((page - 1) * perPage).Take(perPage).ToListAsync();
         }
 
         public async Task<IEnumerable<AdminLog>> GetPaginated(int page, int perPage)

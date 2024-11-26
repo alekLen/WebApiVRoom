@@ -94,11 +94,11 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<AdminLogDTO>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery)
+        public async Task<IEnumerable<AdminLogDTO>> GetPaginatedAndSortedWithQuery(int page, int perPage, string type, string? searchQuery)
         {
             try
             {
-                var adminLogs = await Database.AdminLogs.GetPaginatedAndSortedWithQuery(page, perPage, searchQuery);
+                var adminLogs = await Database.AdminLogs.GetPaginatedAndSortedWithQuery(page, perPage, type, searchQuery);
 
                 if (adminLogs == null)
                 {

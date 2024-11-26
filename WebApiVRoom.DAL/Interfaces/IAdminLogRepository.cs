@@ -19,7 +19,7 @@ namespace WebApiVRoom.DAL.Interfaces
 
         Task Update(AdminLog adminLog);
 
-        Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery);
+        Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string type, string? searchQuery);
 
         Task<IEnumerable<AdminLog>> GetPaginated(int page, int perPage);
 

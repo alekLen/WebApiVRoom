@@ -16,7 +16,7 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task<IEnumerable<AdminLogDTO>> GetPaginatedWithQuery(int page, int perPage, string? searchQuery);
 
-        Task<IEnumerable<AdminLogDTO>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery);
+        Task<IEnumerable<AdminLogDTO>> GetPaginatedAndSortedWithQuery(int page, int perPage, string type, string? searchQuery);
 
         Task<AdminLogDTO> GetById(int id);
 
