@@ -36,7 +36,6 @@ namespace WebApiVRoom.DAL.Interfaces
         IVideoViewsRepository VideoViews { get; }
         IAdRepository Ads { get; }
         IContentReportRepository ContentReports { get; }
-
         IAdminLogRepository AdminLogs { get; }
     }
 }
