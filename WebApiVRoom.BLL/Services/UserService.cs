@@ -299,5 +299,11 @@ namespace WebApiVRoom.BLL.Services
             }
             catch { return null; }
         }
+
+        public async Task<List<DateTime>> GetUsersByDateDiapason(DateTime start, DateTime end)
+        {
+           var users = await Database.Users.GetUsersByDiapason(start,end);            
+            return users.ToList();
+        }
     }
 }

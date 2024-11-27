@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiVRoom.DAL.EF;
 
@@ -11,9 +12,11 @@ using WebApiVRoom.DAL.EF;
 namespace WebApiVRoom.DAL.Migrations
 {
     [DbContext(typeof(VRoomContext))]
-    partial class VRoomContextModelSnapshot : ModelSnapshot
+    [Migration("20241124095617_VideoView")]
+    partial class VideoView
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,63 +53,6 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasIndex("VideosId");
 
                     b.ToTable("TagVideo");
-                });
-
-            modelBuilder.Entity("WebApiVRoom.DAL.Entities.Ad", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ads");
-                });
-
-            modelBuilder.Entity("WebApiVRoom.DAL.Entities.AdminLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AdminId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AdminLogs");
                 });
 
             modelBuilder.Entity("WebApiVRoom.DAL.Entities.AnswerPost", b =>
@@ -393,50 +339,6 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasIndex("VideoId");
 
                     b.ToTable("CommentVideos");
-                });
-
-            modelBuilder.Entity("WebApiVRoom.DAL.Entities.ContentReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AdminId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SenderUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ContentReports");
                 });
 
             modelBuilder.Entity("WebApiVRoom.DAL.Entities.Country", b =>
@@ -774,21 +676,13 @@ namespace WebApiVRoom.DAL.Migrations
 
             modelBuilder.Entity("WebApiVRoom.DAL.Entities.PlayListVideo", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int>("PlayListId")
                         .HasColumnType("int");
 
                     b.Property<int>("VideoId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("PlayListId");
+                    b.HasKey("PlayListId", "VideoId");
 
                     b.HasIndex("VideoId");
 
@@ -1169,7 +1063,7 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.Post", "Post")
                         .WithMany("CommentPosts")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("WebApiVRoom.DAL.Entities.ChannelSettings", "User")
@@ -1194,7 +1088,7 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.Video", "Video")
                         .WithMany("CommentVideos")
                         .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1228,7 +1122,7 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.Video", "Video")
                         .WithMany("HistoryOfBrowsings")
                         .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1356,13 +1250,13 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.PlayList", "PlayList")
                         .WithMany("PlayListVideos")
                         .HasForeignKey("PlayListId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("WebApiVRoom.DAL.Entities.Video", "Video")
                         .WithMany("PlayListVideos")
                         .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("PlayList");
@@ -1412,7 +1306,7 @@ namespace WebApiVRoom.DAL.Migrations
             modelBuilder.Entity("WebApiVRoom.DAL.Entities.VideoView", b =>
                 {
                     b.HasOne("WebApiVRoom.DAL.Entities.User", "User")
-                        .WithMany("VideoViews")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1433,13 +1327,13 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.OptionsForPost", "Option")
                         .WithMany("Voutes")
                         .HasForeignKey("OptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("WebApiVRoom.DAL.Entities.Post", "Post")
                         .WithMany("Voutes")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("WebApiVRoom.DAL.Entities.User", "User")
@@ -1515,11 +1409,6 @@ namespace WebApiVRoom.DAL.Migrations
                     b.Navigation("Options");
 
                     b.Navigation("Voutes");
-                });
-
-            modelBuilder.Entity("WebApiVRoom.DAL.Entities.User", b =>
-                {
-                    b.Navigation("VideoViews");
                 });
 
             modelBuilder.Entity("WebApiVRoom.DAL.Entities.Video", b =>

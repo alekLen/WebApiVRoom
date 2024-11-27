@@ -15,45 +15,7 @@ namespace WebApiVRoom.DAL.EF
         public VRoomContext(DbContextOptions<VRoomContext> options)
          : base(options)
         {
-            if (Database.EnsureCreated())
-            {
-                var tags = new List<Tag>
-                {
-                     new Tag { Name = "Music" },
-                     new Tag { Name = "Video" },
-                     new Tag { Name = "Comedy" },
-                     new Tag { Name = "Science" },
-                     new Tag { Name = "History" },
-                     new Tag { Name = "Wild_animals" },
-                     new Tag { Name = "Travel" },
-                     new Tag { Name = "Nature" },
-                     new Tag { Name = "Films" },
-                     new Tag { Name = "Summer" },
-                     new Tag { Name = "News" },
-                     new Tag { Name = "Cooking" },
-                     new Tag { Name = "Good_weather" },
-                     new Tag { Name = "Pets" },
-                     new Tag { Name = "Sport" },
-                     new Tag { Name = "Dreams" },
-                     new Tag { Name = "Beautiful_place" },
-                     new Tag { Name = "Education" }
-                };
-                Tags.AddRange(tags);
-                SaveChanges();
 
-                var categories = new List<Category>
-                {
-                    new Category{ Name = "music"},
-                    new Category{ Name = "trending"},
-                    new Category{ Name = "news"},
-                    new Category{ Name = "games"},
-                    new Category{ Name = "sport"},
-                    new Category{ Name = "films"},
-                    new Category{ Name = "education"},
-                };
-                Categories.AddRange(categories);
-                SaveChanges();
-            }
         }
 
 
@@ -83,51 +45,12 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<OptionsForPost> Options { get; set; }
         public DbSet<Vote> Votes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
+        public DbSet<VideoView> VideoViews { get; set; }
+        public DbSet<ContentReport> ContentReports { get; set; }
+        public DbSet<Ad> Ads { get; set; }
+        public DbSet<AdminLog> AdminLogs { get; set; }
+       
+            
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<CommentPost>()
-                    .HasOne(cp => cp.Post)
-                    .WithMany(p => p.CommentPosts)
-                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
-
-            modelBuilder.Entity<CommentVideo>()
-                    .HasOne(cp => cp.Video)
-                    .WithMany(p => p.CommentVideos)
-                    .OnDelete(DeleteBehavior.NoAction); 
-
-            modelBuilder.Entity<HistoryOfBrowsing>()
-                   .HasOne(cp => cp.Video)
-                   .WithMany(p => p.HistoryOfBrowsings)
-                   .OnDelete(DeleteBehavior.NoAction); 
-
-            modelBuilder.Entity<PlayListVideo>()
-         .HasKey(pv => new { pv.PlayListId, pv.VideoId }); // Первичный ключ составной
-
-            modelBuilder.Entity<PlayListVideo>()
-                .HasOne(pv => pv.PlayList)
-                .WithMany(p => p.PlayListVideos)
-                .HasForeignKey(pv => pv.PlayListId)
-                .OnDelete(DeleteBehavior.NoAction); // Отключаем каскадное удаление со стороны PlayList
-
-            modelBuilder.Entity<PlayListVideo>()
-                .HasOne(pv => pv.Video)
-                .WithMany(v => v.PlayListVideos)
-                .HasForeignKey(pv => pv.VideoId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Vote>()
-                .HasOne(pv => pv.Post)
-                .WithMany(v => v.Voutes)
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<Vote>()
-               .HasOne(pv => pv.Option)
-               .WithMany(v => v.Voutes)
-               .OnDelete(DeleteBehavior.NoAction);
-
-
-        }
     }
 }
-

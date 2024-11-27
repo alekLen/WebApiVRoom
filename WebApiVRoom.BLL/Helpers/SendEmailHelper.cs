@@ -5,34 +5,6 @@ namespace WebApiVRoom.BLL.Helpers
 {
     public static class SendEmailHelper
     {
-        //public static void SendEmailMessage(string userName, string userEmail, string text)
-        //{
-        //    try
-        //    {
-        //        var message = new MimeMessage();
-        //        message.From.Add(new MailboxAddress("VRoom Team", "vroomteamit@gmail.com"));
-        //        message.To.Add(new MailboxAddress(userName, userEmail));
-        //        message.Subject = "Wellcome to VRoom";
-
-        //        message.Body = new TextPart("plain")
-        //        {
-        //            Text = userName + text
-        //        };
-
-        //        using (var client = new SmtpClient())
-        //        {
-        //            client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-        //            client.Authenticate("vroomteamit@gmail.com", "mrmb yara ecfw loqt");
-        //            client.Send(message);
-        //            client.Disconnect(true);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Ошибка отправки email: {ex.Message}");
-        //    }
-        //}
-
         public static void SendEmailMessage(string userName, string userEmail, string text)
         {
             try
@@ -42,7 +14,6 @@ namespace WebApiVRoom.BLL.Helpers
                 message.To.Add(new MailboxAddress(userName, userEmail));
                 message.Subject = "Welcome to VRoom";
 
-                // HTML-содержимое
                 var htmlContent = $@"
             <html>
             <body>

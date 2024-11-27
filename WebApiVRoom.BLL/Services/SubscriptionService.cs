@@ -188,5 +188,11 @@ namespace WebApiVRoom.BLL.Services
             var a = await Database.Subscriptions.GetByChannelId(channelid);
             return a.Count();   
         }
+
+        public async Task<List<DateTime>> GetSubscriptionsByDiapasonAndChannel(DateTime start, DateTime end, int ch)
+        {
+            var users = await Database.Subscriptions.GetSubscriptionsByDiapasonAndChannel(start, end, ch);
+            return users;
+        }
     }
 }

@@ -29,6 +29,7 @@ namespace WebApiVRoom.DAL.Entities
         public bool EmailSubscribedOnOthersMentionOnMyChannel { get; set; } = false;
         public bool EmailSubscribedOnShareMyContent { get; set; } = false;
         public bool EmailSubscribedOnPromotionalContent { get; set; } = false;
+        public List<VideoView> VideoViews { get; set; } = new List<VideoView>();
 
     }
 }

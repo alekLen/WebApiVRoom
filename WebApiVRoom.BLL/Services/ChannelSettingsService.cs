@@ -285,5 +285,16 @@ namespace WebApiVRoom.BLL.Services
             return mapper.Map<ChannelSettings, ChannelSettingsDTO>(channelSettings);
 
         }
+
+        public async Task<List<DateTime>> GetUploadVideosCountByDateDiapasonAndChannel(DateTime start, DateTime end, int chId)
+        {
+            var users = await Database.ChannelSettings.GetUploadVideosCountByDiapasonAndChannel(start, end, chId);
+            return users;
+        }
+        public async Task<List<DateTime>> GetUploadVideosCountByDateDiapason(DateTime start, DateTime end)
+        {
+            var users = await Database.ChannelSettings.GetUploadVideosCountByDiapason(start, end);
+            return users;
+        }
     }
 }
