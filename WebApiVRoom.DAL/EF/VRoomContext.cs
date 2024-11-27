@@ -46,6 +46,41 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Vote> Votes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
         public DbSet<VideoView> VideoViews { get; set; }
+        public DbSet<ContentReport> ContentReports { get; set; }
+        public DbSet<Ad> Ads { get; set; }
+        public DbSet<AdminLog> AdminLogs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CommentPost>()
+                    .HasOne(cp => cp.Post)
+                    .WithMany(p => p.CommentPosts)
+                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<CommentVideo>()
+                    .HasOne(cp => cp.Video)
+                    .WithMany(p => p.CommentVideos)
+                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<HistoryOfBrowsing>()
+                   .HasOne(cp => cp.Video)
+                   .WithMany(p => p.HistoryOfBrowsings)
+                   .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<PlayListVideo>()
+         .HasKey(pv => new { pv.PlayListId, pv.VideoId }); // Первичный ключ составной
+
+            modelBuilder.Entity<PlayListVideo>()
+                .HasOne(pv => pv.PlayList)
+                .WithMany(p => p.PlayListVideos)
+                .HasForeignKey(pv => pv.PlayListId)
+                .OnDelete(DeleteBehavior.NoAction); // Отключаем каскадное удаление со стороны PlayList
+
+            modelBuilder.Entity<PlayListVideo>()
+                .HasOne(pv => pv.Video)
+                .WithMany(v => v.PlayListVideos)
+                .HasForeignKey(pv => pv.VideoId)
+                .OnDelete(DeleteBehavior.NoAction);
 
     }
 }

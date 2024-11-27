@@ -40,7 +40,7 @@ namespace WebApiVRoom.Controllers
         }
         
 
-            [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
         {
 
@@ -51,6 +51,7 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+
         [HttpPut("update")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO u)
         {
@@ -58,11 +59,14 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             UserDTO user = await _userService.GetUser(u.Id);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             UserDTO usernew=await _userService.UpdateUser(u);
 
             return Ok(usernew);
@@ -77,19 +81,19 @@ namespace WebApiVRoom.Controllers
                 string SigningSecret = _configuration["Clerk:WebhookSecret"]; 
             Request.EnableBuffering();
 
-            string requestBody;
-            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
-            {
-                requestBody = await reader.ReadToEndAsync();
-                Request.Body.Position = 0;
-            }
+                string requestBody;
+                using (var reader = new StreamReader(Request.Body, leaveOpen: true))
+                {
+                    requestBody = await reader.ReadToEndAsync();
+                    Request.Body.Position = 0;
+                }
 
-            var headers = new WebHeaderCollection();
-            headers.Set("svix-id", Request.Headers["svix-id"]);
-            headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
-            headers.Set("svix-signature", Request.Headers["svix-signature"]);
+                var headers = new WebHeaderCollection();
+                headers.Set("svix-id", Request.Headers["svix-id"]);
+                headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
+                headers.Set("svix-signature", Request.Headers["svix-signature"]);
           
-            var wh= new Webhook(SigningSecret);
+                var wh= new Webhook(SigningSecret);
            
                 wh.Verify(requestBody,headers);
            

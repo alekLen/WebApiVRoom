@@ -11,6 +11,7 @@ using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
+using WebApiVRoom.DAL.Interfaces;
 using Google;
 using WebApiVRoom.DAL.EF;
 
@@ -48,6 +49,9 @@ builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider 
 });
 
 // Scoped services
+builder.Services.AddScoped<IContentReportService, ContentReportService>();
+builder.Services.AddScoped<IAdService, AdService>();
+builder.Services.AddScoped<IAdminLogService, AdminLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -76,6 +80,7 @@ builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVideoViewsService, VideoViewsService>();
+
 
 
 
