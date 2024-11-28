@@ -22,6 +22,8 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task<ContentReportDTO> Delete(int id);
 
+        Task Process(int id, string adminId);
+
         Task<int> Count(string searchQuery);
 
         Task<IEnumerable<ContentReportDTO>> GetAll();

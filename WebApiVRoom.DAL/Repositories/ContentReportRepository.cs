@@ -20,8 +20,18 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<IEnumerable<ContentReport>> GetPaginated(int page, int perPage, string? searchQuery)
         {
+            if (page <= 0) page = 1;
+            if (perPage <= 0) perPage = 10;
+            
+            bool isNumber = int.TryParse(searchQuery, out int idSearch);
+
             return await db.ContentReports
-                .Where(x => searchQuery == null || x.Title.Contains(searchQuery) || x.Id == int.Parse(searchQuery) || x.Description.Contains(searchQuery))
+                .Where(x => 
+                    string.IsNullOrEmpty(searchQuery) || 
+                    x.Title.Contains(searchQuery) || 
+                    (isNumber && x.Id == idSearch) || 
+                    x.Description.Contains(searchQuery)
+                )
                 .Skip((page - 1) * perPage)
                 .Take(perPage)
                 .ToListAsync();
@@ -68,10 +78,18 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<int> Count(string? searchQuery)
         {
+            bool isNumber = int.TryParse(searchQuery, out int idSearch);
+            
             return await db.ContentReports
-                .Where(x => searchQuery == null || x.Title.Contains(searchQuery) || x.Id == int.Parse(searchQuery) || x.Description.Contains(searchQuery))
+                .Where(x =>
+                        string.IsNullOrEmpty(searchQuery) ||  
+                        x.Title.Contains(searchQuery) ||    
+                        (isNumber && x.Id == idSearch) ||   
+                        x.Description.Contains(searchQuery) 
+                )
                 .CountAsync();
         }
+
 
         public async Task<IEnumerable<ContentReport>> GetAll()
         {

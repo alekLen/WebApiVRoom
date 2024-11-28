@@ -20,7 +20,8 @@ namespace WebApiVRoom.Controllers
         public async Task<IActionResult> GetPaginated(int page, int perPage, string? searchQuery)
         {
             var contentReports = await _contentReportService.GetPaginated(page, perPage, searchQuery);
-            return Ok(contentReports);
+            var count = await _contentReportService.Count(searchQuery);
+            return Ok(new {contentReports, count});
         }
 
         [HttpGet("{id}")]
@@ -48,6 +49,13 @@ namespace WebApiVRoom.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             await _contentReportService.Delete(id);
+            return Ok();
+        }
+        
+        [HttpPut("{id}/{adminId}/process")]
+        public async Task<IActionResult> Process([FromRoute] int id, [FromRoute] string adminId)
+        {
+            await _contentReportService.Process(id, adminId);
             return Ok();
         }
 

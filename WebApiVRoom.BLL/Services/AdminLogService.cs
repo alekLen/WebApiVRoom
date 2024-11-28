@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
@@ -29,7 +30,9 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.AdminId, opt => opt.MapFrom(src => src.AdminId))
                     .ForMember(dest => dest.Action, opt => opt.MapFrom(src => src.Action))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
-                    .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date));
+                    .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+                    .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type));
+                
             });
             return new Mapper(config);
         }
@@ -210,11 +213,11 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<int> GetCountWithQuery(string? searchQuery)
+        public async Task<int> GetCountWithQuery(string type, string? searchQuery)
         {
             try
             {
-                return await Database.AdminLogs.GetCountWithQuery(searchQuery);
+                return await Database.AdminLogs.GetCountWithQuery(type, searchQuery);
             }
             catch (Exception ex)
             {

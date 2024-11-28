@@ -91,6 +91,7 @@ namespace WebApiVRoom.BLL.Services
 
             Language langNew = new();
             Country countryNew = new();
+            AdminLog adminLog = new();
 
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
            
@@ -104,6 +105,14 @@ namespace WebApiVRoom.BLL.Services
 
             var mapper = InitializeMapper();
             var updatedUserDto = mapper.Map<User, UserDTO>(user);
+            
+            adminLog.AdminId = user.Clerk_Id;
+            adminLog.Action = "create";
+            adminLog.Type = "user";
+            adminLog.Description = "User created";
+            adminLog.Date = DateTime.Now;
+            
+            await Database.AdminLogs.Add(adminLog);
 
             return updatedUserDto;
         }
@@ -112,6 +121,16 @@ namespace WebApiVRoom.BLL.Services
         {
             User user = await Database.Users.GetByClerk_Id(clerkId);
             await Database.Users.Delete(user.Id);
+            
+            AdminLog adminLog = new();
+            
+            adminLog.AdminId = user.Id.ToString();
+            adminLog.Action = "delete";
+            adminLog.Type = "user";
+            adminLog.Description = "User deleted";
+            adminLog.Date = DateTime.Now;
+            
+            await Database.AdminLogs.Add(adminLog);
 
             var mapper = InitializeMapper();
             return mapper.Map<User, UserDTO>(user);
@@ -199,9 +218,18 @@ namespace WebApiVRoom.BLL.Services
                 user.EmailSubscribedOnShareMyContent = userDto.EmailSubscribedOnShareMyContent;
                 user.EmailSubscribedOnPromotionalContent = userDto.EmailSubscribedOnPromotionalContent;
                 user.SubscribedOnMainEmailNotifications = userDto.SubscribedOnMainEmailNotifications;
+                
+                AdminLog adminLog = new();
+            
+                adminLog.AdminId = user.Clerk_Id;
+                adminLog.Action = "updated";
+                adminLog.Type = "user";
+                adminLog.Description = "User updated";
+                adminLog.Date = DateTime.Now;
+            
+                await Database.AdminLogs.Add(adminLog);
 
-
-        await Database.Users.Update(user);
+                await Database.Users.Update(user);
 
                 var mapper = InitializeMapper();
                 var updatedUserDto = mapper.Map<User, UserDTO>(user);

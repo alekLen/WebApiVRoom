@@ -26,14 +26,13 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<ContentReport, ContentReportDTO>()
                 .ForMember(dest => dest.SenderUserId, opt => opt.MapFrom(src => src.SenderUserId))
-                    .ForMember(dest => dest.AdminId, opt => opt.MapFrom(src => src.AdminId))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                    .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.SubjectId))
                     .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                     .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-                    .ForMember(dest => dest.ClosedAt, opt => opt.MapFrom(src => src.ClosedAt))
-                    .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.SubjectId));
+                    .ForMember(dest => dest.ClosedAt, opt => opt.MapFrom(src => src.ClosedAt));
             });
 
             return new Mapper(config);
@@ -52,6 +51,29 @@ namespace WebApiVRoom.BLL.Services
 
                 var mapper = InitializeMapper();
                 return mapper.Map<ContentReport, ContentReportDTO>(contentReport);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        
+        public async Task Process(int id, string adminId)
+        {
+            try
+            {
+                var contentReport = await Database.ContentReports.Get(id);
+
+                if (contentReport == null)
+                {
+                    throw new Exception("Content report not found");
+                }
+
+                contentReport.AdminId = adminId;
+                contentReport.Status = "Processing";
+                contentReport.ClosedAt = DateTime.Now;
+
+                await Database.ContentReports.Update(contentReport);
             }
             catch (Exception ex)
             {
@@ -86,13 +108,13 @@ namespace WebApiVRoom.BLL.Services
                 var contentReport = new ContentReport
                 {
                     SenderUserId = contentReportDTO.SenderUserId,
-                    AdminId = contentReportDTO.AdminId,
+                    AdminId = null,
                     Title = contentReportDTO.Title,
                     Description = contentReportDTO.Description,
                     Type = contentReportDTO.Type,
-                    Status = contentReportDTO.Status,
-                    CreatedAt = contentReportDTO.CreatedAt,
-                    ClosedAt = contentReportDTO.ClosedAt,
+                    Status = "Open",
+                    CreatedAt = DateTime.Now,
+                    ClosedAt = null,
                     SubjectId = contentReportDTO.SubjectId
                 };
 
@@ -115,13 +137,13 @@ namespace WebApiVRoom.BLL.Services
                 {
                     Id = contentReportDTO.Id,
                     SenderUserId = contentReportDTO.SenderUserId,
-                    AdminId = contentReportDTO.AdminId,
+                    AdminId = null,
                     Title = contentReportDTO.Title,
                     Description = contentReportDTO.Description,
                     Type = contentReportDTO.Type,
-                    Status = contentReportDTO.Status,
-                    CreatedAt = contentReportDTO.CreatedAt,
-                    ClosedAt = contentReportDTO.ClosedAt,
+                    Status = "Open",
+                    CreatedAt = DateTime.Now,
+                    ClosedAt = null,
                     SubjectId = contentReportDTO.SubjectId
                 };
 

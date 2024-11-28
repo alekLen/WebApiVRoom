@@ -29,7 +29,7 @@ namespace WebApiVRoom.DAL.Interfaces
 
         Task<int> GetCount();
 
-        Task<int> GetCountWithQuery(string? searchQuery);
+        Task<int> GetCountWithQuery(string type, string? searchQuery);
 
         Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery, string? sortField, string? sortOrder);
     }
