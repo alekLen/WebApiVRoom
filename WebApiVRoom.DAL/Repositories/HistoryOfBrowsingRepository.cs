@@ -90,5 +90,12 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetAllHistoryByIdGroupedByDate(int userId)
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video)
+                           .Where(h => h.User.Id == userId)
+                           .ToListAsync();
+        }
     }
 }
