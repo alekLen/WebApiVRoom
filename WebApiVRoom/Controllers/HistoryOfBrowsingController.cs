@@ -78,11 +78,45 @@ namespace WebApiVRoom.Controllers
             return Ok(ans);
         }
 
+        [HttpDelete("deleteall/{clerk_id}")]
+        public async Task<ActionResult<HistoryOfBrowsingDTO>> DeleteAll(string clerk_id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            List<HistoryOfBrowsingDTO> ans = await _hbService.GetByUserId(clerk_id);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+
+            foreach (var item in ans)
+            {
+                await _hbService.Delete(item.Id);
+            }
+            
+
+            return Ok(ans);
+        }
+
         [HttpGet("getbyuserid/{clerk_id}")]
         public async Task<ActionResult<List<HistoryOfBrowsingDTO>>> ByUserId(string clerk_id)
         {
 
             List<HistoryOfBrowsingDTO> list = await _hbService.GetByUserId(clerk_id);
+            if (list == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(list);
+        }
+        [HttpGet("getallhistorybyclerkidgroupedbydate/{clerk_id}")]
+        public async Task<ActionResult<List<HistoryOfBrowsingGroupDateDTO>>> GetAllHistoryByClerkIdGroupedByDate(string clerk_id)
+        {
+
+            List<HistoryOfBrowsingGroupDateDTO> list = await _hbService.GetAllHistoryByIdGroupedByDate(clerk_id);
             if (list == null)
             {
                 return NotFound();

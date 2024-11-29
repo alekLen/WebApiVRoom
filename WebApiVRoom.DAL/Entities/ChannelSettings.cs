@@ -33,5 +33,9 @@ namespace WebApiVRoom.DAL.Entities
         public List<AnswerVideo> AnswerVideos { get; set; } = new List<AnswerVideo>();
         public List<Notification> Notifications { get; set; } = new List<Notification>();
 
+        public static explicit operator ChannelSettings(Task<ChannelSettings> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
