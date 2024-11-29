@@ -13,9 +13,8 @@ using Svix;
 using Svix.Exceptions;
 using Newtonsoft.Json;
 using static System.Net.Mime.MediaTypeNames;
-using MimeKit;
-using MailKit.Net.Smtp;
 using static WebApiVRoom.BLL.DTO.AddUserRequest;
+using WebApiVRoom.BLL.Helpers;
 
 namespace WebApiVRoom.Controllers
 {
@@ -41,7 +40,7 @@ namespace WebApiVRoom.Controllers
         }
         
 
-            [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
         {
 
@@ -52,6 +51,7 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
+
         [HttpPut("update")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO u)
         {
@@ -59,11 +59,14 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             UserDTO user = await _userService.GetUser(u.Id);
+
             if (user == null)
             {
                 return NotFound();
             }
+
             UserDTO usernew=await _userService.UpdateUser(u);
 
             return Ok(usernew);
@@ -78,19 +81,19 @@ namespace WebApiVRoom.Controllers
                 string SigningSecret = _configuration["Clerk:WebhookSecret"]; 
             Request.EnableBuffering();
 
-            string requestBody;
-            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
-            {
-                requestBody = await reader.ReadToEndAsync();
-                Request.Body.Position = 0;
-            }
+                string requestBody;
+                using (var reader = new StreamReader(Request.Body, leaveOpen: true))
+                {
+                    requestBody = await reader.ReadToEndAsync();
+                    Request.Body.Position = 0;
+                }
 
-            var headers = new WebHeaderCollection();
-            headers.Set("svix-id", Request.Headers["svix-id"]);
-            headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
-            headers.Set("svix-signature", Request.Headers["svix-signature"]);
+                var headers = new WebHeaderCollection();
+                headers.Set("svix-id", Request.Headers["svix-id"]);
+                headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
+                headers.Set("svix-signature", Request.Headers["svix-signature"]);
           
-            var wh= new Webhook(SigningSecret);
+                var wh= new Webhook(SigningSecret);
            
                 wh.Verify(requestBody,headers);
            
@@ -107,8 +110,8 @@ namespace WebApiVRoom.Controllers
                         if(item.id== request.data.primary_email_address_id)
                         {
                             email.IsPrimary = true;
-                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
-                                item.email_address, ", Wellcome to VRoom! Your regestration on VRoom is successful.");
+                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                                item.email_address, " Wellcome to VRoom! Your regestration is successful.");
                         }
                         else
                             email.IsPrimary = false;
@@ -131,7 +134,7 @@ namespace WebApiVRoom.Controllers
                     {
                         if (item.id == request.data.primary_email_address_id)
                         {
-                            SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
                                 item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
                         }
                     }
@@ -429,33 +432,6 @@ namespace WebApiVRoom.Controllers
             return Ok();
         }
 
-        private void SendEmailMessage(string userName, string userEmail,string text)
-        {
-            try
-            {
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("VRoom Team", "vroomteamit@gmail.com"));
-                message.To.Add(new MailboxAddress(userName, userEmail));
-                message.Subject = "Wellcome to VRoom";
-
-                message.Body = new TextPart("plain")
-                {
-                    Text = userName + text
-                };
-
-                using (var client = new SmtpClient())
-                {
-                    client.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                    client.Authenticate("vroomteamit@gmail.com", "mrmb yara ecfw loqt");
-                    client.Send(message);
-                    client.Disconnect(true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка отправки email: {ex.Message}");
-            }
-        }
     }
         
 }

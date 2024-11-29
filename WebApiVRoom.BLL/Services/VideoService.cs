@@ -15,9 +15,7 @@ using Newtonsoft.Json;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
-using static WebApiVRoom.BLL.DTO.AddUserRequest;
+using WebApiVRoom.BLL.Helpers;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -729,7 +727,7 @@ namespace WebApiVRoom.BLL.Services
             return _mapper.Map<List<Video>, List<VideoDTO>>(v);
         }
 
-       public async Task SendNotificationsToSubscribers( Video video)
+        public async Task SendNotificationsToSubscribers( Video video)
         {
             List<Subscription> subscriptions = await _unitOfWork.Subscriptions.GetByChannelId(video.ChannelSettings.Id);
             foreach (var subscription in subscriptions) {
@@ -741,6 +739,13 @@ namespace WebApiVRoom.BLL.Services
                     notification.IsRead = false;
                     notification.Message = video.ChannelSettings.ChannelNikName + " new video " + video.VRoomVideoUrl; 
                     await _unitOfWork.Notifications.Add(notification);
+                }
+                if (subscription.Subscriber.EmailSubscribedOnMySubscriptionChannelActivity == true)
+                {
+                    Email email = await _unitOfWork.Emails.GetByUserPrimary(subscription.Subscriber.Clerk_Id);
+                    ChannelSettings channelSettings = await _unitOfWork.ChannelSettings.FindByOwner(subscription.Subscriber.Clerk_Id);
+                    SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName,  email.EmailAddress, 
+                        video.ChannelSettings.ChannelNikName + " new video " + video.VRoomVideoUrl);
                 }
             }
         }

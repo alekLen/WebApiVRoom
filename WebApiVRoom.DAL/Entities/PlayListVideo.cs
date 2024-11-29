@@ -8,6 +8,7 @@ namespace WebApiVRoom.DAL.Entities
 {
     public class PlayListVideo
     {
+        public int Id { get; set; } 
         public int PlayListId { get; set; }
         public PlayList PlayList { get; set; }
 

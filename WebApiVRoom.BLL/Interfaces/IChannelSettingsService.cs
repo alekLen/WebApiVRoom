@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +20,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<ChannelSettingsDTO> GetByUrl(string url);
         Task<ChannelSettingsDTO> GetByNikName(string nik);
         Task<bool> IsNickNameUnique(string nickName, int chSettingsId);
+        Task<List<DateTime>> GetUploadVideosCountByDateDiapasonAndChannel(DateTime start, DateTime end, int chId);
+        Task<List<DateTime>> GetUploadVideosCountByDateDiapason(DateTime start, DateTime end);
     }
 }

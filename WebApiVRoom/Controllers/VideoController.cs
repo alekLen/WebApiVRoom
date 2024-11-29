@@ -2,6 +2,7 @@
 using Google.Apis.YouTube.v3.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Web;
 using WebApiVRoom.BLL.DTO;
@@ -119,19 +120,22 @@ namespace WebApiVRoom.Controllers
     public class VideoController : ControllerBase
     {
         private readonly IVideoService _videoService;
+        private readonly IVideoViewsService _videoViewsService;
         private readonly IChannelSettingsService _chService;
         private ILikesDislikesVService _likesService;
         private readonly IHubContext<ChatHub> _hubContext;
         private IUserService _userService;
 
         public VideoController(IVideoService videoService, IChannelSettingsService _ch,
-            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService)
+            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext,
+            IUserService userService, IVideoViewsService videoViewsService)
         {
             _videoService = videoService;
             _chService = _ch;
             _hubContext = hubContext;
             _likesService = likesService;
             _userService = userService;
+            _videoViewsService = videoViewsService;
         }
 
         [HttpGet("getvideosorshortsbychannelidwithfilters")]
@@ -464,6 +468,23 @@ namespace WebApiVRoom.Controllers
 
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "viewed_video", payload = obj });
             return Ok();
+        }
+        [HttpPost("viewingduration")]
+        public async Task<ActionResult> ViewingDurationVideo([FromForm] ViewDurationRequest videoView)
+        {
+            try
+            {
+                VideoViewDTO v = new VideoViewDTO();
+                v.VideoId = int.Parse(videoView.VideoId);
+                v.ClerkId = videoView.ClerkId;
+                v.Duration = int.Parse(videoView.Duration);
+                v.Location = videoView.Location;
+                v.Date = DateTime.Parse(videoView.Date);
+                await _videoViewsService.AddVideoView(v);
+                return Ok();
+            }
+            catch { return BadRequest(); }
+           
         }
         private async Task<object> ConvertObject(VideoDTO video)
         {
