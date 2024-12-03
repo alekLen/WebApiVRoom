@@ -12,6 +12,7 @@ namespace WebApiVRoom.BLL.Interfaces
     {
         Task<SubtitleDTO> GetSubtitle(int id);
         Task<List<SubtitleDTO>> GetPublishedSubtitlesByVideo(int videoid);
+        Task<List<SubtitleDTO>> GetSubtitlesByVideo(int videoid);
         Task<List<SubtitleDTO>> GetNotPublishedSubtitlesByVideo(int videoid);
         Task AddSubtitle(SubtitleDTO emDTO, IFormFile fileVTT);
         Task<SubtitleDTO> UpdateSubtitle(SubtitleDTO emDTO, IFormFile fileVTT);

@@ -9,6 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
 {
     public interface ISubtitleRepository : ISetGetRepository<Subtitle>
     {
+        Task<List<Subtitle>> GetSubtitleByVideoId(int videoId);
         Task<List<Subtitle>> GetPublishedSubtitleByVideoId(int videoId);
         Task<List<Subtitle>> GetNotPublishedSubtitleByVideoId(int videoId);
     }

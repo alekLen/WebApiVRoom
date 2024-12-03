@@ -49,6 +49,14 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Video)
                 .ToListAsync();
         }
+
+        public async Task<List<Subtitle>> GetSubtitleByVideoId(int videoId)
+        {
+            return await db.Subtitles
+               .Include(v => v.Video)
+               .Where(v => v.Video.Id == videoId)
+               .ToListAsync();
+        }
         public async Task<List<Subtitle>> GetPublishedSubtitleByVideoId(int videoId)
         {
             return await db.Subtitles

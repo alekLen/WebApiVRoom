@@ -16,6 +16,13 @@ namespace WebApiVRoom.Controllers
         {
             _subService = subService;
         }
+        [HttpGet("getsubtitles/{videoid}")]
+        public async Task<ActionResult<List<SubtitleDTO>>> GetSubtitlesByVideo(int videoid)
+        {
+            var subs = await _subService.GetSubtitlesByVideo(videoid);
+
+            return new ObjectResult(subs);
+        }
 
         [HttpGet("getpublishsubtitles/{videoid}")]
         public async Task<ActionResult<List<SubtitleDTO>>> GetPublishedSubtitlesByVideo(int videoid)

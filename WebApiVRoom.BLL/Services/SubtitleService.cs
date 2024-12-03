@@ -43,7 +43,17 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { return null; }
         }
-       
+
+        public async Task<List<SubtitleDTO>> GetSubtitlesByVideo(int videoid)
+        {
+            try
+            {
+                List<Subtitle> em = await Database.Subtitles.GetSubtitleByVideoId(videoid);
+                return _mapper.Map<IEnumerable<Subtitle>, IEnumerable<SubtitleDTO>>(em).ToList();
+            }
+            catch (Exception ex) { return null; }
+        }
+
         public async Task<List<SubtitleDTO>> GetPublishedSubtitlesByVideo(int videoid)
         {
             try
