@@ -955,9 +955,10 @@ namespace WebApiVRoom.DAL.Migrations
                     { "music" },
                     { "trending" },
                     { "news" },
-                    {"games" },
+                    {"live" },
                     { "sport" },
                     { "films" },
+                    { "games" },
                     { "education" },
 
                  });
