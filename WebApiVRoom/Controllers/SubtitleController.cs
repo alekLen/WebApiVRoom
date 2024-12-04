@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
@@ -11,10 +13,13 @@ namespace WebApiVRoom.Controllers
     public class SubtitleController : Controller
     {
         private ISubtitleService _subService;
+        private readonly BlobServiceClient _blobServiceClient;
+        private readonly string _containerName;
 
-        public SubtitleController(ISubtitleService subService)
+        public SubtitleController(ISubtitleService subService,BlobServiceClient blobclient)
         {
             _subService = subService;
+            _blobServiceClient = blobclient;
         }
         [HttpGet("getsubtitles/{videoid}")]
         public async Task<ActionResult<List<SubtitleDTO>>> GetSubtitlesByVideo(int videoid)
@@ -23,6 +28,30 @@ namespace WebApiVRoom.Controllers
 
             return new ObjectResult(subs);
         }
+
+        [HttpGet("getsubtitlefile/{puthtofile}")]
+        public async Task<IActionResult> GetSubtitleFile(string puthtofile)
+        {
+           
+            try
+            {
+                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+
+                var blobClient = containerClient.GetBlobClient(puthtofile);
+        
+                var stream = new MemoryStream();
+                await blobClient.DownloadToAsync(stream);
+                stream.Position = 0; // Сбрасываем позицию потока
+
+                return File(stream, "text/vtt", Path.GetFileName(puthtofile));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ошибка при загрузке файла: {ex.Message}");
+            }
+        }
+
 
         [HttpGet("getpublishsubtitles/{videoid}")]
         public async Task<ActionResult<List<SubtitleDTO>>> GetPublishedSubtitlesByVideo(int videoid)

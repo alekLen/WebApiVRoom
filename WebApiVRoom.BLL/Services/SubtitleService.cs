@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -74,14 +75,26 @@ namespace WebApiVRoom.BLL.Services
         }
         public async Task AddSubtitle(SubtitleDTO emDTO, IFormFile fileVTT)
         {
-            Subtitle em = new Subtitle();
-            em.LanguageName = emDTO.LanguageName;
-            em.LanguageCode = emDTO.LanguageCode;
-            em.Video = await Database.Videos.GetById(emDTO.VideoId);
-            em.IsPublished = emDTO.IsPublished;
-            em.PuthToFile = await _videoService.UploadFileAsync(fileVTT);
-
-            await Database.Subtitles.Add(em);
+            Subtitle subtitle = await Database.Subtitles.GetById(emDTO.Id);
+            if (subtitle == null)
+            {
+                Subtitle em = new Subtitle();
+                em.LanguageName = emDTO.LanguageName;
+                em.LanguageCode = emDTO.LanguageCode;
+                em.Video = await Database.Videos.GetById(emDTO.VideoId);
+                em.IsPublished = emDTO.IsPublished;
+                em.PuthToFile = await _videoService.UploadFileAsync(fileVTT);
+                await Database.Subtitles.Add(em);
+            }
+            else
+            {
+                subtitle.LanguageName = emDTO.LanguageName;
+                subtitle.LanguageCode = emDTO.LanguageCode;
+                subtitle.Video = await Database.Videos.GetById(emDTO.VideoId);
+                subtitle.IsPublished = emDTO.IsPublished;
+                subtitle.PuthToFile = await _videoService.UploadFileAsync(fileVTT);
+                await Database.Subtitles.Update(subtitle);
+            }
         }
         public async Task<SubtitleDTO> UpdateSubtitle(SubtitleDTO emDTO,  IFormFile fileVTT)
         {
