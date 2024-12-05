@@ -25,10 +25,14 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                Tag tag = new Tag();
-                tag.Id = tagDTO.Id;
+                Tag tag = new Tag()
+                {
+                    Id = tagDTO.Id,
+                    Name = tagDTO.Name
 
-                tag.Name = tagDTO.Name;
+
+                };
+
                 List<Video> list = new();
 
                 foreach (int id in tagDTO.VideosId)
