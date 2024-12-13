@@ -134,5 +134,16 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(list);
         }
+        [HttpGet("getlatestvideohistorybyuseridpaginated/{pageNumber}/{pageSize}/{clerk_id}")]
+        public async Task<ActionResult<List<VideoHistoryItem>>> GetLatestVideoHistoryByUserIdPaginated([FromRoute] int pageNumber, [FromRoute] int pageSize, [FromRoute] string clerk_id)
+        {
+
+            List<VideoHistoryItem> list = await _hbService.GetLatestVideoHistoryByUserIdPaginated(pageNumber, pageSize, clerk_id);
+            if (list == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(list);
+        }
     }
 }

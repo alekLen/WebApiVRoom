@@ -25,6 +25,7 @@ namespace WebApiVRoom.DAL.Repositories
         private CountryRepository countryRepository;
         private LanguageRepository languageRepository;
         private ChannelSettingsRepository channelSettingsRepository;
+        private ChannelSectionsRepository channelSectionsRepository;
         private HistoryOfBrowsingRepository historyOfBrowsingRepository;
         private NotificationRepository notificationRepository;
         private PlayListRepository playListRepository;
@@ -243,6 +244,15 @@ namespace WebApiVRoom.DAL.Repositories
                 if (channelSettingsRepository == null)
                     channelSettingsRepository = new ChannelSettingsRepository(db);
                 return channelSettingsRepository;
+            }
+        }
+        public IChannelSectionRepository ChannelSections
+        {
+            get
+            {
+                if (channelSectionsRepository == null)
+                    channelSectionsRepository = new ChannelSectionsRepository(db);
+                return channelSectionsRepository;
             }
         }
         public IHistoryOfBrowsingRepository HistoryOfBrowsings

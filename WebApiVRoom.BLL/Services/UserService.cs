@@ -51,7 +51,7 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
- 
+
 
         public async Task<UserDTO> GetUser(int id)
         {
@@ -66,12 +66,12 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        public async Task<UserDTO> AddUser(string clerk_id,string imgurl)
+        public async Task<UserDTO> AddUser(string clerk_id, string imgurl)
         {
             User user = new()
             {
                 Clerk_Id = clerk_id,
-                SubscribedOnRecomendedVideo =true,
+                SubscribedOnRecomendedVideo = true,
                 SubscribedOnMySubscriptionChannelActivity = true,
                 SubscribedOnActivityOnMyChannel = true,
                 SubscribedOnOnActivityOnMyComments = true,
@@ -92,15 +92,19 @@ namespace WebApiVRoom.BLL.Services
             Language langNew = new();
             Country countryNew = new();
 
+
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
-           
+
             user.ChannelSettings_Id = channelSettings.Id;
 
             await Database.Users.Update(user);
             channelSettings.ChannelName = "VRoom_Channel" + (channelSettings.Id + 1000);
-            channelSettings.ChannelNikName = "VRoom_Channel" +( channelSettings.Id+1000) ;
+            channelSettings.ChannelNikName = "VRoom_Channel" + (channelSettings.Id + 1000);
             channelSettings.Channel_URL = "http://localhost:3000/gotochannel/" + channelSettings.Id;
             await Database.ChannelSettings.Update(channelSettings);
+
+            await CreateChannelSectionsV2(channelSettings.Id, channelSettings);//
+
 
             var mapper = InitializeMapper();
             var updatedUserDto = mapper.Map<User, UserDTO>(user);
@@ -117,7 +121,7 @@ namespace WebApiVRoom.BLL.Services
             return mapper.Map<User, UserDTO>(user);
         }
 
-        private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user,  string imgurl)
+        private async Task<ChannelSettings> CreateChannelSettings(Language l, Country c, User user, string imgurl)
         {
             ChannelSettings channelSettings = new()
             {
@@ -125,13 +129,71 @@ namespace WebApiVRoom.BLL.Services
                 Language = l,
                 Country = c,
                 Owner = user,
-               ChannelBanner = imgurl,
-               ChannelPlofilePhoto = imgurl,
+                ChannelBanner = imgurl,
+                ChannelPlofilePhoto = imgurl,
             };
 
             await Database.ChannelSettings.Add(channelSettings);
             return channelSettings;
+        }
 
+
+        private async Task CreateChannelSectionsV2(int channelSettingsId, ChannelSettings channelSettings)
+        {
+            try
+            {
+                List<string> defaultSections = new List<string>()// Список предопределённых разделов
+                {
+                    "home", "Video", "shorts", "Broadcasts", "playlists",
+                    "posts", "about", "PinnedVideoSection", "subscriptionsSection"
+                };
+
+                var allGlobalSections = await Database.ChannelSections.GetAllChSection();  // Получаем все глобальные разделы из базы
+
+                
+                var matchedSections = allGlobalSections// Разделяем глобальные разделы на два списка: совпадающие и остальные
+                    .Where(gs => defaultSections.Contains(gs.Title))
+                    .ToList();
+
+                var remainingSections = allGlobalSections
+                    .Where(gs => !defaultSections.Contains(gs.Title))
+                    .ToList();
+
+                List<ChannelSection> channelSections = new List<ChannelSection>();// Создаём список разделов канала из совпадающих
+                int pos = 1;
+                foreach (var section in matchedSections)
+                {
+                    channelSections.Add(new ChannelSection
+                    {
+                        ChSection = section,
+                        ChSectionId = section.Id,
+                        Channel_Settings = channelSettings,
+                        ChannelSettingsId = channelSettingsId,
+                        IsVisible = true,
+                        Order = pos++
+                    });
+                }
+
+                foreach (var section in remainingSections)// Обрабатываем оставшиеся разделы, если требуется
+                {
+                    channelSections.Add(new ChannelSection
+                    {
+                        ChSection = section,
+                        ChSectionId = section.Id,
+                        Channel_Settings = channelSettings,
+                        ChannelSettingsId = channelSettingsId,
+                        IsVisible = false, 
+                        Order = 0
+                    });
+                }
+
+                // Добавляем все разделы в базу данных
+                await Database.ChannelSections.AddRangeChannelSectionsByClerkId(channelSettingsId, channelSections);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreateChannelSections: {ex.Message}");
+            }
         }
 
         private async Task<Language> FindLanguage(string language)
@@ -169,7 +231,7 @@ namespace WebApiVRoom.BLL.Services
 
             return updatedUserDto;
         }
-      
+
         public async Task<UserDTO> UpdateUser(UserDTO userDto)
         {
             try
@@ -201,7 +263,7 @@ namespace WebApiVRoom.BLL.Services
                 user.SubscribedOnMainEmailNotifications = userDto.SubscribedOnMainEmailNotifications;
 
 
-        await Database.Users.Update(user);
+                await Database.Users.Update(user);
 
                 var mapper = InitializeMapper();
                 var updatedUserDto = mapper.Map<User, UserDTO>(user);
@@ -228,7 +290,7 @@ namespace WebApiVRoom.BLL.Services
             return deletedUserDto;
         }
 
-      
+
         public async Task<IEnumerable<UserDTO>> GetAllUsersPaginated(int pageNumber, int pageSize)
         {
             try
@@ -260,7 +322,7 @@ namespace WebApiVRoom.BLL.Services
                     return mapper.Map<User, UserDTO>(user);
                 }
                 return null;
-                
+
             }
             catch (Exception ex)
             {
@@ -273,7 +335,7 @@ namespace WebApiVRoom.BLL.Services
             try
             {
 
-                  Post post = await Database.Posts.GetById(postId);
+                Post post = await Database.Posts.GetById(postId);
                 ChannelSettings ch = await Database.ChannelSettings.GetById(post.ChannelSettings.Id);
 
                 User user = await Database.Users.GetById(ch.Owner.Id);
@@ -302,7 +364,7 @@ namespace WebApiVRoom.BLL.Services
 
         public async Task<List<DateTime>> GetUsersByDateDiapason(DateTime start, DateTime end)
         {
-           var users = await Database.Users.GetUsersByDiapason(start,end);            
+            var users = await Database.Users.GetUsersByDiapason(start, end);
             return users.ToList();
         }
     }
