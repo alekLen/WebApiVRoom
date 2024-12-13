@@ -91,10 +91,10 @@ namespace WebApiVRoom.Controllers
           
             var wh= new Webhook(SigningSecret);
            
-                wh.Verify(requestBody,headers);
-           
-                var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
-           
+            wh.Verify(requestBody,headers);
+            
+            var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
+            
             if (request.type == "user.created")
             {
                 UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);

@@ -58,6 +58,27 @@ namespace WebApiVRoom.Controllers
             await _contentReportService.Process(id, adminId);
             return Ok();
         }
+        
+        [HttpPut("{id}/reopen")]
+        public async Task<IActionResult> ReOpen([FromRoute] int id)
+        {
+            await _contentReportService.ReOpen(id);
+            return Ok();
+        }
+        
+        [HttpPost("{id}/answer")]
+        public async Task<IActionResult> AdminAnswer([FromRoute] int id, [FromBody] ContentReportAnserDTO answer)
+        {
+            await _contentReportService.AdminAnswer(id, answer.Answer);
+            return Ok();
+        }
+        
+        [HttpGet("{clerkId}/my-reports")]
+        public async Task<IActionResult> GetByUser([FromRoute] string clerkId)
+        {
+            var contentReports = await _contentReportService.GetByUser(clerkId, 1, 100);
+            return Ok(contentReports);
+        }
 
     }
 }

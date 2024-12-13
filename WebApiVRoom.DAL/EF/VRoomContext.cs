@@ -53,7 +53,6 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<ContentReport> ContentReports { get; set; }
         public DbSet<Ad> Ads { get; set; }
         public DbSet<AdminLog> AdminLogs { get; set; }
-        
     }
 }
 

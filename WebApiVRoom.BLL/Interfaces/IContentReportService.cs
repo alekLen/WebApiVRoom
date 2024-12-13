@@ -28,6 +28,10 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task<IEnumerable<ContentReportDTO>> GetAll();
 
-        Task<IEnumerable<ContentReportDTO>> GetByUser(int userId, int page, int pageSize);
+        Task<IEnumerable<ContentReportDTO>> GetByUser(string userId, int page, int pageSize);
+        
+        Task AdminAnswer(int id, string adminAnswer);
+        
+        Task ReOpen(int id);
     }
 }

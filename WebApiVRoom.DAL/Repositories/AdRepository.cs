@@ -65,5 +65,10 @@ namespace WebApiVRoom.DAL.Repositories
             db.Ads.Remove(ad);
             await db.SaveChangesAsync();
         }
+        
+        public async Task<int> Count(string searchQuery)
+        {
+            return await db.Ads.CountAsync(x => searchQuery == null || x.Title.Contains(searchQuery) || x.Id == int.Parse(searchQuery) || x.Description.Contains(searchQuery));
+        }
     }
 }
