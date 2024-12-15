@@ -53,7 +53,16 @@ namespace WebApiVRoom.BLL.Services
             });
             return new Mapper(config);
         }
-
+        public static IMapper InitializeListMapper2()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<ChannelSectionDTO, DAL.Entities.ChannelSection>()
+                    .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.Channel_SettingsId))
+                    .ForMember(dest => dest.ChSectionId, opt => opt.MapFrom(src => src.ChSectionId));
+            });
+            return new Mapper(config);
+        }
         public async Task AddRangeChannelSectionsByClerkId(string clerkId, List<ChannelSectionDTO> t)
         {
             try
@@ -78,29 +87,34 @@ namespace WebApiVRoom.BLL.Services
             catch (Exception ex) { throw ex; }
         }
 
-
-        public async Task UpdateRangeChannelSectionsByClerkId(string clerkId, List<ChannelSectionDTO> t)
+        public async Task UpdateRangeChannelSectionsByClerkId(string clerkId, List<ChannelSectionDTO> updatedSections)
         {
             try
             {
-                var chsettings = await Database.ChannelSettings.FindByOwner(clerkId);
-                if (t.Count > 8)
-                    throw new ArgumentException("Cannot have more than 8 sections.");
-                //    await Database.ChannelSections.Add(channelSections);
+                var channelSettings = await Database.ChannelSettings.FindByOwner(clerkId);
 
+                if (channelSettings == null)
+                {
+                    throw new ArgumentException("Channel settings not found for the given clerkId.");
+                }
 
-                var mapper = InitializeListMapper();
-                var ChannelSectionsDto = mapper.Map<List<ChannelSectionDTO>, List<DAL.Entities.ChannelSection>>(t).ToList();
+                var visibleCount = updatedSections.Count(s => s.IsVisible);
+                if (visibleCount > 8)
+                {
+                    throw new ArgumentException("Cannot have more than 8 visible sections.");
+                }
 
+                var mapper = InitializeListMapper2();
+                var channelSections = mapper.Map<List<ChannelSectionDTO>, List<DAL.Entities.ChannelSection>>(updatedSections);
 
-
-                await Database.ChannelSections.UpdateRangeChannelSectionsByClerkId(chsettings.Id, ChannelSectionsDto);
-
-
-                //return ChannelSectionsDto;
+                await Database.ChannelSections.UpdateRangeChannelSectionsByClerkId(channelSettings.Id, channelSections);
             }
-            catch (Exception ex) { throw ex; }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to update channel sections.", ex);
+            }
         }
+
         public async Task<List<ChannelSectionDTO>> FindChannelSectionsByChannelOwnerId(string channelOwnerId)
         {
             try

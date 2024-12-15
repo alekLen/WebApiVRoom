@@ -46,36 +46,72 @@ namespace WebApiVRoom.DAL.Repositories
         }
 
 
-        public async Task UpdateRangeChannelSectionsByClerkId(int channelSettingsId, List<ChannelSection> t)
+        public async Task UpdateRangeChannelSectionsByClerkId(int channelSettingsId, List<ChannelSection> updatedSections)
         {
             if (channelSettingsId == null)
             {
                 throw new ArgumentNullException(nameof(channelSettingsId));
             }
 
-            if (t == null)
+            if (updatedSections == null)
             {
-                throw new ArgumentNullException(nameof(t));
+                throw new ArgumentNullException(nameof(updatedSections));
             }
 
-            var existingSections = await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection)
-            .Where(us => us.ChannelSettingsId == channelSettingsId).ToListAsync();
-
-            foreach (var updatedSection in t)// Синхронизируем изменения в существующих разделах
+            // Получаем существующие записи для данного channelSettingsId
+            var existingSections = await db.ChannelSections
+                .Include(cs => cs.Channel_Settings)
+                .Include(cs => cs.ChSection)
+                .Where(cs => cs.ChannelSettingsId == channelSettingsId)
+                .ToListAsync();
+            var newSections = new List<ChannelSection>();
+            // Синхронизация обновляемых и существующих разделов
+            foreach (var updatedSection in updatedSections)
             {
-                var existingSection = existingSections.FirstOrDefault(es => es.ChSectionId == updatedSection.ChSection.Id);
+                var existingSection = existingSections.FirstOrDefault(es => es.ChSectionId == updatedSection.ChSectionId);
                 if (existingSection != null)
                 {
+                    // Обновляем свойства для существующих записей
                     existingSection.Order = updatedSection.Order;
                     existingSection.IsVisible = updatedSection.IsVisible;
                 }
+                else
+                {
+                    // Добавляем новые записи, которых нет в базе
+                    newSections.Add(new ChannelSection
+                    {
+                        ChannelSettingsId = channelSettingsId,
+                        ChSectionId = updatedSection.ChSection.Id,
+                        Order = updatedSection.Order,
+                        IsVisible = updatedSection.IsVisible
+                    });
+                }
             }
 
-            if (t.Any())// Применяем изменения
+            // Удаление разделов, отсутствующих в обновленных данных
+            var updatedSectionIds = updatedSections.Select(us => us.ChSectionId).ToHashSet();
+            var sectionsToRemove = existingSections
+                .Where(es => !updatedSectionIds.Contains(es.ChSectionId))
+                .ToList();
+
+            foreach (var sectionToRemove in sectionsToRemove)
+            {
+                sectionToRemove.IsVisible = false;
+                sectionToRemove.Order = 0;
+            } 
+            
+            // Обновляем существующие записи
+            if (existingSections.Any())
             {
                 db.ChannelSections.UpdateRange(existingSections);
-                await db.SaveChangesAsync();
             }
+            // Добавляем новые записи в базу
+            if (newSections.Any())
+            {
+                await db.ChannelSections.AddRangeAsync(newSections);
+            }
+            // Применяем изменения
+            await db.SaveChangesAsync();
         }
         public async Task<ChannelSection> GetChannelSectionsById(int id)
         {

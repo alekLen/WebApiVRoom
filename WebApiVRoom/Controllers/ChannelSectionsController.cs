@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -28,6 +29,13 @@ namespace WebApiVRoom.Controllers
             return Ok(sections);
         }
 
+        [HttpGet("sections/{channelOwnerId}")]
+        public async Task<IActionResult> GetAllChannelSectionsByClerkId(string channelOwnerId)
+        {
+            var sections = await _chsService.GetAvailableChannelSectionsByChannelOwnerId(channelOwnerId);
+            return Ok(sections);
+        }
+
         [HttpGet("user/{channelOwnerId}")]
         public async Task<IActionResult> GetUserSections(string channelOwnerId)
         {
@@ -37,14 +45,14 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateChannelSections([FromQuery] string clerkId, [FromBody] List<ChannelSectionDTO> chs)
+        public async Task<IActionResult> UpdateChannelSections([FromForm] string clerkId, [FromForm] string chs)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-            await _chsService.UpdateRangeChannelSectionsByClerkId(clerkId, chs);
+            List<ChannelSectionDTO> sectionDTOs = JsonConvert.DeserializeObject<List<ChannelSectionDTO>>(chs);
+            await _chsService.UpdateRangeChannelSectionsByClerkId(clerkId, sectionDTOs);
 
             return Ok();
         }
@@ -77,7 +85,21 @@ namespace WebApiVRoom.Controllers
             }
             catch (Exception ex) { return BadRequest(ModelState); }
         }
+        [HttpGet("getallglobalchannelsection")]
+        public async Task<ActionResult<ChSectionDTO>> GetAllChSection()
+        {
+            try
+            {
+                var chs = await _chsService.GetAllChSection();
+                if (chs == null)
+                {
+                    return NotFound();
+                }
 
+                return new ObjectResult(chs);
+            }
+            catch (Exception ex) { return BadRequest(ModelState); }
+        }
         [HttpPost("addglobalchsection")]
         public async Task<ActionResult<ChSectionDTO>> AddChSettings([FromForm] ChSectionDTO chs)
         {
