@@ -34,10 +34,10 @@ builder.Services.AddSingleton(x => {
     return new BlobServiceClient(connectionString);
 });
 
-if (string.IsNullOrEmpty(blobStorageConnectionString))
-{
-    throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
-}
+//if (string.IsNullOrEmpty(blobStorageConnectionString))
+//{
+//    throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
+//}
 
 builder.Services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
 
@@ -126,10 +126,10 @@ if (app.Environment.IsDevelopment())
 }
 
 // Enable CORS
-app.UseCors(builder => builder.WithOrigins("http://localhost:3000")
+app.UseCors(builder => builder.AllowAnyOrigin()
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials());
+                        );
 
 app.UseHttpsRedirection();
 

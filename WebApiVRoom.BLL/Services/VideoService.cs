@@ -16,6 +16,7 @@ using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using WebApiVRoom.BLL.Helpers;
+using Azure.Storage.Blobs.Models;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -302,6 +303,28 @@ namespace WebApiVRoom.BLL.Services
                      Categories = categories,
                   };
         }
+
+        //public async Task<File> GetSubtitleFile(string puthtofile)
+        //{
+
+        //    try
+        //    {
+        //        var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+        //        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+        //        var decodedUrl = Uri.UnescapeDataString(puthtofile);
+        //        var blobClient = containerClient.GetBlobClient(decodedUrl);
+
+        //        var stream = new MemoryStream();
+        //        await blobClient.DownloadToAsync(stream);
+        //        stream.Position = 0; // Сбрасываем позицию потока
+
+        //        return File(stream, "text/vtt", Path.GetFileName(decodedUrl));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
 
         public async Task<string> UploadFileAsync(IFormFile file)
         {

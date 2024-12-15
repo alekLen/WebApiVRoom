@@ -2,6 +2,8 @@
 using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Org.BouncyCastle.Ocsp;
+using System;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -14,12 +16,16 @@ namespace WebApiVRoom.Controllers
     {
         private ISubtitleService _subService;
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly string _containerName;
 
-        public SubtitleController(ISubtitleService subService,BlobServiceClient blobclient)
+        public SubtitleController(ISubtitleService subService,BlobServiceClient blobclient,
+             IBlobStorageService blobStorageService, IConfiguration configuration)
         {
             _subService = subService;
             _blobServiceClient = blobclient;
+            _containerName = configuration.GetConnectionString("ContainerName");
+            _blobStorageService = blobStorageService;   
         }
         [HttpGet("getsubtitles/{videoid}")]
         public async Task<ActionResult<List<SubtitleDTO>>> GetSubtitlesByVideo(int videoid)
@@ -32,25 +38,28 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getsubtitlefile/{puthtofile}")]
         public async Task<IActionResult> GetSubtitleFile(string puthtofile)
         {
-           
             try
             {
+                var decodedUrl = Uri.UnescapeDataString(puthtofile);
+                string fileName = Path.GetFileName(decodedUrl);
                 var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
-
-                var blobClient = containerClient.GetBlobClient(puthtofile);
-        
+                var blobClient = containerClient.GetBlobClient(fileName);
+                if (!await blobClient.ExistsAsync())
+                {
+                    return NotFound($"Файл не найден: {fileName}");
+                }
                 var stream = new MemoryStream();
                 await blobClient.DownloadToAsync(stream);
                 stream.Position = 0; // Сбрасываем позицию потока
 
-                return File(stream, "text/vtt", Path.GetFileName(puthtofile));
+                return File(stream, "text/vtt", Path.GetFileName(fileName));
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Ошибка при загрузке файла: {ex.Message}");
             }
         }
+
 
 
         [HttpGet("getpublishsubtitles/{videoid}")]
