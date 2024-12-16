@@ -77,7 +77,7 @@ namespace WebApiVRoom.DAL.Repositories
             }
             else
             {
-                db.VideoViews.Update(u);
+                db.VideoViews.Update(tag);
                 await db.SaveChangesAsync();
             }
         }

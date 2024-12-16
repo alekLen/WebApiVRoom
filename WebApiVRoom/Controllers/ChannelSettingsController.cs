@@ -35,16 +35,22 @@ namespace WebApiVRoom.Controllers
         {
             try {  
             var ch = await _chService.GetChannelSettings(id);
+            string name = ch.ChannelName;
             if (ch == null)
             {
                 return NotFound();
             }
             UserDTO u= await _uService.GetUser(ch.Owner_Id);
+                if (ch.ChannelNikName!= null)
+                {
+                    name = ch.ChannelNikName;   
+                }
             ChannelUserFor_CommentDTO user = new()
             {
                 Clerk_Id =u.Clerk_Id,
                 ChannelBanner = ch.ChannelBanner,
                 ChannelName = ch.ChannelName,
+                ChannelNikName = name,
                 ChannelProfilePhoto = ch.ChannelProfilePhoto,
                 Channel_URL = ch.Channel_URL,
                 ChannelNikName = ch.ChannelNikName,
@@ -73,16 +79,22 @@ namespace WebApiVRoom.Controllers
             try
             {
                 var ch = await _chService.FindByOwner(clerkId);
+                string name = ch.ChannelName;
                 if (ch == null)
                 {
                     return NotFound();
                 }
-
+                if (ch.ChannelNikName != null)
+                {
+                    name = ch.ChannelNikName;
+                }
                 ChannelUserFor_CommentDTO user = new()
                 {
                     Clerk_Id = clerkId,
                     ChannelBanner = ch.ChannelBanner,
                     ChannelName = ch.ChannelName,
+                    ChannelNikName = name,
+                    ChannelProfilePhoto = ch.ChannelProfilePhoto
                     ChannelProfilePhoto = ch.ChannelProfilePhoto,
                     Channel_URL = ch.Channel_URL,
                     ChannelNikName= ch.ChannelNikName,

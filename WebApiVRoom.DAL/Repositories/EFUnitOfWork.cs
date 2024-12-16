@@ -45,11 +45,22 @@ namespace WebApiVRoom.DAL.Repositories
         private VideoViewsRepository videoViewsRepository;
         private ContentReportRepository contentReportsRepository;
         private AdRepository adRepository;
-        private AdminLogRepository adminLogRepository;
+        private AdminLogRepository adminLogRepository; 
+        private SubtitleRepository subtitleRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
+        }
+
+        public ISubtitleRepository Subtitles
+        {
+            get
+            {
+                if (subtitleRepository == null)
+                    subtitleRepository = new SubtitleRepository(db);
+                return subtitleRepository;
+            }
         }
 
         public IEmailRepository Emails

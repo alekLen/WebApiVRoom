@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiVRoom.DAL.EF;
 
@@ -11,9 +12,11 @@ using WebApiVRoom.DAL.EF;
 namespace WebApiVRoom.DAL.Migrations
 {
     [DbContext(typeof(VRoomContext))]
-    partial class VRoomContextModelSnapshot : ModelSnapshot
+    [Migration("20241129201803_HistoryOfBrowsingGroupDate")]
+    partial class HistoryOfBrowsingGroupDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

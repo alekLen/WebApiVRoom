@@ -36,5 +36,6 @@ namespace WebApiVRoom.DAL.Entities
         public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
         public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>();
         public TimeSpan LastViewedPosition { get; set; }
+        public List<Subtitle> Subtitles { get; set; } = new List<Subtitle>();
     }
 }
