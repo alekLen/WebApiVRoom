@@ -77,6 +77,13 @@ namespace WebApiVRoom.Controllers
 
             return new ObjectResult(subs);
         }
+        [HttpDelete("delete/{subtitleid}")]
+        public async Task<ActionResult<List<SubtitleDTO>>> DeleteSubtitle(int subtitleid)
+        {
+             await _subService.DeleteSubtitle(subtitleid);
+
+            return Ok();
+        }
 
 
         [HttpPost("add")]

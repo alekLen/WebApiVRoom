@@ -72,6 +72,12 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.Video)
                 .FirstOrDefaultAsync(m => m.Id == id);
         }
+        public async Task<Subtitle> GetByUrl(string path)
+        {
+            return await db.Subtitles
+                .Include(v => v.Video)
+                .FirstOrDefaultAsync(m => m.PuthToFile == path);
+        }
 
         public async Task Update(Subtitle s)
         {

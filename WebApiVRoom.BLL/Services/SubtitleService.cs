@@ -75,7 +75,7 @@ namespace WebApiVRoom.BLL.Services
         }
         public async Task AddSubtitle(SubtitleDTO emDTO, IFormFile fileVTT)
         {
-            Subtitle subtitle = await Database.Subtitles.GetById(emDTO.Id);
+            Subtitle subtitle = await Database.Subtitles.GetByUrl(emDTO.PuthToFile);
             if (subtitle == null)
             {
                 Subtitle em = new Subtitle();
