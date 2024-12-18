@@ -68,6 +68,13 @@ namespace WebApiVRoom.BLL.Services
 
         public async Task<UserDTO> AddUser(string clerk_id, string imgurl)
         {
+           // Проверка на существующего пользователя
+            var existingUser = await Database.Users.GetByClerk_Id(clerk_id);
+            if (existingUser != null)
+            {
+                var mappert = InitializeMapper();
+                return mappert.Map<User, UserDTO>(existingUser);
+            }
             User user = new()
             {
                 Clerk_Id = clerk_id,
