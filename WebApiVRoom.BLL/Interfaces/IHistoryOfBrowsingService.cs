@@ -16,6 +16,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<HistoryOfBrowsingDTO> Delete(int id);
         Task<List<HistoryOfBrowsingDTO>> GetByUserId(string userId);
         Task<List<HistoryOfBrowsingDTO>> GetByUserIdPaginated(int pageNumber, int pageSize, string userId);
+        Task<List<VideoHistoryItem>> GetLatestVideoHistoryByUserIdPaginated(int pageNumber, int pageSize, string clerkId);
         Task<List<HistoryOfBrowsingGroupDateDTO>> GetAllHistoryByIdGroupedByDate(string clerkId);
     }
 }

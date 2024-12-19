@@ -33,6 +33,7 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<ChannelSettings, ChannelSettingsDTO>()
+                .ForMember(dest => dest.ChannelSections, opt => opt.MapFrom(src => src.ChannelSections.Select(v => v.Id).ToList()))
                     .ForMember(dest => dest.Owner_Id, opt => opt.MapFrom(src => src.Owner.Id))
                     .ForMember(dest => dest.Language_Id, opt => opt.MapFrom(src => src.Language.Id))
                     .ForMember(dest => dest.Country_Id, opt => opt.MapFrom(src => src.Country.Id))
@@ -113,6 +114,8 @@ namespace WebApiVRoom.BLL.Services
                 }
 
                 channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);
+                //channelSettings.ChannelSections = await Database.ChannelSections.GetChannelSectionsAsync(channelSettings.Owner.Clerk_Id);
+                
                 channelSettings.Language = await Database.Languages.GetById(chDto.Language_Id);
                 channelSettings.Country = await Database.Countries.GetById(chDto.Country_Id);
                 channelSettings.Videos = await Database.Videos.GetByIds(chDto.Videos);

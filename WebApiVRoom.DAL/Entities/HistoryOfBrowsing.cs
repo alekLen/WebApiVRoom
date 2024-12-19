@@ -13,5 +13,6 @@ namespace WebApiVRoom.DAL.Entities
         public Video Video { get; set; }
         public DateTime Date {  get; set; }
         public int TimeCode { get; set; }
+        public ChannelSettings ChannelSettings { get; set; }
     }
 }
