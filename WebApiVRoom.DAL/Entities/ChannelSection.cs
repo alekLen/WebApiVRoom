@@ -12,7 +12,7 @@ namespace WebApiVRoom.DAL.Entities
         public ChannelSettings Channel_Settings { get; set; }
         public int ChannelSettingsId { get; set; }//  Внешний ключ
 
-        public int ChSectionId { get; set; } // Ссылка на глобальный раздел
+        public int SectionId { get; set; } // Ссылка на глобальный раздел
         public ChSection ChSection { get; set; }
         public int Order { get; set; } // Порядок
         public bool IsVisible { get; set; } // Отображается ли раздел

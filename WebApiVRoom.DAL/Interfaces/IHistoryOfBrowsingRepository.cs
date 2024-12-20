@@ -8,6 +8,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<HistoryOfBrowsing>> GetByIds(List<int> ids);
 
         Task<IEnumerable<HistoryOfBrowsing>> GetLatestVideoHistoryByUserIdPaginated(int pageNumber, int pageSize, int userId);
+        Task<HistoryOfBrowsing> GetByUserIdAndVideoId(string userId, int videoId);
         //Task<List<HistoryOfBrowsingGroupDate>> GetAllHistoryByIdGroupedByDate(int userId);
     }
 }

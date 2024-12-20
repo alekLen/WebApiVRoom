@@ -53,25 +53,34 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                User user = await Database.Users.GetByClerk_Id(hb.UserId);
-                Video video = await Database.Videos.GetById(hb.VideoId);
-                ChannelSettings channelSettings = await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
-
-                HistoryOfBrowsing hbr = new HistoryOfBrowsing()
+                 HistoryOfBrowsing hashbr = await Database.HistoryOfBrowsings.GetByUserIdAndVideoId(hb.UserId, hb.VideoId);
+                if (hashbr == null)
                 {
-                    Date = DateTime.Now,
-                    User = user,
-                    Video = video,
-                    TimeCode = hb.TimeCode,
-                    ChannelSettings = channelSettings
-                };
+                    User user = await Database.Users.GetByClerk_Id(hb.UserId);
+                    Video video = await Database.Videos.GetById(hb.VideoId);
+                    ChannelSettings channelSettings = await Database.ChannelSettings.GetById(video.ChannelSettings.Id);
 
-                await Database.HistoryOfBrowsings.Add(hbr);
+                    HistoryOfBrowsing hbr = new HistoryOfBrowsing()
+                    {
+                        Date = DateTime.Now,
+                        User = user,
+                        Video = video,
+                        TimeCode = hb.TimeCode,
+                        ChannelSettings = channelSettings
+                    };
 
-                var mapper = InitializeMapper();
-                var HistoryOfBrowsingDto = mapper.Map<HistoryOfBrowsing, HistoryOfBrowsingDTO>(hbr);
+                    await Database.HistoryOfBrowsings.Add(hbr);
+                    var mapper = InitializeMapper();
+                    var HistoryOfBrowsingDto = mapper.Map<HistoryOfBrowsing, HistoryOfBrowsingDTO>(hbr);
 
-                return HistoryOfBrowsingDto;
+                    return HistoryOfBrowsingDto;
+                }
+                else
+                {
+                    await Update(hb);
+                }
+
+                return hb;
             }
             catch (Exception ex) { throw ex; }
         }

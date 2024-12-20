@@ -108,5 +108,13 @@ namespace WebApiVRoom.DAL.Repositories
                            .Where(h => h.User.Id == userId)
                            .ToListAsync();
         }
+
+        public async Task<HistoryOfBrowsing> GetByUserIdAndVideoId(string userId, int videoId )
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
+                           .Where(h => h.User.Clerk_Id == userId)
+                            .Where(h => h.Video.Id == videoId)
+                           .FirstOrDefaultAsync();
+        }
     }
 }

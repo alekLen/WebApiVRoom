@@ -59,7 +59,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<ChannelSectionDTO, DAL.Entities.ChannelSection>()
                     .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.Channel_SettingsId))
-                    .ForMember(dest => dest.ChSectionId, opt => opt.MapFrom(src => src.ChSectionId));
+                    .ForMember(dest => dest.SectionId, opt => opt.MapFrom(src => src.ChSectionId));
             });
             return new Mapper(config);
         }
@@ -187,7 +187,7 @@ namespace WebApiVRoom.BLL.Services
                 var globalSections = await Database.ChannelSections.GetAllChSection();
                 var userSections = await Database.ChannelSections.FindChannelSectionsByChannelOwnerId(channelOwnerId);
 
-                var globSections = globalSections.Where(gs => !userSections.Any(us => us.ChSectionId == gs.Id && us.IsVisible))
+                var globSections = globalSections.Where(gs => !userSections.Any(us => us.SectionId == gs.Id && us.IsVisible))
                     .ToList();
 
                 var mapper = InitializeMapperCh();

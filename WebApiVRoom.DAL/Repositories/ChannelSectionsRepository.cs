@@ -19,30 +19,34 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task AddRangeChannelSectionsByClerkId(int channelSettingsId, List<ChannelSection> t)
         {
-            if (channelSettingsId == null)
+            try
             {
-                throw new ArgumentNullException(nameof(channelSettingsId));
-            }
+                if (channelSettingsId == null)
+                {
+                    throw new ArgumentNullException(nameof(channelSettingsId));
+                }
 
-            if (t == null)
-            {
-                throw new ArgumentNullException(nameof(t));
-            }
-            // Привязываем UserId ко всем новым разделам
-            t.ForEach(section => section.ChannelSettingsId = channelSettingsId);
+                if (t == null)
+                {
+                    throw new ArgumentNullException(nameof(t));
+                }
+                // Привязываем UserId ко всем новым разделам
+                t.ForEach(section => section.ChannelSettingsId = channelSettingsId);
 
-            if (t.Any())
-            {
-                await db.ChannelSections.AddRangeAsync(t);
+                if (t.Any())
+                {
+                    await db.ChannelSections.AddRangeAsync(t);
+                    await db.SaveChangesAsync();
+                }
+
+                var existingSections = await db.ChannelSections
+                .Where(us => us.ChannelSettingsId == channelSettingsId)
+                .ToListAsync();
+
+                db.ChannelSections.UpdateRange(existingSections);
                 await db.SaveChangesAsync();
             }
-
-            var existingSections = await db.ChannelSections
-            .Where(us => us.ChannelSettingsId == channelSettingsId)
-            .ToListAsync();
-
-            db.ChannelSections.UpdateRange(existingSections);
-            await db.SaveChangesAsync();
+            catch (Exception ex) {  }
         }
 
 
@@ -68,7 +72,7 @@ namespace WebApiVRoom.DAL.Repositories
             // Синхронизация обновляемых и существующих разделов
             foreach (var updatedSection in updatedSections)
             {
-                var existingSection = existingSections.FirstOrDefault(es => es.ChSectionId == updatedSection.ChSectionId);
+                var existingSection = existingSections.FirstOrDefault(es => es.SectionId == updatedSection.SectionId);
                 if (existingSection != null)
                 {
                     // Обновляем свойства для существующих записей
@@ -81,7 +85,7 @@ namespace WebApiVRoom.DAL.Repositories
                     newSections.Add(new ChannelSection
                     {
                         ChannelSettingsId = channelSettingsId,
-                        ChSectionId = updatedSection.ChSection.Id,
+                        SectionId = updatedSection.ChSection.Id,
                         Order = updatedSection.Order,
                         IsVisible = updatedSection.IsVisible
                     });
@@ -89,9 +93,9 @@ namespace WebApiVRoom.DAL.Repositories
             }
 
             // Удаление разделов, отсутствующих в обновленных данных
-            var updatedSectionIds = updatedSections.Select(us => us.ChSectionId).ToHashSet();
+            var updatedSectionIds = updatedSections.Select(us => us.SectionId).ToHashSet();
             var sectionsToRemove = existingSections
-                .Where(es => !updatedSectionIds.Contains(es.ChSectionId))
+                .Where(es => !updatedSectionIds.Contains(es.SectionId))
                 .ToList();
 
             foreach (var sectionToRemove in sectionsToRemove)
