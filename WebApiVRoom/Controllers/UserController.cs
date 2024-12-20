@@ -138,6 +138,11 @@ namespace WebApiVRoom.Controllers
                                 item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
                         }
                     }
+                    List<EmailDTO> emails = await _emailService.GetAllEmailsByUser(user.Clerk_Id);
+                    foreach (EmailDTO email in emails)
+                    {
+                        await _emailService.DeleteEmail(email.Id);
+                    }
                     UserDTO user2 = await _userService.Delete(request.data.id);              
                 return Ok(user2);
             }
