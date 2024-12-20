@@ -46,7 +46,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
         public DbSet<Vote> Voutes { get; set; }
-        public DbSet<WebSocketMessage> WebSockets { get; set; }
+        //public DbSet<WebSocketMessage> WebSockets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -11,6 +11,8 @@ using System.Text;
 using Newtonsoft.Json;
 using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
+using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.DAL.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +28,15 @@ builder.Services.AddSingleton(x => {
     string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
     return new BlobServiceClient(connectionString);
 });
-
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.CreateMap<PlayList, PlayListDTO>()
+        .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+        .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+        .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+        .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
+        .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
+});
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
@@ -42,7 +52,7 @@ builder.Services.AddTransient<IPlayListService, PlayListService>();
 builder.Services.AddTransient<IPostService, PostService>();
 builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddTransient<ITagService, TagService>();
-builder.Services.AddTransient<IVideoService, VideoService>();
+builder.Services.AddTransient<IVideoService, WebApiVRoom.BLL.Services.VideoService>();
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");
@@ -72,7 +82,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPlayListService, PlayListService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
-builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IVideoService, WebApiVRoom.BLL.Services.VideoService>();
 builder.Services.AddScoped<IAlgoliaService, AlgoliaService>();
 builder.Services.AddScoped<ILikesDislikesCVService, LikesDislikesCVService>();
 builder.Services.AddScoped<ILikesDislikesVService, LikesDislikesVService>();
