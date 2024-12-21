@@ -18,7 +18,11 @@ namespace WebApiVRoom.DAL.Entities
         public string? ChannelNikName { get; set; } = string.Empty;
 
         public List<ChannelSection> ChannelSections { get; set; } = new List<ChannelSection>();//
+                                                                                               
+        public Video? PinnedVideo { get; set; }// Навигационное свойство для закрепленного видео
 
+        // Внешний ключ для закрепленного видео
+        public int? PinnedVideoId { get; set; }
 
 
         public User Owner { get; set; }

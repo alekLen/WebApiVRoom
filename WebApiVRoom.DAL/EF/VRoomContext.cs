@@ -17,7 +17,18 @@ namespace WebApiVRoom.DAL.EF
         {
 
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
+            // Настройка связи между ChannelSettings и Video
+            modelBuilder.Entity<ChannelSettings>()
+                .HasOne(c => c.PinnedVideo)  // В ChannelSettings одно закрепленное видео
+                .WithOne(v => v.ChannelSettings)  // В Video одно ChannelSettings
+                .HasForeignKey<ChannelSettings>(c => c.PinnedVideoId)  // Указываем внешний ключ в ChannelSettings
+                .OnDelete(DeleteBehavior.NoAction);  // Используем NoAction для избежания каскадных путей
+
+        }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Email> Emails { get; set; }
