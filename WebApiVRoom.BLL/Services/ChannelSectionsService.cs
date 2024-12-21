@@ -59,7 +59,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<ChannelSectionDTO, DAL.Entities.ChannelSection>()
                     .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.Channel_SettingsId))
-                    .ForMember(dest => dest.SectionId, opt => opt.MapFrom(src => src.ChSectionId));
+                    .ForMember(dest => dest.SectionId, opt => opt.MapFrom(src => src.SectionId));
             });
             return new Mapper(config);
         }

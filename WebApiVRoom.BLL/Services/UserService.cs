@@ -172,7 +172,7 @@ namespace WebApiVRoom.BLL.Services
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        ChSection = section,
+                        Section = section,
                         SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
@@ -186,7 +186,7 @@ namespace WebApiVRoom.BLL.Services
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        ChSection = section,
+                        Section = section,
                         SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
