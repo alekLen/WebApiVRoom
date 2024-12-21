@@ -19,30 +19,34 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task AddRangeChannelSectionsByClerkId(int channelSettingsId, List<ChannelSection> t)
         {
-            if (channelSettingsId == null)
+            try
             {
-                throw new ArgumentNullException(nameof(channelSettingsId));
-            }
+                if (channelSettingsId == null)
+                {
+                    throw new ArgumentNullException(nameof(channelSettingsId));
+                }
 
-            if (t == null)
-            {
-                throw new ArgumentNullException(nameof(t));
-            }
-            // Привязываем UserId ко всем новым разделам
-            t.ForEach(section => section.ChannelSettingsId = channelSettingsId);
+                if (t == null)
+                {
+                    throw new ArgumentNullException(nameof(t));
+                }
+                // Привязываем UserId ко всем новым разделам
+                t.ForEach(section => section.ChannelSettingsId = channelSettingsId);
 
-            if (t.Any())
-            {
-                await db.ChannelSections.AddRangeAsync(t);
+                if (t.Any())
+                {
+                    await db.ChannelSections.AddRangeAsync(t);
+                    await db.SaveChangesAsync();
+                }
+
+                var existingSections = await db.ChannelSections
+                .Where(us => us.ChannelSettingsId == channelSettingsId)
+                .ToListAsync();
+
+                db.ChannelSections.UpdateRange(existingSections);
                 await db.SaveChangesAsync();
             }
-
-            var existingSections = await db.ChannelSections
-            .Where(us => us.ChannelSettingsId == channelSettingsId)
-            .ToListAsync();
-
-            db.ChannelSections.UpdateRange(existingSections);
-            await db.SaveChangesAsync();
+            catch (Exception ex) {  }
         }
 
 

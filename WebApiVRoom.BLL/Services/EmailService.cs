@@ -49,12 +49,12 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { return null; }
         }
-        public async Task<IEnumerable<EmailDTO>> GetAllEmailsByUser(string clerkId)
+        public async Task<List<EmailDTO>> GetAllEmailsByUser(string clerkId)
         {
             try
             {
                List<Email> em = await Database.Emails.GetByUser(clerkId);
-                return _mapper.Map<IEnumerable<Email>, IEnumerable<EmailDTO>>(em);
+                return _mapper.Map<IEnumerable<Email>, IEnumerable<EmailDTO>>(em).ToList();
             }
             catch (Exception ex) { return null; }
         }

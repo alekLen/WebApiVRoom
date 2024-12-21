@@ -12,5 +12,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Subtitle>> GetSubtitleByVideoId(int videoId);
         Task<List<Subtitle>> GetPublishedSubtitleByVideoId(int videoId);
         Task<List<Subtitle>> GetNotPublishedSubtitleByVideoId(int videoId);
+        Task<Subtitle> GetByUrl(string path);
     }
 }

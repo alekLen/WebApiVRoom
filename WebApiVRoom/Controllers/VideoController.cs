@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
@@ -477,7 +478,8 @@ namespace WebApiVRoom.Controllers
                 VideoViewDTO v = new VideoViewDTO();
                 v.VideoId = int.Parse(videoView.VideoId);
                 v.ClerkId = videoView.ClerkId;
-                v.Duration = int.Parse(videoView.Duration);
+                double number = double.Parse(videoView.Duration, CultureInfo.InvariantCulture);
+                v.Duration = (int)Math.Round(number);
                 v.Location = videoView.Location;
                 v.Date = DateTime.Parse(videoView.Date);
                 await _videoViewsService.AddVideoView(v);

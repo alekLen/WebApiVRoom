@@ -11,7 +11,7 @@ namespace WebApiVRoom.BLL.Interfaces
     {
         Task<EmailDTO> GetEmail(int id);
         Task<EmailDTO> GetEmailByUserPrimary(string clerkId);
-        Task<IEnumerable<EmailDTO>> GetAllEmailsByUser(string clerkId);
+        Task<List<EmailDTO>> GetAllEmailsByUser(string clerkId);
         Task AddEmail(EmailDTO emDTO);
         Task<EmailDTO> UpdateEmail(EmailDTO emDTO);
         Task DeleteEmail(int id);

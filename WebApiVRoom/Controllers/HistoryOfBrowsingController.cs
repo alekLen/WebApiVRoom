@@ -54,7 +54,7 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-            HistoryOfBrowsingDTO ans = await _hbService.Add(request);
+           HistoryOfBrowsingDTO ans = await _hbService.Add(request);
 
             return Ok(ans);
         }

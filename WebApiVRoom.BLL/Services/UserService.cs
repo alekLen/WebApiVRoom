@@ -172,24 +172,25 @@ namespace WebApiVRoom.BLL.Services
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        Section = section,
+                        ChSection = section,
                         SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
                         IsVisible = true,
-                        Order = pos++
+                        Order = pos
                     });
+                    pos++;
                 }
 
                 foreach (var section in remainingSections)// Обрабатываем оставшиеся разделы, если требуется
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        Section = section,
+                        ChSection = section,
                         SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
-                        IsVisible = false, 
+                        IsVisible = false,
                         Order = 0
                     });
                 }
