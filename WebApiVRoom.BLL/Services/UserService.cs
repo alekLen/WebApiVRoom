@@ -172,8 +172,8 @@ namespace WebApiVRoom.BLL.Services
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        ChSection = section,
-                        ChSectionId = section.Id,
+                        Section = section,
+                        SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
                         IsVisible = true,
@@ -185,8 +185,8 @@ namespace WebApiVRoom.BLL.Services
                 {
                     channelSections.Add(new ChannelSection
                     {
-                        ChSection = section,
-                        ChSectionId = section.Id,
+                        Section = section,
+                        SectionId = section.Id,
                         Channel_Settings = channelSettings,
                         ChannelSettingsId = channelSettingsId,
                         IsVisible = false, 
@@ -200,6 +200,10 @@ namespace WebApiVRoom.BLL.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in CreateChannelSections: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine($"\n\n\tCreateChannelSections выполнено\t\n\n");
             }
         }
 

@@ -80,6 +80,7 @@ namespace WebApiVRoom.DAL.Migrations
                 b.ToTable("ChannelSections");
             });
 
+
 #pragma warning restore 612, 618
         }
     }

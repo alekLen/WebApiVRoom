@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +12,8 @@ namespace WebApiVRoom.DAL.Entities
         public int Id { get; set; }
         public ChannelSettings Channel_Settings { get; set; }
         public int ChannelSettingsId { get; set; }//  Внешний ключ
-
-        public int ChSectionId { get; set; } // Ссылка на глобальный раздел
-        public ChSection ChSection { get; set; }
+        public int SectionId { get; set; } // Ссылка на глобальный раздел
+        public ChSection Section { get; set; }
         public int Order { get; set; } // Порядок
         public bool IsVisible { get; set; } // Отображается ли раздел
     }

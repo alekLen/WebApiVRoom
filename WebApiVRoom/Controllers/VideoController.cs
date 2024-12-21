@@ -590,7 +590,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpGet("getshortvideobychannelid/{channelId}")]
-        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetShortVideosByChannelId(int channelId)
+        public async Task<ActionResult<IEnumerable<VideoDTO>>> GetShortVideosByChannelId([FromRoute] int channelId)
         {
             return new ObjectResult(await _videoService.GetShortVideosByChannelId(channelId));
         }
@@ -608,7 +608,19 @@ namespace WebApiVRoom.Controllers
             }
             return Ok(v);
         }
-
+        [HttpGet("getchannelshortsorvideospaginated/{pageNumber}/{pageSize}/{channelid}/{isShorts}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetShortsOrVideosByChannelIdPaginated([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] int channelid, [FromQuery] bool isShorts)
+        {
+            List<VideoDTO> videos = await _videoService.GetShortOrVideosByChannelIdPaginated(pageNumber, pageSize, channelid, isShorts);
+            List<VideoInfoDTO> v = new List<VideoInfoDTO>();
+            foreach (var video in videos)
+            {
+                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
+                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
+                v.Add(videoInfo);
+            }
+            return Ok(v);
+        }
         [HttpGet("getvideolistbytag/{name}")]
         public async Task<ActionResult<List<VideoInfoDTO>>> GetVideoListByTag([FromRoute] string name)
         {

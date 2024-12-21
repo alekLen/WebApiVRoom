@@ -15,6 +15,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<SubscriptionDTO>> GetAllSubscriptions();
         Task<SubscriptionDTO> AddSubscription(int channelid, string userid);
         Task<SubscriptionDTO> GetByUserAndChannel(int channelid, string userid);
+        Task<bool> GetByUserAndChannelIsFollowed(int channelid, string userid);
         Task<SubscriptionDTO> UpdateSubscription(SubscriptionDTO subscriptionDTO);
         Task<SubscriptionDTO> DeleteSubscription(int channelid, string userid);
         Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserId(string id);

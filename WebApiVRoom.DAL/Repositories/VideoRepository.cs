@@ -496,7 +496,19 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
+        public async Task<List<Video>> GetShortsOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShorts)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == isShorts).Where(v => v.ChannelSettings.Id == channelId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
         public async Task<Video> GetById(int? videoId)
         {
             var video = await _context.Videos

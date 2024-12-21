@@ -59,7 +59,7 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<ChannelSectionDTO, DAL.Entities.ChannelSection>()
                     .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.Channel_SettingsId))
-                    .ForMember(dest => dest.ChSectionId, opt => opt.MapFrom(src => src.ChSectionId));
+                    .ForMember(dest => dest.SectionId, opt => opt.MapFrom(src => src.SectionId));
             });
             return new Mapper(config);
         }
@@ -138,7 +138,7 @@ namespace WebApiVRoom.BLL.Services
             var channelSectionsDto = mapper.Map<List<DAL.Entities.ChannelSection>, List<ChannelSectionDTO>>(channelSections).ToList();
             foreach (var channelSection in channelSectionsDto)
             {
-                var ch = await Database.ChannelSections.GetChSectionById(channelSection.ChSectionId);
+                var ch = await Database.ChannelSections.GetChSectionById(channelSection.SectionId);
                 channelSection.Title = ch.Title;
             }
             return channelSectionsDto;
@@ -187,11 +187,11 @@ namespace WebApiVRoom.BLL.Services
                 var globalSections = await Database.ChannelSections.GetAllChSection();
                 var userSections = await Database.ChannelSections.FindChannelSectionsByChannelOwnerId(channelOwnerId);
 
-                var globSections = globalSections.Where(gs => !userSections.Any(us => us.ChSectionId == gs.Id && us.IsVisible))
+                var globSections = globalSections.Where(gs => !userSections.Any(us => us.SectionId == gs.Id && us.IsVisible))
                     .ToList();
 
                 var mapper = InitializeMapperCh();
-                var chSectionsDto = mapper.Map<List<ChSection>, List<ChSectionDTO>>(globSections);
+                var chSectionsDto = mapper.Map<List<DAL.Entities.ChSection>, List<ChSectionDTO>>(globSections);
 
                 return chSectionsDto;
             }
@@ -204,12 +204,12 @@ namespace WebApiVRoom.BLL.Services
             {
                 var config = new MapperConfiguration(cfg =>
                 {
-                    cfg.CreateMap<ChSection, ChSectionDTO>()
+                    cfg.CreateMap<DAL.Entities.ChSection, ChSectionDTO>()
                         .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title));
                 });
 
                 var mapper = new Mapper(config);
-                return mapper.Map<IEnumerable<ChSection>, IEnumerable<ChSectionDTO>>(await Database.ChannelSections.GetAllChSection());
+                return mapper.Map<IEnumerable<DAL.Entities.ChSection>, IEnumerable<ChSectionDTO>>(await Database.ChannelSections.GetAllChSection());
             }
             catch { return null; }
         }
@@ -249,7 +249,7 @@ namespace WebApiVRoom.BLL.Services
                 var isCh = await IsChSectioneUnique(ch.Title, ch.Id);
                 if (isCh)
                 {
-                    ChSection chSection = new ChSection()
+                    DAL.Entities.ChSection chSection = new DAL.Entities.ChSection()
                     {
                         Title = ch.Title,
                     };
@@ -257,7 +257,7 @@ namespace WebApiVRoom.BLL.Services
                     await Database.ChannelSections.AddChSection(chSection);
 
                     var mapper = InitializeMapperCh();
-                    var chSectionDto = mapper.Map<ChSection, ChSectionDTO>(chSection);
+                    var chSectionDto = mapper.Map<DAL.Entities.ChSection, ChSectionDTO>(chSection);
 
                     return chSectionDto;
                 }
@@ -285,7 +285,7 @@ namespace WebApiVRoom.BLL.Services
                 await Database.ChannelSections.UpdateChSection(chs);
 
                 var mapper = InitializeMapperCh();
-                var chSectionDto = mapper.Map<ChSection, ChSectionDTO>(chs);
+                var chSectionDto = mapper.Map<DAL.Entities.ChSection, ChSectionDTO>(chs);
 
                 return chSectionDto;
             }
@@ -303,7 +303,7 @@ namespace WebApiVRoom.BLL.Services
 
                 await Database.ChannelSections.DeleteChSection(id);
                 var mapper = InitializeMapperCh();
-                var chSectionDto = mapper.Map<ChSection, ChSectionDTO>(chs);
+                var chSectionDto = mapper.Map<DAL.Entities.ChSection, ChSectionDTO>(chs);
 
                 return chSectionDto;
             }

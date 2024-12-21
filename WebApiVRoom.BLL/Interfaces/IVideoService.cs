@@ -11,6 +11,7 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<CommentVideoDTO>> GetCommentsByVideoId(int videoId);
         Task<List<VideoDTO>> GetByChannelId(int channelId);
         Task<List<VideoDTO>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
+        Task<List<VideoDTO>> GetShortOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShort);
 
         Task AddVideo(VideoDTO videoDTO, Stream pathFile);// тестовий метод
         Task DeleteVideo(int id);

@@ -152,6 +152,16 @@ namespace WebApiVRoom.BLL.Services
 
             return deletedSubscriptionDto;
         }
+        public async Task<bool> GetByUserAndChannelIsFollowed(int channelid, string userid)
+        {
+            Subscription sub = await Database.Subscriptions.GetByUserAndChannel(channelid, userid);
+            if (sub == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
         public async Task<SubscriptionDTO> GetByUserAndChannel(int channelid, string userid)
         {
             Subscription sub = await Database.Subscriptions.GetByUserAndChannel(channelid, userid);
@@ -162,7 +172,6 @@ namespace WebApiVRoom.BLL.Services
 
             return mapper.Map<Subscription, SubscriptionDTO>(sub);
         }
-
         public async Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserId(string id)
         {
             try

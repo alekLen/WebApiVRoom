@@ -44,6 +44,17 @@ namespace WebApiVRoom.Controllers
             return Ok(userSections);
         }
 
+
+        [HttpGet("channelid/{channelId}")]
+        public async Task<IActionResult> GetChannelSections(int channelId)
+        {
+            //var ownCh = await _chService.FindByOwner(channelOwnerId);
+            var userSections = await _chsService.GetChannelSectionsAsync(channelId);
+            return Ok(userSections);
+        }
+
+
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateChannelSections([FromForm] string clerkId, [FromForm] string chs)
         {
@@ -100,57 +111,57 @@ namespace WebApiVRoom.Controllers
             }
             catch (Exception ex) { return BadRequest(ModelState); }
         }
-        [HttpPost("addglobalchsection")]
-        public async Task<ActionResult<ChSectionDTO>> AddChSettings([FromForm] ChSectionDTO chs)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+    //    [HttpPost("addglobalchsection")]
+    //    public async Task<ActionResult<ChSectionDTO>> AddChSettings([FromForm] ChSectionDTO chs)
+    //    {
+    //        if (!ModelState.IsValid)
+    //        {
+    //            return BadRequest(ModelState);
+    //        }
 
-            ChSectionDTO chSection = await _chsService.UpdateChSection(chs);
+    //        ChSectionDTO chSection = await _chsService.UpdateChSection(chs);
 
 
-            return Ok(chSection);
-        }
+    //        return Ok(chSection);
+    //    }
 
-        [HttpPut("updateglobalchsection")]
-        public async Task<ActionResult<ChSectionDTO>> UpdateChSettings([FromForm] ChSectionDTO chs)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            ChSectionDTO chSec = await _chsService.GetChSectionById(chs.Id);
-            if (chSec == null)
-            {
-                return NotFound();
-            }
+    //    [HttpPut("updateglobalchsection")]
+    //    public async Task<ActionResult<ChSectionDTO>> UpdateChSettings([FromForm] ChSectionDTO chs)
+    //    {
+    //        if (!ModelState.IsValid)
+    //        {
+    //            return BadRequest(ModelState);
+    //        }
+    //        ChSectionDTO chSec = await _chsService.GetChSectionById(chs.Id);
+    //        if (chSec == null)
+    //        {
+    //            return NotFound();
+    //        }
 
-            ChSectionDTO chSection = await _chsService.UpdateChSection(chs);
+    //        ChSectionDTO chSection = await _chsService.UpdateChSection(chs);
            
 
-            return Ok(chSection);
-        }
+    //        return Ok(chSection);
+    //    }
 
 
-        [HttpDelete("deleteglobalchsection/{id}")]
-        public async Task<ActionResult<ChannelSettingsDTO>> DeleteChannelSettings([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+    //    [HttpDelete("deleteglobalchsection/{id}")]
+    //    public async Task<ActionResult<ChannelSettingsDTO>> DeleteChannelSettings([FromRoute] int id)
+    //    {
+    //        if (!ModelState.IsValid)
+    //        {
+    //            return BadRequest(ModelState);
+    //        }
 
-            ChSectionDTO chSection = await _chsService.GetChSectionById(id);
-            if (chSection == null)
-            {
-                return NotFound();
-            }
-            await _chsService.DeleteChSection(id);
+    //        ChSectionDTO chSection = await _chsService.GetChSectionById(id);
+    //        if (chSection == null)
+    //        {
+    //            return NotFound();
+    //        }
+    //        await _chsService.DeleteChSection(id);
 
-            return Ok();
-        }
+    //        return Ok();
+    //    }
 
-    }
+    }//
 }

@@ -61,14 +61,14 @@ namespace WebApiVRoom.DAL.Repositories
             // Получаем существующие записи для данного channelSettingsId
             var existingSections = await db.ChannelSections
                 .Include(cs => cs.Channel_Settings)
-                .Include(cs => cs.ChSection)
+                .Include(cs => cs.Section)
                 .Where(cs => cs.ChannelSettingsId == channelSettingsId)
                 .ToListAsync();
             var newSections = new List<ChannelSection>();
             // Синхронизация обновляемых и существующих разделов
             foreach (var updatedSection in updatedSections)
             {
-                var existingSection = existingSections.FirstOrDefault(es => es.ChSectionId == updatedSection.ChSectionId);
+                var existingSection = existingSections.FirstOrDefault(es => es.SectionId == updatedSection.SectionId);
                 if (existingSection != null)
                 {
                     // Обновляем свойства для существующих записей
@@ -81,7 +81,7 @@ namespace WebApiVRoom.DAL.Repositories
                     newSections.Add(new ChannelSection
                     {
                         ChannelSettingsId = channelSettingsId,
-                        ChSectionId = updatedSection.ChSection.Id,
+                        SectionId = updatedSection.Section.Id,
                         Order = updatedSection.Order,
                         IsVisible = updatedSection.IsVisible
                     });
@@ -89,9 +89,9 @@ namespace WebApiVRoom.DAL.Repositories
             }
 
             // Удаление разделов, отсутствующих в обновленных данных
-            var updatedSectionIds = updatedSections.Select(us => us.ChSectionId).ToHashSet();
+            var updatedSectionIds = updatedSections.Select(us => us.SectionId).ToHashSet();
             var sectionsToRemove = existingSections
-                .Where(es => !updatedSectionIds.Contains(es.ChSectionId))
+                .Where(es => !updatedSectionIds.Contains(es.SectionId))
                 .ToList();
 
             foreach (var sectionToRemove in sectionsToRemove)
@@ -115,30 +115,30 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task<ChannelSection> GetChannelSectionsById(int id)
         {
-            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp=>cp.ChSection).FirstOrDefaultAsync(ch => ch.Id == id);
+            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp=>cp.Section).FirstOrDefaultAsync(ch => ch.Id == id);
 
         }
 
         public async Task<IEnumerable<ChannelSection>> GetAllChannelSections()
         {
-            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection).ToListAsync();
+            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.Section).ToListAsync();
         }
         public async Task<List<ChannelSection>> FindChannelSectionsByChannelOwnerId(string channelOwnerId)
         {
-            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection)
+            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.Section)
                 .Where(cs => cs.Channel_Settings.Owner.Clerk_Id == channelOwnerId).ToListAsync();
 
         }
         public async Task<List<ChannelSection>> GetChannelSectionsAsync(int channelOwnerId)
         {
-            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection)
+            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.Section)
                 .Where(us => us.ChannelSettingsId == channelOwnerId)
                 .OrderBy(us => us.Order)
                 .ToListAsync();
         }
         public async Task<List<ChannelSection>> GetChannelSectionsByChannelUrl(string channelUrl)
         {
-            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection)
+            return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.Section)
                 .Where(cs => cs.Channel_Settings.Channel_URL == channelUrl).ToListAsync();
 
         }
@@ -146,7 +146,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             if (channelNikname == null)
             {
-                return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.ChSection)
+                return await db.ChannelSections.Include(cp => cp.Channel_Settings).Include(cp => cp.Section)
                     .Where(cs => cs.Channel_Settings.ChannelNikName == channelNikname).ToListAsync();
             }
             else

@@ -100,6 +100,18 @@ namespace WebApiVRoom.Controllers
             return Ok(sub);
         }
 
+        [HttpGet("isfolowedbool/{channelid}/{userid}")]
+        public async Task<ActionResult<bool>> IsFindSubscription([FromRoute] int channelid, [FromRoute] string userid)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            bool isFollowed = await _subscriptionService.GetByUserAndChannelIsFollowed(channelid, userid);
+            return Ok(isFollowed);
+        }
+
         [HttpPut("update")]
         public async Task<ActionResult<SubscriptionDTO>> UpdateSubscription(SubscriptionDTO u)
         {
