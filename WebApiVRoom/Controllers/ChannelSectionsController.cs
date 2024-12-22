@@ -44,6 +44,14 @@ namespace WebApiVRoom.Controllers
             return Ok(userSections);
         }
 
+        [HttpGet("channelid/{channelId}")]
+        public async Task<IActionResult> GetChannelSections(int channelId)
+        {
+            //var ownCh = await _chService.FindByOwner(channelOwnerId);
+            var userSections = await _chsService.GetChannelSectionsAsync(channelId);
+            return Ok(userSections);
+        }
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateChannelSections([FromForm] string clerkId, [FromForm] string chs)
         {

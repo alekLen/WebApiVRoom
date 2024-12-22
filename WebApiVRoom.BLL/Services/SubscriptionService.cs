@@ -194,5 +194,15 @@ namespace WebApiVRoom.BLL.Services
             var users = await Database.Subscriptions.GetSubscriptionsByDiapasonAndChannel(start, end, ch);
             return users;
         }
+        public async Task<bool> GetByUserAndChannelIsFollowed(int channelid, string userid)
+        {
+            Subscription sub = await Database.Subscriptions.GetByUserAndChannel(channelid, userid);
+            if (sub == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

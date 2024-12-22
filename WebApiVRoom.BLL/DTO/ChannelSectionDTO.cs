@@ -12,7 +12,7 @@ namespace WebApiVRoom.BLL.DTO
         public int Channel_SettingsId { get; set; }
 
         public string Title { get; set; }//
-        public int ChSectionId { get; set; } // Ссылка на глобальный раздел
+        public int SectionId { get; set; } // Ссылка на глобальный раздел
         public int Order { get; set; } // Порядок
         public bool IsVisible { get; set; } // Отображается ли раздел
     }
