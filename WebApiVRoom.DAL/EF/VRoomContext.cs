@@ -21,6 +21,7 @@ namespace WebApiVRoom.DAL.EF
 
         public DbSet<User> Users { get; set; }
         public DbSet<Email> Emails { get; set; }
+        public DbSet<PinnedVideo> PinnedVideos { get; set; }
         public DbSet<ChannelSettings> ChannelSettings { get; set; }
         public DbSet<ChannelSection> ChannelSections { get; set; }
         public DbSet<ChSection> ChSections { get; set; }

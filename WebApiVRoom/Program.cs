@@ -49,6 +49,7 @@ builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider 
 });
 
 // Scoped services
+builder.Services.AddScoped<IPinnedVideoService, PinnedVideoService>();
 builder.Services.AddScoped<IContentReportService, ContentReportService>();
 builder.Services.AddScoped<IAdService, AdService>();
 builder.Services.AddScoped<IAdminLogService, AdminLogService>();

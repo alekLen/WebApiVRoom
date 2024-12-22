@@ -16,6 +16,7 @@ namespace WebApiVRoom.DAL.Repositories
         private VRoomContext db;
         private IConfiguration configuration;
 
+        private PinnedVideoRepository pinnedVideoRepository;
         private UserRepository userRepository;
         private CategoryRepository categoryRepository;
         private CommentPostRepository commentPostRepository;
@@ -52,7 +53,15 @@ namespace WebApiVRoom.DAL.Repositories
         {
             db = context;
         }
-
+        public IPinnedVideoRepository PinnedVideos
+        {
+            get
+            {
+                if (pinnedVideoRepository == null)
+                    pinnedVideoRepository = new PinnedVideoRepository(db);
+                return pinnedVideoRepository;
+            }
+        }
         public ISubtitleRepository Subtitles
         {
             get

@@ -9,6 +9,7 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface IUnitOfWork
     {      
         IUserRepository Users { get; }
+        IPinnedVideoRepository PinnedVideos { get; }
         ICategoryRepository Categories { get; }
         ICommentPostRepository CommentPosts { get; }
         IAnswerPostRepository AnswerPosts { get; }

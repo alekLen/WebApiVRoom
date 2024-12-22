@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Azure.Storage.Blobs;
 using Microsoft.Identity.Client;
 using System.Threading.Channels;
+using Azure;
 
 
 namespace WebApiVRoom.DAL.Repositories

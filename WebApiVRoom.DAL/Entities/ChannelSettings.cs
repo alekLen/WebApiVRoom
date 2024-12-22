@@ -19,6 +19,8 @@ namespace WebApiVRoom.DAL.Entities
 
         public List<ChannelSection> ChannelSections { get; set; } = new List<ChannelSection>();//
 
+
+        public PinnedVideo? PinnedVideo { get; set; }
         public User Owner { get; set; }
         public Language Language { get; set; }
         public Country Country { get; set; }
