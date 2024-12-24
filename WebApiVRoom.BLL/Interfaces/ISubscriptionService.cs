@@ -21,6 +21,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<SubscriptionDTO>> GetSubscriptionsByUserIdPaginated(int pageNumber, int pageSize, string id);
         Task<int> Count(int channelid);
         Task<List<DateTime>> GetSubscriptionsByDiapasonAndChannel(DateTime start, DateTime end, int chId);
-
+        Task<bool> GetByUserAndChannelIsFollowed(int channelid, string userid);
     }
 }

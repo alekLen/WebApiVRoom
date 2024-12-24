@@ -41,7 +41,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<ChannelSettings> GetById(int id)
         {
-            return await db.ChannelSettings
+            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -55,6 +55,7 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<IEnumerable<ChannelSettings>> GetAll()
         {
             return await db.ChannelSettings
+                .Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -78,7 +79,8 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<ChannelSettings> FindByOwner(string ownerId)
         {
-            return await db.ChannelSettings
+            try { 
+            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -86,11 +88,16 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Posts)
                 .Include(cp => cp.Subscriptions)
                 .FirstOrDefaultAsync(cs => cs.Owner.Clerk_Id == ownerId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
                
         }
         public async Task<ChannelSettings> GetByUrl(string url)
         {
-            return await db.ChannelSettings
+            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -104,7 +111,7 @@ namespace WebApiVRoom.DAL.Repositories
         {
             if (nikname == null)
             {
-                return await db.ChannelSettings
+                return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                     .Include(cp => cp.Owner)
                     .Include(cp => cp.Language)
                     .Include(cp => cp.Country)

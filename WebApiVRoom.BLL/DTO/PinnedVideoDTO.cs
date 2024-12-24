@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebApiVRoom.DAL.Entities;
 
-namespace WebApiVRoom.BLL.DTO
+namespace WebApiVRoom.DAL.Entities
 {
-    public class HistoryOfBrowsingDTO
+    public class PinnedVideoDTO
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
+        
         public int VideoId { get; set; }
-        public DateTime Date { get; set; }
-        public int TimeCode { get; set; }
         public int ChannelSettingsId { get; set; }
+
+        
     }
 }

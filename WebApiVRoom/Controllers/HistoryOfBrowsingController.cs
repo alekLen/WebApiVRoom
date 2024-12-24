@@ -54,7 +54,7 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-            HistoryOfBrowsingDTO ans = await _hbService.Add(request);
+           HistoryOfBrowsingDTO ans = await _hbService.Add(request);
 
             return Ok(ans);
         }
@@ -128,6 +128,17 @@ namespace WebApiVRoom.Controllers
         {
 
             List<HistoryOfBrowsingDTO> list = await _hbService.GetByUserIdPaginated(pageNumber, pageSize,clerk_id);
+            if (list == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(list);
+        }
+        [HttpGet("getlatestvideohistorybyuseridpaginated/{pageNumber}/{pageSize}/{clerk_id}")]
+        public async Task<ActionResult<List<VideoHistoryItem>>> GetLatestVideoHistoryByUserIdPaginated([FromRoute] int pageNumber, [FromRoute] int pageSize, [FromRoute] string clerk_id)
+        {
+
+            List<VideoHistoryItem> list = await _hbService.GetLatestVideoHistoryByUserIdPaginated(pageNumber, pageSize, clerk_id);
             if (list == null)
             {
                 return NotFound();

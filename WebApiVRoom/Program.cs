@@ -49,13 +49,15 @@ builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider 
 });
 
 // Scoped services
+builder.Services.AddScoped<IPinnedVideoService, PinnedVideoService>();
 builder.Services.AddScoped<IContentReportService, ContentReportService>();
 builder.Services.AddScoped<IAdService, AdService>();
 builder.Services.AddScoped<IAdminLogService, AdminLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>(); 
+builder.Services.AddScoped<IChannelSectionsService, ChannelSectionsService>();
 builder.Services.AddScoped<IChannelSettingsService, ChannelSettingsService>();
 builder.Services.AddScoped<IAnswerPostService, AnswerPostService>();
 builder.Services.AddScoped<IAnswerVideoService, AnswerVideoService>();

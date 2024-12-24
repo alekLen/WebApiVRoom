@@ -52,6 +52,7 @@ namespace WebApiVRoom.Controllers
                 ChannelName = ch.ChannelName,
                 ChannelNikName = name,
                 ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                Channel_URL = ch.Channel_URL,
 
             };
             return new ObjectResult(user);
@@ -92,7 +93,8 @@ namespace WebApiVRoom.Controllers
                     ChannelBanner = ch.ChannelBanner,
                     ChannelName = ch.ChannelName,
                     ChannelNikName = name,
-                    ChannelProfilePhoto = ch.ChannelProfilePhoto
+                    ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                    Channel_URL = ch.Channel_URL,
                 };
 
                 return new ObjectResult(user);

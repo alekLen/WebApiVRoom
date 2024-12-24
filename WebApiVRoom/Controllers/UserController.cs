@@ -29,7 +29,7 @@ namespace WebApiVRoom.Controllers
         private IConfiguration _configuration;
         private IEmailService _emailService;
 
-        public UserController(IUserService userService,IVideoService video,INotificationService notificationService,
+        public UserController(IUserService userService, IVideoService video, INotificationService notificationService,
             IConfiguration configuration, IEmailService emailService)
         {
             _userService = userService;
@@ -38,7 +38,7 @@ namespace WebApiVRoom.Controllers
             _videoService = video;
             _emailService = emailService;
         }
-        
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
@@ -67,7 +67,7 @@ namespace WebApiVRoom.Controllers
                 return NotFound();
             }
 
-            UserDTO usernew=await _userService.UpdateUser(u);
+            UserDTO usernew = await _userService.UpdateUser(u);
 
             return Ok(usernew);
         }
@@ -78,8 +78,8 @@ namespace WebApiVRoom.Controllers
         {
             try
             {
-                string SigningSecret = _configuration["Clerk:WebhookSecret"]; 
-            Request.EnableBuffering();
+                string SigningSecret = _configuration["Clerk:WebhookSecret"];
+                Request.EnableBuffering();
 
                 string requestBody;
                 using (var reader = new StreamReader(Request.Body, leaveOpen: true))
@@ -92,22 +92,22 @@ namespace WebApiVRoom.Controllers
                 headers.Set("svix-id", Request.Headers["svix-id"]);
                 headers.Set("svix-timestamp", Request.Headers["svix-timestamp"]);
                 headers.Set("svix-signature", Request.Headers["svix-signature"]);
-          
-                var wh= new Webhook(SigningSecret);
-           
-                wh.Verify(requestBody,headers);
-           
+
+                var wh = new Webhook(SigningSecret);
+
+                wh.Verify(requestBody, headers);
+
                 var request = JsonConvert.DeserializeObject<AddUserRequest>(requestBody);
-           
-            if (request.type == "user.created")
-            {
-                UserDTO user = await _userService.AddUser(request.data.id,request.data.image_url);
+
+                if (request.type == "user.created")
+                {
+                    UserDTO user = await _userService.AddUser(request.data.id, request.data.image_url);
                     foreach (var item in request.data.email_addresses)
                     {
                         EmailDTO email = new EmailDTO();
-                        email.EmailAddress=item.email_address;
-                        email.UserClerkId=user.Clerk_Id;
-                        if(item.id== request.data.primary_email_address_id)
+                        email.EmailAddress = item.email_address;
+                        email.UserClerkId = user.Clerk_Id;
+                        if (item.id == request.data.primary_email_address_id)
                         {
                             email.IsPrimary = true;
                             SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
@@ -119,37 +119,54 @@ namespace WebApiVRoom.Controllers
                     }
                     await AddNotification(user, "Добро пожаловать на на сайт!");
 
-                return Ok(user);             
-            }
-            if (request.type == "user.deleted")
-            {
+                    return Ok(user);
+                }
+                //if (request.type == "user.deleted")//old
+                //{
+                //        UserDTO user = await _userService.GetUserByClerkId(request.data.id);
+                //        List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
+                //        foreach (VideoDTO video in videos)
+                //        {
+                //            await _videoService.DeleteVideo(video.Id);
+                //        }
+                //        foreach (var item in request.data.email_addresses)//error
+                //        {
+                //            if (item.id == request.data.primary_email_address_id)
+                //            {
+                //                SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                //                    item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
+                //            }
+                //        }
+                //        UserDTO user2 = await _userService.Delete(request.data.id);              
+                //    return Ok(user2);
+                //}
+                if (request.type == "user.deleted")//new
+                {
                     UserDTO user = await _userService.GetUserByClerkId(request.data.id);
-
                     List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
                     foreach (VideoDTO video in videos)
                     {
                         await _videoService.DeleteVideo(video.Id);
                     }
-                    foreach (var item in request.data.email_addresses)
+
+                    var primaryEmail = await _emailService.GetEmailByUserPrimary(user.Clerk_Id);
+                    if (primaryEmail != null)
                     {
-                        if (item.id == request.data.primary_email_address_id)
-                        {
-                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
-                                item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
-                        }
+                        SendEmailHelper.SendEmailMessage(" ", primaryEmail.EmailAddress, "Your account on VRoom has been deleted. We are waiting for you back");
                     }
                     List<EmailDTO> emails = await _emailService.GetAllEmailsByUser(user.Clerk_Id);
                     foreach (EmailDTO email in emails)
                     {
-                        await _emailService.DeleteEmail(email.Id);
+                        await _emailService.DeleteEmail(email.Id);  
                     }
-                    UserDTO user2 = await _userService.Delete(request.data.id);              
-                return Ok(user2);
-            }
+                    UserDTO user2 = await _userService.Delete(request.data.id);
+                    return Ok(user2);
+                }
                 if (request.type == "user.updated")
                 {
                     IEnumerable<EmailDTO> ems = await _emailService.GetAllEmailsByUser(request.data.id);
-                    foreach(var email in ems){
+                    foreach (var email in ems)
+                    {
                         await _emailService.DeleteEmail(email.Id);
                     }
                     foreach (var item in request.data.email_addresses)
@@ -170,7 +187,7 @@ namespace WebApiVRoom.Controllers
             return BadRequest(ModelState);
         }
 
-        private async Task AddNotification(UserDTO user,string text)
+        private async Task AddNotification(UserDTO user, string text)
         {
             NotificationDTO notification = new NotificationDTO();
             notification.Date = DateTime.Now;
@@ -438,5 +455,5 @@ namespace WebApiVRoom.Controllers
         }
 
     }
-        
+
 }

@@ -58,13 +58,39 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { return null; }
         }
-        public async Task AddEmail(EmailDTO emDTO){
+        public async Task AddEmail(EmailDTO emDTO)//старый
+        {
             Email em = new Email();
             em.EmailAddress = emDTO.EmailAddress;
             em.IsPrimary = emDTO.IsPrimary;
-            em.User= await Database.Users.GetByClerk_Id(emDTO.UserClerkId);
+            em.User = await Database.Users.GetByClerk_Id(emDTO.UserClerkId);
             await Database.Emails.Add(em);
         }
+        //public async Task AddEmail(EmailDTO emDTO)//новый есть ошибки
+        //{
+        //    // Проверяем, существует ли уже email с таким адресом и Clerk_Id
+        //    var existingEmail = await Database.Emails.GetByUser(emDTO.UserClerkId);
+
+        //    if (existingEmail != null)
+        //    {
+        //        foreach (var item in existingEmail)
+        //        {
+        //            if (item.EmailAddress == emDTO.EmailAddress)
+        //                return;
+        //        }
+        //    }
+
+        //    // Если email не найден, добавляем его
+        //    Email em = new Email
+        //    {
+        //        EmailAddress = emDTO.EmailAddress,
+        //        IsPrimary = emDTO.IsPrimary,
+        //        User = await Database.Users.GetByClerk_Id(emDTO.UserClerkId)
+        //    };
+
+        //    await Database.Emails.Add(em);
+        //}
+
         public async Task<EmailDTO> UpdateEmail(EmailDTO emDTO){
             Email em = await Database.Emails.GetById(emDTO.Id);
             em.IsPrimary = emDTO.IsPrimary;
