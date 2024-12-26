@@ -203,7 +203,79 @@ namespace WebApiVRoom.BLL.Services
                 throw;
             }
         }
+        public async Task DeleteFileV2Async(string fileUrl)
+        {
+            if (string.IsNullOrEmpty(fileUrl))
+            {
+                throw new ArgumentException("File URL cannot be null or empty");
+            }
 
+            Uri uri = new Uri(fileUrl);
+            string fileName = Path.GetFileName(uri.LocalPath);
+            //string filePrefix = Path.GetFileNameWithoutExtension(fileName); // Визначаємо префікс для пов'язаних сегментів
+
+
+
+
+            // Удаляем только последнее вхождение "_master"
+            string basePrefix = Path.GetFileNameWithoutExtension(fileName); // Например, "Flowers_master_master"
+            int lastMasterIndex = basePrefix.LastIndexOf("_master", StringComparison.OrdinalIgnoreCase);
+            string filePrefix = lastMasterIndex > -1
+                ? basePrefix.Substring(0, lastMasterIndex) // Пример: "Flowers_master"
+                : basePrefix;
+
+            Console.WriteLine("\n\n" + filePrefix + "\n\n");
+
+            var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
+
+            // Видаляємо сам файл плейлиста (.m3u8)
+            var blobClient = containerClient.GetBlobClient(fileName);
+            Console.WriteLine($"Deleting playlist file: {fileName}");
+
+            try
+            {
+                var response = await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                if (!response)
+                {
+                    Console.WriteLine("Playlist file did not exist or could not be deleted.");
+                }
+                else
+                {
+                    Console.WriteLine("Playlist file successfully deleted.");
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Failed to delete playlist file: {ex.Message}");
+                throw;
+            }
+
+            try
+            {
+                Console.WriteLine($"Deleting files with prefix: {filePrefix}");
+
+                await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: filePrefix))
+                {
+                    var segmentBlobClient = containerClient.GetBlobClient(blobItem.Name);
+                    Console.WriteLine($"Deleting segment file: {blobItem.Name}");
+
+                    var deleteSegmentResponse = await segmentBlobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+                    if (!deleteSegmentResponse)
+                    {
+                        Console.WriteLine($"Segment file {blobItem.Name} did not exist or could not be deleted.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Segment file {blobItem.Name} successfully deleted.");
+                    }
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"Failed to delete segment files: {ex.Message}");
+                throw;
+            }
+        }
 
         public async Task<bool> BlobExistsAsync(string fileName)
         {

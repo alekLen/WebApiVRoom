@@ -112,7 +112,7 @@ namespace WebApiVRoom.BLL.Services
                 string sanitizedTitle = videoDTO.Tittle.Replace(" ", "_");
                 string outputFolder = Path.Combine(Path.GetTempPath(), sanitizedTitle);
                 Directory.CreateDirectory(outputFolder);
-
+                Console.WriteLine("\n\n" + sanitizedTitle + "\n\n");
                 string outputPlaylist480p = Path.Combine(outputFolder, $"{sanitizedTitle}_480p.m3u8");
                 string outputPlaylist720p = Path.Combine(outputFolder, $"{sanitizedTitle}_720p.m3u8");
                 string outputPlaylist1200p = Path.Combine(outputFolder, $"{sanitizedTitle}_1200p.m3u8");
@@ -346,12 +346,12 @@ namespace WebApiVRoom.BLL.Services
             return blobClient.Uri.ToString();
         }
 
-        private async Task DeleteFileAsync(string fileUrl)
-        {
-            var blobUri = new Uri(fileUrl);
-            var blobClient = new BlobClient(blobUri);
-            await blobClient.DeleteIfExistsAsync();
-        }
+        //private async Task DeleteFileAsync(string fileUrl)
+        //{
+        //    var blobUri = new Uri(fileUrl);
+        //    var blobClient = new BlobClient(blobUri);
+        //    await blobClient.DeleteIfExistsAsync();
+        //}
         private async Task<string> UploadFileAsync(string videoUrl)
         {
             throw new NotImplementedException();
@@ -382,7 +382,12 @@ namespace WebApiVRoom.BLL.Services
             var videos = await _unitOfWork.Videos.GetAllShortsPaginatedWith1VById(pageNumber, pageSize, videoId);
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
-
+        private async Task DeleteFileAsync(string fileUrl)
+        {
+            var blobUri = new Uri(fileUrl);
+            var blobClient = new BlobClient(blobUri);
+            await blobClient.DeleteIfExistsAsync();
+        }
         public async Task DeleteVideo(int id)
         {
             try
@@ -402,7 +407,25 @@ namespace WebApiVRoom.BLL.Services
                 throw new Exception("Error while deleting video", ex);
             }
         }
+        public async Task DeleteVideoV2(int id)
+        {
+            try
+            {
+                var video = await _unitOfWork.Videos.GetById(id);
+                if (video == null)
+                {
+                    throw new KeyNotFoundException("Video not found");
+                }
+                await _blobStorageService.DeleteFileV2Async(video.VideoUrl);
+                await _unitOfWork.Videos.Delete(id);
 
+                await _algoliaService.DeleteVideoAsync(video.ObjectID);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error while deleting video", ex);
+            }
+        }
 
         public async Task<VideoDTO> UpdateVideo(VideoDTO videoDTO)
         {

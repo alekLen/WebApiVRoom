@@ -3,6 +3,7 @@ using Google.Apis.YouTube.v3.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Web;
@@ -351,6 +352,39 @@ namespace WebApiVRoom.Controllers
             }
 
             await _videoService.DeleteVideo(id);
+            return NoContent();
+        }
+
+        [HttpDelete("deleterangevideo")]
+        public async Task<ActionResult> DeleteRangeVideo([FromBody] List<int> videoIdsToDelete)
+        {
+            bool notFoundIds = false;
+
+            if (videoIdsToDelete == null || !videoIdsToDelete.Any())
+            {
+                return NotFound("Список ID пустой.");
+            }
+
+            foreach (var id in videoIdsToDelete)
+            {
+                var video = await _videoService.GetVideoInfo(id);//це або GetVideo
+                if (video == null)
+                {
+                    notFoundIds = true;
+                }
+
+                await _videoService.DeleteVideoV2(id);
+            }
+          
+
+            if (notFoundIds)
+            {
+                return Ok(new
+                {
+                    Message = "Некоторые видео не найдены и были пропущены."
+                });
+            }
+
             return NoContent();
         }
 

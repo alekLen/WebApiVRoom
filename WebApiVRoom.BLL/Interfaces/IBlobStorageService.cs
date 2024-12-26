@@ -12,6 +12,7 @@ namespace WebApiVRoom.BLL.Interfaces
     {
         Task<bool> BlobExistsAsync(string fileName);
         Task DeleteFileAsync(string fileUrl);
+        Task DeleteFileV2Async(string fileUrl);
         Task DeleteImgAsync(string fileUrl);
         Task<BlobStorageDTO> DownloadFileAsync(string fileName);
         Task<IEnumerable<BlobStorageDTO>> ListBlobsAsync();

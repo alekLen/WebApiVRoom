@@ -14,6 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task AddVideo(VideoDTO videoDTO, Stream pathFile);// тестовий метод
         Task DeleteVideo(int id);
+        Task DeleteVideoV2(int id);
         Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<List<VideoDTO>> GetAllShortsPaginated(int pageNumber, int pageSize);
         Task<List<VideoDTO>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null);
