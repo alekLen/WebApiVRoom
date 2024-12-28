@@ -9,6 +9,7 @@ namespace WebApiVRoom.BLL.DTO
     public  class ChannelUserFor_CommentDTO
     {
         public string Clerk_Id { get; set; }
+        public int Channel_Id { get; set; }
         public string ChannelName { get; set; }
         public string ChannelNikName { get; set; }
         public string Channel_URL { get; set; }

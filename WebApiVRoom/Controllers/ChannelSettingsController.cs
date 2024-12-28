@@ -50,6 +50,7 @@ namespace WebApiVRoom.Controllers
                 ChannelUserFor_CommentDTO user = new()
                 {
                     Clerk_Id = u.Clerk_Id,
+                    Channel_Id = ch.Id,
                     ChannelBanner = ch.ChannelBanner,
                     ChannelName = ch.ChannelName,
                     ChannelNikName = name,
@@ -92,6 +93,7 @@ namespace WebApiVRoom.Controllers
                 ChannelUserFor_CommentDTO user = new()
                 {
                     Clerk_Id = clerkId,
+                    Channel_Id = ch.Id,
                     ChannelBanner = ch.ChannelBanner,
                     ChannelName = ch.ChannelName,
                     ChannelNikName = name,

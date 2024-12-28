@@ -795,6 +795,10 @@ namespace WebApiVRoom.BLL.Services
                 }
             }
         }
-
+        public async Task<List<VideoDTO>> GetShortOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShort)
+        {
+            var videos = await _unitOfWork.Videos.GetShortsOrVideosByChannelIdPaginated(pageNumber, pageSize, channelId, isShort);
+            return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
+        }
     }
 }

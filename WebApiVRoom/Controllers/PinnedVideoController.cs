@@ -31,6 +31,17 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(pinnedVideo);
         }
 
+        [HttpGet("getispinnedvideobychannelid/{channelId}")]
+        public async Task<ActionResult<PinnedVideoDTO>> GetIsPinnedVideoByChannelId(int channelId)
+        {
+            var pinnedVideo = await _pinnedVideoService.GetPinnedVideoByChannelId(channelId);
+            if (pinnedVideo == null)
+            {
+                return new ObjectResult(null);
+            }
+            return new ObjectResult(pinnedVideo);
+        }
+
         [HttpGet("getpinnedvideobychannelid/{channelId}")]
         public async Task<ActionResult<PinnedVideoDTO>> GetPinnedVideoByChannelId(int channelId)
         {
