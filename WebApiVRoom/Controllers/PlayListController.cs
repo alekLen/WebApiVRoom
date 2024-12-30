@@ -76,7 +76,38 @@ namespace WebApiVRoom.Controllers
 
             return Ok(ans);
         }
+        [HttpDelete("deleterangeplaylist")]
+        public async Task<ActionResult> DeleteRangePlaylist([FromBody] List<int> playlistIdsToDelete)
+        {
+            bool notFoundIds = false;
 
+            if (playlistIdsToDelete == null || !playlistIdsToDelete.Any())
+            {
+                return NotFound("Список ID пустой.");
+            }
+
+            foreach (var id in playlistIdsToDelete)
+            {
+
+                PlayListDTO ans = await _plService.GetById(id);
+                if (ans == null)
+                {
+                    notFoundIds = true;
+                }
+
+                await _plService.Delete(id);
+            }
+
+            if (notFoundIds)
+            {
+                return Ok(new
+                {
+                    Message = "Некоторые плей листы не найдены и были пропущены."
+                });
+            }
+
+            return NoContent();
+        }
         [HttpGet("getbyuserid/{clerk_id}")]
         public async Task<ActionResult<List<PlayListDTO>>> ByUserId([FromRoute]string clerk_id)//GetPlayListsByClerkUserId
         {

@@ -14,6 +14,7 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task AddVideo(VideoDTO videoDTO, Stream pathFile);// тестовий метод
         Task DeleteVideo(int id);
+        Task DeleteVideoV2(int id);
         Task<IEnumerable<VideoDTO>> GetAllPaginated(int pageNumber, int pageSize);
         Task<List<VideoDTO>> GetAllShortsPaginated(int pageNumber, int pageSize);
         Task<List<VideoDTO>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null);
@@ -34,5 +35,6 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<IEnumerable<VideoDTO>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter);
         Task<VideoDTO> GetVideoInfoByVRoomVideoUrl(string url);
         Task<List<VideoDTO>> GetByTag(string tagName);
+        Task<List<VideoDTO>> GetShortOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShort);
     }
 }

@@ -3,6 +3,7 @@ using Google.Apis.YouTube.v3.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Crypto;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Web;
@@ -354,6 +355,39 @@ namespace WebApiVRoom.Controllers
             return NoContent();
         }
 
+        [HttpDelete("deleterangevideo")]
+        public async Task<ActionResult> DeleteRangeVideo([FromBody] List<int> videoIdsToDelete)
+        {
+            bool notFoundIds = false;
+
+            if (videoIdsToDelete == null || !videoIdsToDelete.Any())
+            {
+                return NotFound("Список ID пустой.");
+            }
+
+            foreach (var id in videoIdsToDelete)
+            {
+                var video = await _videoService.GetVideoInfo(id);//це або GetVideo
+                if (video == null)
+                {
+                    notFoundIds = true;
+                }
+
+                await _videoService.DeleteVideoV2(id);
+            }
+          
+
+            if (notFoundIds)
+            {
+                return Ok(new
+                {
+                    Message = "Некоторые видео не найдены и были пропущены."
+                });
+            }
+
+            return NoContent();
+        }
+
 
         [HttpGet("{id}/comments")]
         public async Task<ActionResult<IEnumerable<CommentVideoDTO>>> GetVideoComments([FromRoute] int id)
@@ -631,6 +665,19 @@ namespace WebApiVRoom.Controllers
 
 
 
+        [HttpGet("getchannelshortsorvideospaginated/{pageNumber}/{pageSize}/{channelid}/{isShorts}")]
+        public async Task<ActionResult<List<VideoInfoDTO>>> GetShortsOrVideosByChannelIdPaginated([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] int channelid, [FromQuery] bool isShorts)
+        {
+            List<VideoDTO> videos = await _videoService.GetShortOrVideosByChannelIdPaginated(pageNumber, pageSize, channelid, isShorts);
+            List<VideoInfoDTO> v = new List<VideoInfoDTO>();
+            foreach (var video in videos)
+            {
+                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
+                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
+                v.Add(videoInfo);
+            }
+            return Ok(v);
+        }
 
 
 
@@ -638,7 +685,6 @@ namespace WebApiVRoom.Controllers
 
 
 
-       
     }
 }
 

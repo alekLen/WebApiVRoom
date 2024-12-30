@@ -31,6 +31,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetVideosByChannelId(int channelId);
         Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter);
         Task<Video> GetByVRoomVideoUrl(string url);
-
+        Task<List<Video>> GetShortsOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShorts);
     }
 }
