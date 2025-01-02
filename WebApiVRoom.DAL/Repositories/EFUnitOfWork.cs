@@ -28,6 +28,7 @@ namespace WebApiVRoom.DAL.Repositories
         private HistoryOfBrowsingRepository historyOfBrowsingRepository;
         private NotificationRepository notificationRepository;
         private PlayListRepository playListRepository;
+        private PlayListVideoRepository playListVideoRepository;
         private PostRepository postRepository;
         private SubscriptionRepository subscriptionRepository;
         private TagRepository tagRepository;
@@ -40,6 +41,8 @@ namespace WebApiVRoom.DAL.Repositories
         private LikesDislikesPRepository likesDislikesRepositoryP;
         private OptionsForPostRepository optionsForPostRepository;
         private VoteRepository vouteRepository;
+        private WebRTCConnectionRepository webRTCConnectionRepository;
+        private WebRTCSessionRepository webRTCSessionRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
@@ -262,6 +265,37 @@ namespace WebApiVRoom.DAL.Repositories
                 if (videoRepository == null)
                     videoRepository = new VideoRepository(db);
                 return videoRepository;
+            }
+        }
+
+        public IWebRTCConnectionRepository WebRTCConnections
+        {
+            get
+            {
+                if (webRTCConnectionRepository == null)
+                    webRTCConnectionRepository = new WebRTCConnectionRepository(db);
+                return webRTCConnectionRepository;
+            }
+        }
+
+        public IWebRTCSessionRepository WebRTCSessions
+        {
+            get
+            {
+                if (webRTCSessionRepository == null)
+                    webRTCSessionRepository = new WebRTCSessionRepository(db);
+                return webRTCSessionRepository;
+            }
+        }
+
+        public IPlayListVideoRepositoty PlayListVideo
+        {
+            get
+            {
+                if (playListVideoRepository == null)
+                    playListVideoRepository = new PlayListVideoRepository(db);
+                return playListVideoRepository;
+
             }
         }
     }

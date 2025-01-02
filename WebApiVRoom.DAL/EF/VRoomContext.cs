@@ -33,6 +33,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Language> Languages { get; set; }
         public DbSet<HistoryOfBrowsing> HistoryOfBrowsings { get; set; }
         public DbSet<PlayList> PlayLists { get; set; }
+        public DbSet<PlayListVideo> PlayListVideo { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -46,7 +47,8 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
         public DbSet<Vote> Voutes { get; set; }
-        //public DbSet<WebSocketMessage> WebSockets { get; set; }
+        public DbSet<WebRTCSession> WebRTCSessions { get; set; }
+        public DbSet<WebRTCConnection> WebRTCConnections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

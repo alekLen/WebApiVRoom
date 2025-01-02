@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApiVRoom.DAL.Entities;
 
 namespace WebApiVRoom.DAL.Interfaces
 {
@@ -20,6 +21,7 @@ namespace WebApiVRoom.DAL.Interfaces
         IHistoryOfBrowsingRepository HistoryOfBrowsings { get; }
         INotificationRepository Notifications { get; }
         IPlayListRepository PlayLists { get; }
+        IPlayListVideoRepositoty PlayListVideo { get; }
         IPostRepository Posts { get; }
         ISubscriptionRepository Subscriptions { get; }
         ITagRepository Tags { get; }
@@ -32,5 +34,7 @@ namespace WebApiVRoom.DAL.Interfaces
         ILikesDislikesPRepository LikesP { get; }
         IOptionsForPostRepository Options {  get; }
         IVoteRepository Votes { get; }
+        IWebRTCConnectionRepository WebRTCConnections { get; }
+        IWebRTCSessionRepository WebRTCSessions { get; }
     }
 }

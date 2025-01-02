@@ -13,6 +13,8 @@ using WebApiVRoom;
 using Microsoft.AspNetCore.Http.Features;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.DAL.Entities;
+using WebApiVRoom.DAL.Interfaces;
+using WebApiVRoom.DAL.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,10 @@ builder.Services.AddAutoMapper(cfg =>
         .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
         .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
 });
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IWebRTCSessionRepository, WebRTCSessionRepository>();
+builder.Services.AddScoped<IWebRTCConnectionRepository, WebRTCConnectionRepository>();
+builder.Services.AddScoped<IWebRTCService, WebRTCService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
@@ -90,10 +96,21 @@ builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
 builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
 builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
-builder.Services.AddSingleton<LiveStreamingService>(provider =>new LiveStreamingService("AIzaSyDvXp8Wi0-Y6BPC55SDA953CFIid2g6TtY"));
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+});
 
+// Configure large file uploads
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 400_000_000;
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -115,6 +132,12 @@ builder.Services.AddAzureClients(clientBuilder =>
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+var webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2),
+    ReceiveBufferSize = 4 * 1024
+};
+app.UseWebSockets(webSocketOptions);
 
 if (app.Environment.IsDevelopment())
 {
@@ -122,18 +145,26 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Enable CORS
-app.UseCors(builder => builder.WithOrigins("http://localhost:3000")
+app.UseCors(builder => builder.WithOrigins("http://localhost:3000", "https://9dda-176-98-71-120.ngrok-free.app")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials());
 
 app.UseHttpsRedirection();
-
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    foreach (var header in context.Request.Headers)
+    {
+        Console.WriteLine($"{header.Key}: {header.Value}");
+    }
+    await next.Invoke();
+});
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.MapHub<ChatHub>("/hub");
+app.MapHub<WebRTCHub>("/webrtc");
 
 app.Run();
