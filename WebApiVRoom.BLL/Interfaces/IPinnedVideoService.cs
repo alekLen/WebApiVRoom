@@ -12,8 +12,9 @@ namespace WebApiVRoom.BLL.Interfaces
     {
         Task<PinnedVideoDTO> GetPinnedVideoById(int id);
         Task<PinnedVideoDTO> GetPinnedVideoByChannelId(int channelId);
-        Task AddPinnedVideo(PinnedVideoDTO pinnedVideoDTO);
+        Task<PinnedVideoDTO> AddPinnedVideo(PinnedVideoDTO pinnedVideoDTO);
         Task<PinnedVideoDTO> UpdatePinnedVideo(PinnedVideoDTO pinnedVideoDTO);
+        Task<PinnedVideoDTO?> GetPinnedVideoOrNullByChannelId(int channelId);
         Task DeletePinnedVideo(int id);
     }
 }

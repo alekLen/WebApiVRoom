@@ -204,7 +204,8 @@ namespace WebApiVRoom.BLL.Services
                             ChannelSettingsId = h.User.ChannelSettings_Id,
                             ChannelName = channel?.ChannelName,
                             Channel_URL = channel.Channel_URL,
-                            TimeCode = h.TimeCode
+                            TimeCode = h.TimeCode,
+                            Duration= h.Video.Duration
                         };
 
                         videoList.Add(video);
@@ -267,7 +268,8 @@ namespace WebApiVRoom.BLL.Services
                         ChannelSettingsId = group.User.ChannelSettings_Id,
                         ChannelName = channel?.ChannelName,
                         Channel_URL = channel.Channel_URL,
-                        TimeCode = group.TimeCode
+                        TimeCode = group.TimeCode,
+                        Duration = group.Video.Duration
                     };
 
                     videoList.Add(video);

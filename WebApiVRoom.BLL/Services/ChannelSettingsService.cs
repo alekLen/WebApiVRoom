@@ -94,7 +94,7 @@ namespace WebApiVRoom.BLL.Services
                 channelSettings.ChannelNikName = chDto.ChannelNikName;
                 channelSettings.Channel_URL = chDto.Channel_URL;
                 channelSettings.DateJoined = chDto.DateJoined;
-                channelSettings.Description = chDto.Description;
+                channelSettings.Description = chDto.Description == null ? "" : chDto.Description;
                 channelSettings.Notification = chDto.Notification;
                 channelSettings.SubscriptionCount = chDto.SubscriptionCount;
                 //channelSettings.ChannelBanner = chDto.ChannelBanner;
@@ -145,8 +145,8 @@ namespace WebApiVRoom.BLL.Services
                 }
                 channelSettings.ChannelName = chSDto.ChannelName;
                 channelSettings.ChannelNikName = chSDto.ChannelNikName;
-                channelSettings.Description = chSDto.Description;
-
+                channelSettings.Description = chSDto.Description == null ? "": chSDto.Description;
+                channelSettings.Country = await Database.Countries.GetById(chSDto.Country_Id);
                 if (channelImg != null)
                 {
                     if (channelImg[0] != null)//если нет баннера оставляем старую ссылку

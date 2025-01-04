@@ -21,5 +21,6 @@ namespace WebApiVRoom.BLL.DTO
         public string ChannelName { get; set; }
         public string Channel_URL { get; set; }
         public int TimeCode { get; set; }
+        public int Duration { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace WebApiVRoom.Controllers
 {
@@ -11,11 +12,14 @@ namespace WebApiVRoom.Controllers
     [Route("api/[controller]")]
     public class PinnedVideoController : ControllerBase
     {
-        private IPinnedVideoService _pinnedVideoService;
-
-        public PinnedVideoController(IPinnedVideoService pinnedVideoService)
+        private readonly IPinnedVideoService _pinnedVideoService;
+        private readonly IVideoService _videoService;
+        private readonly IChannelSettingsService _chService;
+        public PinnedVideoController(IPinnedVideoService pinnedVideoService, IVideoService videoService, IChannelSettingsService channelSettingsService)
         {
             _pinnedVideoService = pinnedVideoService;
+            _videoService = videoService;
+            _chService = channelSettingsService;
         }
 
         
@@ -31,45 +35,86 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(pinnedVideo);
         }
 
-        [HttpGet("getispinnedvideobychannelid/{channelId}")]
-        public async Task<ActionResult<PinnedVideoDTO>> GetIsPinnedVideoByChannelId(int channelId)
+        
+        private VideoInfoDTO ConvertVideoToVideoInfo(VideoDTO v, ChannelSettingsDTO ch)
         {
-            var pinnedVideo = await _pinnedVideoService.GetPinnedVideoByChannelId(channelId);
+            return new VideoInfoDTO
+            {
+                Id = v.Id,
+                ObjectID = v.ObjectID,
+                ChannelSettingsId = ch.Id,
+                ChannelName = ch.ChannelName,
+                ChannelBanner = ch.ChannelBanner,
+                ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                ChannelNikName = ch.ChannelNikName,
+                Channel_URL = ch.Channel_URL,
+                Tittle = v.Tittle,
+                Description = v.Description,
+                UploadDate = v.UploadDate,
+                Duration = v.Duration,
+                VideoUrl = v.VideoUrl,
+                VRoomVideoUrl = v.VRoomVideoUrl,
+                ChannelSubscriptionCount = ch.SubscriptionCount,
+                ViewCount = v.ViewCount,
+                LikeCount = v.LikeCount,
+                CommentCount = v.CommentVideoIds.Count,
+                DislikeCount = v.DislikeCount,
+                IsShort = v.IsShort,
+                Cover = v.Cover,
+                Visibility = v.Visibility,
+                IsAgeRestriction = v.IsAgeRestriction,
+                IsCopyright = v.IsCopyright,
+                Audience = v.Audience,
+            };
+        }
+        [HttpGet("getpinnedvideoornullbychannelid/{channelId}")]
+        public async Task<ActionResult<VideoInfoDTO>> GetIsPinnedVideoOrNullByChannelId(int channelId)
+        {
+            var pinnedVideo = await _pinnedVideoService.GetPinnedVideoOrNullByChannelId(channelId);
             if (pinnedVideo == null)
             {
-                return new ObjectResult(null);
+                return Ok(null); // Возвращаем null
             }
-            return new ObjectResult(pinnedVideo);
-        }
+            var video = await _videoService.GetVideoInfo(pinnedVideo.VideoId);
 
-        [HttpGet("getpinnedvideobychannelid/{channelId}")]
-        public async Task<ActionResult<PinnedVideoDTO>> GetPinnedVideoByChannelId(int channelId)
-        {
-            var pinnedVideo = await _pinnedVideoService.GetPinnedVideoByChannelId(channelId);
             if (pinnedVideo == null)
             {
                 return NotFound();
             }
-            return new ObjectResult(pinnedVideo);
+            ChannelSettingsDTO ch = await _chService.GetChannelSettings(video.ChannelSettingsId);
+            VideoInfoDTO videoInfoDTO = ConvertVideoToVideoInfo(video, ch);
+
+            return Ok(videoInfoDTO);
+
+        }
+        [HttpGet("getpinnedvideobychannelid/{channelId}")]
+        public async Task<ActionResult<PinnedVideoDTO>> GetPinnedVideoByChannelId(int channelId)
+        {
+            var pinnedVideo = await _pinnedVideoService.GetPinnedVideoOrNullByChannelId(channelId);
+            if (pinnedVideo == null)
+            {
+                return Ok(null);
+            }
+            return Ok(pinnedVideo);
         }
 
 
         [HttpPost("add")]
-        public async Task<ActionResult<PinnedVideoDTO>> AddPinnedVideo(PinnedVideoDTO pinnedVideoDTO)
+        public async Task<ActionResult<PinnedVideoDTO>> AddPinnedVideo([FromBody] PinnedVideoDTO pinnedVideoDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            await _pinnedVideoService.AddPinnedVideo(pinnedVideoDTO);
-            return Ok();
+            PinnedVideoDTO pinnedVideo_new = await _pinnedVideoService.AddPinnedVideo(pinnedVideoDTO);
+            return Ok(pinnedVideoDTO);
         }
 
 
 
         [HttpPut("update")]
-        public async Task<ActionResult<PinnedVideoDTO>> UpdateTag(PinnedVideoDTO u)
+        public async Task<ActionResult<PinnedVideoDTO>> UpdatePinnedVideo([FromBody] PinnedVideoDTO u)
         {
             if (!ModelState.IsValid)
             {
@@ -87,7 +132,7 @@ namespace WebApiVRoom.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PinnedVideoDTO>> DeletePinnedVideo(int id)
+        public async Task<ActionResult<PinnedVideoDTO>> DeletePinnedVideo( int id)
         {
             if (!ModelState.IsValid)
             {
