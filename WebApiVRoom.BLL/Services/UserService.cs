@@ -108,7 +108,7 @@ namespace WebApiVRoom.BLL.Services
             await Database.Users.Update(user);
             channelSettings.ChannelName = "VRoom_Channel" + (channelSettings.Id + 1000);
             channelSettings.ChannelNikName = "VRoom_Channel" + (channelSettings.Id + 1000);
-            channelSettings.Channel_URL = "http://localhost:3000/gotochannel/" + channelSettings.Id;
+            channelSettings.Channel_URL = "https://vr-oom.vercel.app/gotochannel/" + channelSettings.Id;
             await Database.ChannelSettings.Update(channelSettings);
 
             await CreateChannelSectionsV2(channelSettings.Id, channelSettings);//
