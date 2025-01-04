@@ -50,7 +50,18 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string type, string? searchQuery)
         {
-            return await db.AdminLogs.Where(x => x.Action.Contains(searchQuery) || x.Action == type || x.Description.Contains(searchQuery)).OrderByDescending(x => x.Date).Skip((page - 1) * perPage).Take(perPage).ToListAsync();
+            if (page <= 0) page = 1;
+            if (perPage <= 0) perPage = 10;
+
+            return await db.AdminLogs
+                .Where(x => 
+                    (string.IsNullOrEmpty(searchQuery) || x.Action.Contains(searchQuery) || x.Description.Contains(searchQuery)) &&
+                    (string.IsNullOrEmpty(type) || x.Type == type)
+                )
+                .OrderByDescending(x => x.Date)
+                .Skip((page - 1) * perPage)
+                .Take(perPage)
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<AdminLog>> GetPaginated(int page, int perPage)
@@ -73,9 +84,9 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.AdminLogs.CountAsync();
         }
 
-        public async Task<int> GetCountWithQuery(string? searchQuery)
+        public async Task<int> GetCountWithQuery(string type, string? searchQuery)
         {
-            return await db.AdminLogs.Where(x => x.Action.Contains(searchQuery) || x.Description.Contains(searchQuery)).CountAsync();
+            return await db.AdminLogs.Where(x => x.Action.Contains(searchQuery) || x.Type == type || x.Description.Contains(searchQuery)).CountAsync();
         }
 
         public async Task<IEnumerable<AdminLog>> GetPaginatedAndSortedWithQuery(int page, int perPage, string? searchQuery, string? sortField, string? sortOrder)

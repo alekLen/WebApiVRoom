@@ -27,9 +27,10 @@ public class AdminLogController : Controller
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AdminLogDTO>>> GetAdminLogs([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string type, [FromQuery] string? searchQuery)
+    public async Task<ActionResult<object>> GetAdminLogs([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string type, [FromQuery] string? searchQuery)
     {
         var adminLogs = await _adminLogService.GetPaginatedAndSortedWithQuery(page, perPage, type, searchQuery);
-        return new ObjectResult(adminLogs);
+        var adminLogsCount = await _adminLogService.GetCountWithQuery(type, searchQuery);
+        return new ObjectResult(new { adminLogs, adminLogsCount });
     }
 }

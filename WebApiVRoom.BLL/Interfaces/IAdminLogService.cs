@@ -28,7 +28,7 @@ namespace WebApiVRoom.BLL.Interfaces
 
         Task<int> GetCount();
 
-        Task<int> GetCountWithQuery(string? searchQuery);
+        Task<int> GetCountWithQuery(string type, string? searchQuery);
 
         Task<IEnumerable<AdminLogDTO>> GetAll();
     }

@@ -18,5 +18,11 @@ namespace WebApiVRoom.BLL.Interfaces
         Task<bool> Delete(int id);
 
         Task<IEnumerable<AdDTO>> GetPaginated(int page, int perPage, string searchQuery);
+
+        Task<int> Count(string searchQuery);
+
+        Task<bool> Add(AdDTO adDTO);
+
+        Task<AdDTO> GetRandom();
     }
 }

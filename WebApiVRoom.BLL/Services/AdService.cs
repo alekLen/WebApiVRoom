@@ -122,5 +122,61 @@ namespace WebApiVRoom.BLL.Services
                 return null;
             }
         }
+        
+        public async Task<int> Count(string searchQuery)
+        {
+            try
+            {
+                return await Database.Ads.Count(searchQuery);
+            }
+            catch (Exception ex)
+            {
+                return 0;
+            }
+        }
+        
+        public async Task<bool> Add(AdDTO adDTO)
+        {
+            try
+            {
+                var ad = new Ad
+                {
+                    Title = adDTO.Title,
+                    Description = adDTO.Description,
+                    Url = adDTO.Url,
+                    ImageUrl = adDTO.ImageUrl,
+                    CreatedAt = adDTO.CreatedAt
+                };
+
+                Database.Ads.Add(ad);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public async Task<AdDTO> GetRandom()
+        {
+            try
+            {
+                var ads = await Database.Ads.GetPaginated(1, 1, null);
+
+                if (ads == null)
+                {
+                    return null;
+                }
+
+                var ad = ads.FirstOrDefault();
+                var mapper = InitializeMapper();
+                return mapper.Map<Ad, AdDTO>(ad);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

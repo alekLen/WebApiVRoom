@@ -26,14 +26,16 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<ContentReport, ContentReportDTO>()
                 .ForMember(dest => dest.SenderUserId, opt => opt.MapFrom(src => src.SenderUserId))
-                    .ForMember(dest => dest.AdminId, opt => opt.MapFrom(src => src.AdminId))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                     .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                    .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.SubjectId))
                     .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                     .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.ClosedAt, opt => opt.MapFrom(src => src.ClosedAt))
-                    .ForMember(dest => dest.SubjectId, opt => opt.MapFrom(src => src.SubjectId));
+                    .ForMember(dest => dest.AdminId, opt => opt.MapFrom(src => src.AdminId))
+                    .ForMember(dest => dest.AdminAnswer, opt => opt.MapFrom(src => src.AdminAnswer));
+                
             });
 
             return new Mapper(config);
@@ -52,6 +54,28 @@ namespace WebApiVRoom.BLL.Services
 
                 var mapper = InitializeMapper();
                 return mapper.Map<ContentReport, ContentReportDTO>(contentReport);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        
+        public async Task Process(int id, string adminId)
+        {
+            try
+            {
+                var contentReport = await Database.ContentReports.Get(id);
+
+                if (contentReport == null)
+                {
+                    throw new Exception("Content report not found");
+                }
+
+                contentReport.AdminId = adminId;
+                contentReport.Status = "Processing";
+
+                await Database.ContentReports.Update(contentReport);
             }
             catch (Exception ex)
             {
@@ -83,16 +107,23 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
+                var user = await Database.Users.GetByClerk_Id(contentReportDTO.SenderUserId);
+                
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+                
                 var contentReport = new ContentReport
                 {
-                    SenderUserId = contentReportDTO.SenderUserId,
-                    AdminId = contentReportDTO.AdminId,
+                    SenderUserId = user.Id,
+                    AdminId = null,
                     Title = contentReportDTO.Title,
                     Description = contentReportDTO.Description,
                     Type = contentReportDTO.Type,
-                    Status = contentReportDTO.Status,
-                    CreatedAt = contentReportDTO.CreatedAt,
-                    ClosedAt = contentReportDTO.ClosedAt,
+                    Status = "Open",
+                    CreatedAt = DateTime.Now,
+                    ClosedAt = null,
                     SubjectId = contentReportDTO.SubjectId
                 };
 
@@ -111,17 +142,24 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
+                var user = await Database.Users.GetByClerk_Id(contentReportDTO.SenderUserId);
+
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+                
                 var contentReport = new ContentReport
                 {
                     Id = contentReportDTO.Id,
-                    SenderUserId = contentReportDTO.SenderUserId,
-                    AdminId = contentReportDTO.AdminId,
+                    SenderUserId = user.Id,
+                    AdminId = null,
                     Title = contentReportDTO.Title,
                     Description = contentReportDTO.Description,
                     Type = contentReportDTO.Type,
-                    Status = contentReportDTO.Status,
-                    CreatedAt = contentReportDTO.CreatedAt,
-                    ClosedAt = contentReportDTO.ClosedAt,
+                    Status = "Open",
+                    CreatedAt = DateTime.Now,
+                    ClosedAt = null,
                     SubjectId = contentReportDTO.SubjectId
                 };
 
@@ -190,19 +228,66 @@ namespace WebApiVRoom.BLL.Services
             }
         }
 
-        public async Task<IEnumerable<ContentReportDTO>> GetByUser(int userId, int page, int pageSize)
+        public async Task<IEnumerable<ContentReportDTO>> GetByUser(string clerkId, int page, int pageSize)
         {
             try
             {
-                var contentReports = await Database.ContentReports.GetByUserIdPaginated(userId, page, pageSize);
-
-                if (contentReports == null)
+                var user = await Database.Users.GetByClerk_Id(clerkId);
+                
+                if (user == null)
                 {
-                    return null;
+                    throw new Exception("User not found");
                 }
+                
+                var contentReports = await Database.ContentReports.GetByUserIdPaginated(user.Id, page, pageSize);
 
                 var mapper = InitializeMapper();
                 return mapper.Map<IEnumerable<ContentReport>, IEnumerable<ContentReportDTO>>(contentReports);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        
+        public async Task AdminAnswer(int id, string adminAnswer)
+        {
+            try
+            {
+                var contentReport = await Database.ContentReports.Get(id);
+
+                if (contentReport == null)
+                {
+                    throw new Exception("Content report not found");
+                }
+
+                contentReport.AdminAnswer = adminAnswer;
+                contentReport.Status = "Closed";
+                contentReport.ClosedAt = DateTime.Now;
+
+                await Database.ContentReports.Update(contentReport);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task ReOpen(int id)
+        {
+            try
+            {
+                var contentReport = await Database.ContentReports.Get(id);
+
+                if (contentReport == null)
+                {
+                    throw new Exception("Content report not found");
+                }
+
+                contentReport.Status = "Processing";
+                contentReport.ClosedAt = null;
+
+                await Database.ContentReports.Update(contentReport);
             }
             catch (Exception ex)
             {

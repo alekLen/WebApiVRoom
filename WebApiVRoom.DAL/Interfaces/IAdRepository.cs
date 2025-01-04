@@ -18,5 +18,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task Update(Ad ad);
 
         Task Delete(int id);
+
+        Task<int> Count(string searchQuery);
     }
 }

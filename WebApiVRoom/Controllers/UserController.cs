@@ -40,7 +40,7 @@ namespace WebApiVRoom.Controllers
         }
 
 
-        [HttpGet("{id}")]
+            [HttpGet("{id}")]
         public async Task<ActionResult<UserDTO>> GetUser([FromRoute] int id)
         {
 
@@ -51,7 +51,6 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(user);
         }
-
         [HttpPut("update")]
         public async Task<ActionResult<UserDTO>> UpdateUser([FromBody] UserDTO u)
         {
@@ -59,9 +58,7 @@ namespace WebApiVRoom.Controllers
             {
                 return BadRequest(ModelState);
             }
-
             UserDTO user = await _userService.GetUser(u.Id);
-
             if (user == null)
             {
                 return NotFound();
@@ -81,12 +78,12 @@ namespace WebApiVRoom.Controllers
                 string SigningSecret = _configuration["Clerk:WebhookSecret"];
                 Request.EnableBuffering();
 
-                string requestBody;
-                using (var reader = new StreamReader(Request.Body, leaveOpen: true))
-                {
-                    requestBody = await reader.ReadToEndAsync();
-                    Request.Body.Position = 0;
-                }
+            string requestBody;
+            using (var reader = new StreamReader(Request.Body, leaveOpen: true))
+            {
+                requestBody = await reader.ReadToEndAsync();
+                Request.Body.Position = 0;
+            }
 
                 var headers = new WebHeaderCollection();
                 headers.Set("svix-id", Request.Headers["svix-id"]);
@@ -110,8 +107,8 @@ namespace WebApiVRoom.Controllers
                         if (item.id == request.data.primary_email_address_id)
                         {
                             email.IsPrimary = true;
-                            SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
-                                item.email_address, " Wellcome to VRoom! Your regestration is successful.");
+                            //SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
+                            //    item.email_address, " Wellcome to VRoom! Your regestration is successful.");
                         }
                         else
                             email.IsPrimary = false;
