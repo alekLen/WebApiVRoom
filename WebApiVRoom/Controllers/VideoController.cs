@@ -375,7 +375,7 @@ namespace WebApiVRoom.Controllers
 
                 await _videoService.DeleteVideoV2(id);
             }
-          
+
 
             if (notFoundIds)
             {
@@ -520,7 +520,7 @@ namespace WebApiVRoom.Controllers
                 return Ok();
             }
             catch { return BadRequest(); }
-           
+
         }
         private async Task<object> ConvertObject(VideoDTO video)
         {
@@ -665,10 +665,12 @@ namespace WebApiVRoom.Controllers
 
 
 
-        [HttpGet("getchannelshortsorvideospaginated/{pageNumber}/{pageSize}/{channelid}/{isShorts}")]
+        [HttpGet("getchannelshortsorvideospaginated")]
         public async Task<ActionResult<List<VideoInfoDTO>>> GetShortsOrVideosByChannelIdPaginated([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] int channelid, [FromQuery] bool isShorts)
         {
             List<VideoDTO> videos = await _videoService.GetShortOrVideosByChannelIdPaginated(pageNumber, pageSize, channelid, isShorts);
+
+
             List<VideoInfoDTO> v = new List<VideoInfoDTO>();
             foreach (var video in videos)
             {
@@ -678,10 +680,6 @@ namespace WebApiVRoom.Controllers
             }
             return Ok(v);
         }
-
-
-
-
 
 
 

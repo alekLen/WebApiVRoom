@@ -10,5 +10,6 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface IPinnedVideoRepository: ISetGetRepository<PinnedVideo>
     {
         Task<PinnedVideo> GetPinnedVideoByChannelId(int channelId);
+        Task<PinnedVideo?> GetPinnedVideoOrNullByChannelId(int channelId);
     }
 }

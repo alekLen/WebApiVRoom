@@ -22,7 +22,7 @@ namespace WebApiVRoom.BLL.Services
         }
 
 
-        public async Task AddPinnedVideo(PinnedVideoDTO pinnedVideoDTO)
+        public async Task<PinnedVideoDTO> AddPinnedVideo(PinnedVideoDTO pinnedVideoDTO)
         {
             try
             {
@@ -44,9 +44,12 @@ namespace WebApiVRoom.BLL.Services
                 pinnedVideo.VideoId = video.Id;
 
                 await Database.PinnedVideos.Add(pinnedVideo);
+
+                return pinnedVideoDTO;
             }
             catch (Exception ex)
             {
+                return null;
             }
         }
 
@@ -120,7 +123,7 @@ namespace WebApiVRoom.BLL.Services
             var a = await Database.PinnedVideos.GetPinnedVideoByChannelId(channelId);
 
             if (a == null)
-                throw new ValidationException("Wrong tag!", "");
+                throw new KeyNotFoundException("Video not found");
 
             PinnedVideoDTO pinnedVideoDTO = new PinnedVideoDTO();
             pinnedVideoDTO.Id = a.Id;
@@ -130,6 +133,21 @@ namespace WebApiVRoom.BLL.Services
 
             return pinnedVideoDTO;
         }
+        public async Task<PinnedVideoDTO?> GetPinnedVideoOrNullByChannelId(int channelId)
+        {
+            var a = await Database.PinnedVideos.GetPinnedVideoOrNullByChannelId(channelId);
 
+            if (a == null)
+                return null; // Возвращаем null, если записи нет
+
+            PinnedVideoDTO pinnedVideoDTO = new PinnedVideoDTO
+            {
+                Id = a.Id,
+                ChannelSettingsId = a.Channel_Settings.Id,
+                VideoId = a.Video.Id
+            };
+
+            return pinnedVideoDTO;
+        }
     }
 }

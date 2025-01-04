@@ -77,6 +77,16 @@ namespace WebApiVRoom.DAL.Repositories
             return pinnedVideo;
         }
 
+        public async Task<PinnedVideo?> GetPinnedVideoOrNullByChannelId(int channelId)
+        {
+            var pinnedVideo = await db.PinnedVideos
+                .Include(v => v.Channel_Settings)
+                .Include(v => v.Video)
+                .FirstOrDefaultAsync(v => v.ChannelSettingsId == channelId);
+
+
+            return pinnedVideo;
+        }
         public async Task<PinnedVideo> GetPinnedVideoByChannelId(int channelId)
         {
             var pinnedVideo = await db.PinnedVideos
@@ -89,6 +99,5 @@ namespace WebApiVRoom.DAL.Repositories
 
             return pinnedVideo;
         }
-
     }
 }
