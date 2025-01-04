@@ -532,18 +532,21 @@ namespace WebApiVRoom.DAL.Migrations
                         name: "FK_HistoryOfBrowsings_ChannelSettings_ChannelSettingsId",
                         column: x => x.ChannelSettingsId,
                         principalTable: "ChannelSettings",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_HistoryOfBrowsings_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction,
+                        onUpdate: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_HistoryOfBrowsings_Videos_VideoId",
                         column: x => x.VideoId,
                         principalTable: "Videos",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(

@@ -15,11 +15,7 @@ namespace WebApiVRoom.DAL.EF
         public VRoomContext(DbContextOptions<VRoomContext> options)
             : base(options)
         {
-            if (Database.EnsureCreated())
-            {
-
-
-            }
+           
         }
 
 

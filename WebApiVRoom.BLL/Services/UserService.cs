@@ -97,7 +97,7 @@ namespace WebApiVRoom.BLL.Services
             await Database.Users.Add(user);
 
             Language langNew = new();
-            Country countryNew = new();
+          
             AdminLog adminLog = new();
             //Country countryNew = new();
             Country countryNew = await Database.Countries.GetByCountryCode("NotSelected");

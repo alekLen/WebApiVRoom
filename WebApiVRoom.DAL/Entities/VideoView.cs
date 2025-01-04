@@ -13,6 +13,8 @@ namespace WebApiVRoom.DAL.Entities
         
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public Video Video { get; set; }
+
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public User User { get; set; }
         public string? Location { get; set; }
         public int Duration { get; set; }

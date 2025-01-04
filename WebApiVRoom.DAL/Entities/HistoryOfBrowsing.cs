@@ -10,12 +10,14 @@ namespace WebApiVRoom.DAL.Entities
     public class HistoryOfBrowsing
     {
         public int Id { get; set; }
+
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public User User { get; set; }
-        
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public Video Video { get; set; }
         public DateTime Date {  get; set; }
         public int TimeCode { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public ChannelSettings ChannelSettings { get; set; }
     }
 }
