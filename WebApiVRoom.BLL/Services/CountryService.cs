@@ -29,14 +29,7 @@ namespace WebApiVRoom.BLL.Services
                 country.Id = countryDTO.Id;
                 country.Name = countryDTO.Name;
                 country.CountryCode = countryDTO.CountryCode;
-                List<ChannelSettings> list = new();
-
-                foreach (int id in countryDTO.ChannelSettingsId)
-                {
-                    list.Add(await Database.ChannelSettings.GetById(id));
-                }
-
-                country.ChannelSettingss = list;
+                
 
                 await Database.Countries.Add(country);
                
@@ -68,12 +61,7 @@ namespace WebApiVRoom.BLL.Services
             country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
-            country.ChannelSettingsId = new List<int>();
-
-            foreach (ChannelSettings channel in a.ChannelSettingss)
-            {
-                country.ChannelSettingsId.Add(channel.Id);
-            }
+            
 
             return country;
         }
@@ -90,12 +78,7 @@ namespace WebApiVRoom.BLL.Services
             country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
-            country.ChannelSettingsId = new List<int>();
-
-            foreach (ChannelSettings channel in a.ChannelSettingss)
-            {
-                country.ChannelSettingsId.Add(channel.Id);
-            }
+            
 
             return country;
         }
@@ -112,13 +95,7 @@ namespace WebApiVRoom.BLL.Services
             country.Name = a.Name;
             country.CountryCode = a.CountryCode;
 
-            country.ChannelSettingsId = new List<int>();
-
-            foreach (ChannelSettings channel in a.ChannelSettingss)
-            {
-                country.ChannelSettingsId.Add(channel.Id);
-            }
-
+           
             return country;
         }
 
@@ -131,14 +108,7 @@ namespace WebApiVRoom.BLL.Services
                 country.Id = countryDTO.Id;
                 country.Name = countryDTO.Name;
                 country.CountryCode = countryDTO.CountryCode;
-                List<ChannelSettings> list = new();
-
-                foreach (int id in countryDTO.ChannelSettingsId)
-                {
-                    list.Add(await Database.ChannelSettings.GetById(id));
-                }
-
-                country.ChannelSettingss = list;
+               
 
                 await Database.Countries.Update(country);
 
@@ -159,8 +129,7 @@ namespace WebApiVRoom.BLL.Services
                 {
                     cfg.CreateMap<Country, CountryDTO>()
                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                        .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.CountryCode))
-                        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettingss.Select(ch => new ChannelSettings { Id = ch.Id })));
+                        .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.CountryCode));
                 });
 
                 var mapper = new Mapper(config);
@@ -177,8 +146,7 @@ namespace WebApiVRoom.BLL.Services
                 {
                     cfg.CreateMap<Country, CountryDTO>()
                         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                        .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.CountryCode))
-                        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettingss.Select(ch => new ChannelSettings { Id = ch.Id })));
+                        .ForMember(dest => dest.CountryCode, opt => opt.MapFrom(src => src.CountryCode));
                 });
 
                 var mapper = new Mapper(config);

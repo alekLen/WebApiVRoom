@@ -97,8 +97,8 @@ namespace WebApiVRoom.BLL.Services
             await Database.Users.Add(user);
 
             Language langNew = new();
-            Country countryNew = new();
-
+            //Country countryNew = new();
+            Country countryNew = await Database.Countries.GetByCountryCode("NotSelected");
 
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
 
@@ -152,7 +152,7 @@ namespace WebApiVRoom.BLL.Services
                 List<string> defaultSections = new List<string>()// Список предопределённых разделов
                 {
                     "home", "Video", "shorts", "Broadcasts", "playlists",
-                    "posts", "about", "PinnedVideoSection", "subscriptionsSection"
+                    "posts", "about", "PinnedVideoSection", "ForYou", "HighRaitingVideos"
                 };
 
                 var allGlobalSections = await Database.ChannelSections.GetAllChSection();  // Получаем все глобальные разделы из базы
