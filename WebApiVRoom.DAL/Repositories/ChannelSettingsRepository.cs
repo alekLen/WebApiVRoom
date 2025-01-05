@@ -80,7 +80,7 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<ChannelSettings> FindByOwner(string ownerId)
         {
             try { 
-            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
+            return await db.ChannelSettings.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)

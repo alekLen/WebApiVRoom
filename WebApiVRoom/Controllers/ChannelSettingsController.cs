@@ -81,11 +81,12 @@ namespace WebApiVRoom.Controllers
             try
             {
                 var ch = await _chService.FindByOwner(clerkId);
-                string name = ch.ChannelName;
+              
                 if (ch == null)
                 {
                     return NotFound();
                 }
+                string name = ch.ChannelName;
                 if (ch.ChannelNikName != null)
                 {
                     name = ch.ChannelNikName;

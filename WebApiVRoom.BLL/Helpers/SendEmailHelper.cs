@@ -12,15 +12,15 @@ namespace WebApiVRoom.BLL.Helpers
                 var message = new MimeMessage();
                 message.From.Add(new MailboxAddress("VRoom Team", "vroomteamit@gmail.com"));
                 message.To.Add(new MailboxAddress(userName, userEmail));
-                message.Subject = "Welcome to VRoom";
+                message.Subject = "VRoom message";
 
                 var htmlContent = $@"
             <html>
             <body>
-                <h1 style='font-size:24px; color:blue;'>Hello, {userName}!</h1>
-                <p style='font-size:16px;'>{text}</p>
-                <p>Yours respectfully,<br>
-                <span style=' color:green;'>Team VRoom</span></p>
+                <h1 style='font-size:22px; color:blue;'>Hello, {userName}!</h1>
+                <p style='font-size:16px;'>{text}</p><br>
+                <p>Regards,<br>
+                <span style=' color:green;'>Your friends at VRoom</span></p>
             </body>
             </html>";
 

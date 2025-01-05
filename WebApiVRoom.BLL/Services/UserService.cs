@@ -99,8 +99,8 @@ namespace WebApiVRoom.BLL.Services
             Language langNew = new();
           
             AdminLog adminLog = new();
-            Country countryNew = new();
-            //Country countryNew = await Database.Countries.GetByCountryCode("NotSelected");
+           // Country countryNew = new();
+            Country countryNew = await Database.Countries.GetByCountryCode("NotSelected");
 
             ChannelSettings channelSettings = await CreateChannelSettings(langNew, countryNew, user, imgurl);
 
