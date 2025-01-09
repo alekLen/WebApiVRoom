@@ -216,9 +216,17 @@ namespace WebApiVRoom.DAL.Repositories
             if (existingVideo == null)
                 throw new KeyNotFoundException("Video not found");
 
+            // Перевірка перед оновленням
+            Console.WriteLine("Before update:", existingVideo);
             ValidateVideo(video);
+
+            // Оновлення відео
             _context.Videos.Update(video);
             await _context.SaveChangesAsync();
+
+            // Перевірка після оновлення
+            var updatedVideo = await _context.Videos.FindAsync(video.Id);
+            Console.WriteLine("After update:", updatedVideo);
         }
 
 
@@ -381,14 +389,18 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<List<Video>> GetVideosByChannelId(int channelId)
         {
-            return await _context.Videos
-                 .Include(v => v.Categories)
-                .Include(v => v.Tags)
-                .Include(v => v.CommentVideos)
-                 .Include(v => v.ChannelSettings)
-                 .Include(v => v.PlayListVideos)
-                .Where(v => v.IsShort == false).Where(v => v.ChannelSettings.Id == channelId)
-                .ToListAsync();
+            var videos = await _context.Videos
+    .Include(v => v.Categories)
+    .Include(v => v.Tags)
+    .Include(v => v.CommentVideos)
+    .Include(v => v.ChannelSettings)
+    .Include(v => v.PlayListVideos)
+    .AsSplitQuery()
+    .Where(v => !v.IsShort && v.ChannelSettings.Id == channelId)
+    .ToListAsync();
+
+            Console.WriteLine($"Videos found: {videos.Count}");
+            return videos;
         }
 
         public async Task<List<Video>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility)

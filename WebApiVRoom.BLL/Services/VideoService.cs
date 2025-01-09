@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using static WebApiVRoom.BLL.DTO.VideoService;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using System.Xml.Linq;
+using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Helpers;
 using Azure.Storage.Blobs.Models;
 
@@ -696,6 +698,8 @@ namespace WebApiVRoom.BLL.Services
         public async Task<List<VideoDTO>> GetVideosByChannelId(int channelId)
         {
             var videos = await _unitOfWork.Videos.GetVideosByChannelId(channelId);
+
+
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }
         public async Task<List<VideoDTO>> GetShortVideosByChannelId(int channelId)

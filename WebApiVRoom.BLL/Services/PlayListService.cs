@@ -14,8 +14,10 @@ namespace WebApiVRoom.BLL.Services
     public class PlayListService : IPlayListService
     {
         IUnitOfWork Database { get; set; }
-        public PlayListService(IUnitOfWork database)
+        private readonly IMapper _mapper;
+        public PlayListService(IUnitOfWork database, IMapper mapper)
         {
+            _mapper = mapper;
             Database = database;
         }
         public static IMapper InitializeMapper()
@@ -23,13 +25,14 @@ namespace WebApiVRoom.BLL.Services
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<PlayList, PlayListDTO>()
-                       .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
-                       .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
-                       .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
-                        .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
-                       .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId).ToList()));
-
+             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
+             .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
+             .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
             });
+
+
             return new Mapper(config);
         }
 
@@ -64,26 +67,72 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
+        //public async Task<PlayListDTO> Add(PlayListDTO pl)
+        //{
+        //    try
+        //    {
+        //        User user = await Database.Users.GetById(pl.UserId);
+
+        //        PlayList playlist = new PlayList();
+        //        playlist.User = user;
+        //        playlist.Title = pl.Title;
+        //        playlist.Date = pl.Date;   
+        //        playlist.Access = pl.Access;
+
+
+        //        await Database.PlayLists.Add(playlist);
+
+        //        var mapper = InitializeMapper();
+        //        var plDto = mapper.Map<PlayList, PlayListDTO>(playlist);
+
+        //        return plDto;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw ex;
+        //    }
+        //}
         public async Task<PlayListDTO> Add(PlayListDTO pl)
         {
             try
             {
+                // Отримуємо користувача
                 User user = await Database.Users.GetById(pl.UserId);
 
-                PlayList playlist = new PlayList();
-                playlist.User = user;
-                playlist.Title = pl.Title;
-                playlist.Date = pl.Date;   
-                playlist.Access = pl.Access;
-            
+                // Створюємо новий плейлист
+                PlayList playlist = new PlayList
+                {
+                    User = user,
+                    Title = pl.Title,
+                    Date = pl.Date,
+                    Access = pl.Access
+                    
+                };
 
+                // Додаємо плейлист у базу
                 await Database.PlayLists.Add(playlist);
 
+                // Додаємо відео до таблиці зв'язків PlayListVideos
+                foreach (var videoId in pl.VideosId)
+                {
+                    var playListVideo = new PlayListVideo
+                    {
+                        PlayListId = playlist.Id,
+                        VideoId = videoId
+                    };
+
+                    await Database.PlayListVideo.Add(playListVideo); // Використовуємо правильний репозиторій
+                }
+
+                // Зберігаємо зміни
+                // await Database.();
+
+                // Мапінг у DTO
                 var mapper = InitializeMapper();
                 var plDto = mapper.Map<PlayList, PlayListDTO>(playlist);
 
                 return plDto;
-
             }
             catch (Exception ex)
             {
@@ -103,9 +152,23 @@ namespace WebApiVRoom.BLL.Services
                     playlist.Title = pl.Title;
                     playlist.Date = pl.Date;
                     playlist.Access = pl.Access;
-                
 
-                    await Database.PlayLists.Update(playlist);
+                    // Оновлення зв'язків PlayListVideos
+                    var existingVideos = await Database.PlayListVideo.GetByPlayListIdAsync(pl.Id);
+                    foreach (var video in existingVideos)
+                    {
+                        await Database.PlayListVideo.Delete(video.VideoId);
+                    }
+
+                    foreach (var videoId in pl.VideosId)
+                    {
+                        var playListVideo = new PlayListVideo
+                        {
+                            PlayListId = playlist.Id,
+                            VideoId = videoId
+                        };
+                        await Database.PlayListVideo.Add(playListVideo);
+                    }
 
                     var mapper = InitializeMapper();
                     var plDto = mapper.Map<PlayList, PlayListDTO>(playlist);
@@ -113,13 +176,13 @@ namespace WebApiVRoom.BLL.Services
                     return plDto;
                 }
                 return null;
-
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception("Помилка при оновленні плейлиста", ex);
             }
         }
+
         public async Task<PlayListDTO> Delete(int id)
         {
             try {  

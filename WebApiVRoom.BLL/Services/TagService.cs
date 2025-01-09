@@ -25,11 +25,15 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                Tag tag = new Tag();
-               Tag t = await Database.Tags.GetByName(tagDTO.Name);
-                if (t == null)
+                Tag tag = new Tag()
                 {
-                    tag.Name = tagDTO.Name;
+                    Id = tagDTO.Id,
+                    Name = tagDTO.Name
+
+
+                };
+
+                List<Video> list = new();
 
                     await Database.Tags.Add(tag);
                 }

@@ -34,6 +34,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Language> Languages { get; set; }
         public DbSet<HistoryOfBrowsing> HistoryOfBrowsings { get; set; }
         public DbSet<PlayList> PlayLists { get; set; }
+        public DbSet<PlayListVideo> PlayListVideo { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -46,6 +47,41 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
+        public DbSet<Vote> Voutes { get; set; }
+        public DbSet<WebRTCSession> WebRTCSessions { get; set; }
+        public DbSet<WebRTCConnection> WebRTCConnections { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<CommentPost>()
+                    .HasOne(cp => cp.Post)
+                    .WithMany(p => p.CommentPosts)
+                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<CommentVideo>()
+                    .HasOne(cp => cp.Video)
+                    .WithMany(p => p.CommentVideos)
+                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<HistoryOfBrowsing>()
+                   .HasOne(cp => cp.Video)
+                   .WithMany(p => p.HistoryOfBrowsings)
+                   .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+
+            modelBuilder.Entity<PlayListVideo>()
+         .HasKey(pv => new { pv.PlayListId, pv.VideoId }); // Первичный ключ составной
+
+            modelBuilder.Entity<PlayListVideo>()
+                .HasOne(pv => pv.PlayList)
+                .WithMany(p => p.PlayListVideos)
+                .HasForeignKey(pv => pv.PlayListId)
+                .OnDelete(DeleteBehavior.NoAction); // Отключаем каскадное удаление со стороны PlayList
+
+            modelBuilder.Entity<PlayListVideo>()
+                .HasOne(pv => pv.Video)
+                .WithMany(v => v.PlayListVideos)
+                .HasForeignKey(pv => pv.VideoId)
+                .OnDelete(DeleteBehavior.NoAction);
         public DbSet<Vote> Votes { get; set; }
         public DbSet<Broadcast> Broadcasts { get; set; }
         public DbSet<VideoView> VideoViews { get; set; }

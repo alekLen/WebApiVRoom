@@ -634,16 +634,36 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getchannelvideos/{channelid}")]
         public async Task<ActionResult<List<VideoInfoDTO>>> GetChannelVideos([FromRoute] int channelid)
         {
-            List<VideoDTO> videos = await _videoService.GetByChannelId(channelid);
-            List<VideoInfoDTO> v = new List<VideoInfoDTO>();
+            List<VideoDTO> videos = await _videoService.GetVideosByChannelId(channelid);
+            Console.WriteLine($"Total videos retrieved: {videos.Count}");
+
+            ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(channelid);
+
+            if (channelSettings == null)
+            {
+                Console.WriteLine($"Channel settings not found for channel ID: {channelid}");
+                return NotFound($"Channel settings not found for channel ID: {channelid}");
+            }
+
+            List<VideoInfoDTO> videoInfoList = new List<VideoInfoDTO>();
+
             foreach (var video in videos)
             {
-                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
-                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
-                v.Add(videoInfo);
+                if (video.ChannelSettingsId == channelid) 
+                {
+                    VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
+                    videoInfoList.Add(videoInfo);
+                }
+                else
+                {
+                    Console.WriteLine($"Video with ID: {video.Id} does not belong to channel ID: {channelid}");
+                }
             }
-            return Ok(v);
+
+            return Ok(videoInfoList);
         }
+
+
 
         [HttpGet("getvideolistbytag/{name}")]
         public async Task<ActionResult<List<VideoInfoDTO>>> GetVideoListByTag([FromRoute] string name)
