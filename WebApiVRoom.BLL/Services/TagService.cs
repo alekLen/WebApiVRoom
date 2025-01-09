@@ -34,7 +34,7 @@ namespace WebApiVRoom.BLL.Services
                 };
 
                 List<Video> list = new();
-
+                { 
                     await Database.Tags.Add(tag);
                 }
                

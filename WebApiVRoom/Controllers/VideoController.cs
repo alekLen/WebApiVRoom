@@ -373,7 +373,7 @@ namespace WebApiVRoom.Controllers
                     notFoundIds = true;
                 }
 
-                await _videoService.DeleteVideoV2(id);
+                await _videoService.DeleteVideo(id);
             }
 
 

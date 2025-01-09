@@ -82,8 +82,10 @@ namespace WebApiVRoom.DAL.EF
                 .WithMany(v => v.PlayListVideos)
                 .HasForeignKey(pv => pv.VideoId)
                 .OnDelete(DeleteBehavior.NoAction);
+        }
+
         public DbSet<Vote> Votes { get; set; }
-        public DbSet<Broadcast> Broadcasts { get; set; }
+        //public DbSet<Broadcast> Broadcasts { get; set; }
         public DbSet<VideoView> VideoViews { get; set; }
         public DbSet<ContentReport> ContentReports { get; set; }
         public DbSet<Ad> Ads { get; set; }

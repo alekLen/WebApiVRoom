@@ -182,11 +182,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(builder => builder.WithOrigins("http://localhost:3000", "https://9dda-176-98-71-120.ngrok-free.app")
 // Enable CORS
-app.UseCors(builder => builder.AllowAnyOrigin()
+app.UseCors(builder => builder.WithOrigins("http://localhost:3000", "https://cd1c-91-225-36-96.ngrok-free.app")
                         .AllowAnyHeader()
-                        .AllowAnyMethod()
+                        .AllowAnyMethod().AllowCredentials()
                         );
 
 app.UseHttpsRedirection();
