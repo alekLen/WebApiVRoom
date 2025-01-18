@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,32 +10,34 @@ using WebApiVRoom.DAL.Interfaces;
 
 namespace WebApiVRoom.DAL.Repositories
 {
-    public class PlayListVideoRepository : IPlayListVideoRepositoty
+    public class PlayListVideoRepository : IPlayListVideoRepository
     {
-        private readonly VRoomContext _context;
+        private VRoomContext db;
 
         public PlayListVideoRepository(VRoomContext context)
         {
-            _context = context;
+            this.db = context;
         }
+
         public async Task Add(PlayListVideo t)
         {
-            await _context.PlayListVideo.AddAsync(t);
-            await _context.SaveChangesAsync();
+            await db.PlayListVideos.AddAsync(t);
+            await db.SaveChangesAsync();
         }
+
         public async Task Delete(int id)
         {
-            var entity = await _context.PlayListVideo.FindAsync(id);
+            var entity = await db.PlayListVideos.FindAsync(id);
             if (entity != null)
             {
-                _context.PlayListVideo.Remove(entity);
-                await _context.SaveChangesAsync();
+                db.PlayListVideos.Remove(entity);
+                await db.SaveChangesAsync();
             }
         }
 
         public async Task<IEnumerable<PlayListVideo>> GetAll()
         {
-            return await _context.PlayListVideo
+            return await db.PlayListVideos
                 .Include(pv => pv.PlayList)
                 .Include(pv => pv.Video)
                 .ToListAsync();
@@ -43,7 +45,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<PlayListVideo> GetById(int id)
         {
-            return await _context.PlayListVideo    
+            return await db.PlayListVideos
                 .Include(pv => pv.PlayList)
                 .Include(pv => pv.Video)
                 .FirstOrDefaultAsync(pv => pv.PlayListId == id || pv.VideoId == id);
@@ -51,15 +53,16 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<IEnumerable<PlayListVideo>> GetByPlayListIdAsync(int playListId)
         {
-            return await _context.PlayListVideo
+            return await db.PlayListVideos
                 .Where(pv => pv.PlayListId == playListId)
-                .Include(pv => pv.Video) 
+                .Include(pv => pv.Video)
                 .ToListAsync();
         }
+
         public async Task Update(PlayListVideo t)
         {
-            _context.PlayListVideo.Update(t);
-            await _context.SaveChangesAsync();
+            db.PlayListVideos.Update(t);
+            await db.SaveChangesAsync();
         }
     }
 }

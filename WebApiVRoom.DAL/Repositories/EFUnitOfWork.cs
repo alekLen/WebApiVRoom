@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -288,7 +288,7 @@ namespace WebApiVRoom.DAL.Repositories
             }
         }
 
-        public IPlayListVideoRepositoty PlayListVideo
+        public IPlayListVideoRepository PlayListVideo
         {
             get
             {
@@ -298,5 +298,7 @@ namespace WebApiVRoom.DAL.Repositories
 
             }
         }
+
+  
     }
 }

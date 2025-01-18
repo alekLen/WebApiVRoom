@@ -21,7 +21,7 @@ namespace WebApiVRoom.DAL.Interfaces
         IHistoryOfBrowsingRepository HistoryOfBrowsings { get; }
         INotificationRepository Notifications { get; }
         IPlayListRepository PlayLists { get; }
-        IPlayListVideoRepositoty PlayListVideo { get; }
+        IPlayListVideoRepository PlayListVideo { get; }
         IPostRepository Posts { get; }
         ISubscriptionRepository Subscriptions { get; }
         ITagRepository Tags { get; }

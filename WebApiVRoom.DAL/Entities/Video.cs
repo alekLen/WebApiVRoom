@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Formats.Asn1;
 using System.Linq;
@@ -27,14 +27,11 @@ namespace WebApiVRoom.DAL.Entities
         public bool IsAgeRestriction { get; set; }//Возрастные ограничения --> true = есть, false = нет
         public bool IsCopyright { get; set; }//Авторские права --> true = есть, false = нет
         public string Audience { get; set; }//Аудитория --> children = дети, adults = взрослые, all = все
-
-
+        public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>();
         public List<Category> Categories { get; set; } = new List<Category>();
         public List<Tag> Tags { get; set; } = new List<Tag>();
         public List<HistoryOfBrowsing> HistoryOfBrowsings { get; set; } = new List<HistoryOfBrowsing>();
         public List<CommentVideo> CommentVideos { get; set; } = new List<CommentVideo>();
-        public List<PlayList>? PlayLists { get; set; } = new List<PlayList>();
-        public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>();
         public TimeSpan LastViewedPosition { get; set; }
     }
 }

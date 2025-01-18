@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Web;
 using WebApiVRoom.BLL.DTO;
@@ -122,15 +123,17 @@ namespace WebApiVRoom.Controllers
         private ILikesDislikesVService _likesService;
         private readonly IHubContext<ChatHub> _hubContext;
         private IUserService _userService;
+        private readonly ILogger<VideoController> _logger;
 
         public VideoController(IVideoService videoService, IChannelSettingsService _ch,
-            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService)
+            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService, ILogger<VideoController> logger)
         {
             _videoService = videoService;
             _chService = _ch;
             _hubContext = hubContext;
             _likesService = likesService;
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet("getvideosorshortsbychannelidwithfilters")]
@@ -294,23 +297,24 @@ namespace WebApiVRoom.Controllers
         [HttpPut("update")]
         public async Task<ActionResult<VideoDTO>> UpdateVideo([FromBody] VideoDTO videoDto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var currentVideo = await _videoService.GetVideo(videoDto.Id);
-            if (currentVideo == null)
+                var updatedVideo = await _videoService.UpdateVideo(videoDto);
+                return Ok(updatedVideo);
+            }
+            catch (KeyNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-            else
+            catch (Exception ex)
             {
-                await _videoService.UpdateVideo(videoDto);
-                return Ok(currentVideo);
+                return StatusCode(500, $"Error updating video: {ex.Message}");
             }
-
-
         }
         [HttpPut("updatevideoinfo")]
         public async Task<ActionResult<VideoDTO>> UpdateVideoInfo([FromBody] VideoDTO videoDto)
@@ -337,14 +341,22 @@ namespace WebApiVRoom.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteVideo([FromRoute] int id)
         {
-            var video = await _videoService.GetVideo(id);
-            if (video == null)
+            try
             {
-                return NotFound();
+                await _videoService.DeleteVideo(id);
+                _logger.LogInformation($"Video with ID {id} successfully deleted");
+                return NoContent();
             }
-
-            await _videoService.DeleteVideo(id);
-            return NoContent();
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning($"Video with ID {id} not found: {ex.Message}");
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error deleting video {id}");
+                return StatusCode(500, new { message = "An error occurred while deleting the video" });
+            }
         }
 
 
@@ -554,4 +566,3 @@ namespace WebApiVRoom.Controllers
 
     }
 }
-

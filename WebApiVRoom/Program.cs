@@ -1,4 +1,3 @@
-﻿
 using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -15,21 +14,44 @@ using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
 using WebApiVRoom.DAL.Repositories;
-
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.WebSockets;
+using Microsoft.Extensions.FileProviders;
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+if (!Directory.Exists(wwwrootPath))
+{
+    Directory.CreateDirectory(wwwrootPath);
+}
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Ensure wwwroot directory exists
+
+
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-//string? AlgoliaAppId = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-//string? AlgoliaKey = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
 builder.Services.AddVRoomContext(connection);
 builder.Services.AddUnitOfWorkService();
+builder.Services.AddSingleton<IHLSService, HLSService>();
 builder.Services.AddSingleton(x => {
     string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
     return new BlobServiceClient(connectionString);
 });
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:3000") // React app URL
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.CreateMap<PlayList, PlayListDTO>()
@@ -39,10 +61,20 @@ builder.Services.AddAutoMapper(cfg =>
         .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
         .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
 });
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 400_000_000;
+});
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddSignalR();
 builder.Services.AddScoped<IWebRTCSessionRepository, WebRTCSessionRepository>();
 builder.Services.AddScoped<IWebRTCConnectionRepository, WebRTCConnectionRepository>();
-builder.Services.AddScoped<IWebRTCService, WebRTCService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICategoryService, CategoryService>();
@@ -50,8 +82,8 @@ builder.Services.AddTransient<ILanguageService, LanguageService>();
 builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
 builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
 builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
-//builder.Services.AddTransient<ICommentPostService, CommentPostService>();
-//builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
+builder.Services.AddTransient<ICommentPostService, CommentPostService>();
+builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
 builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
 builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddTransient<IPlayListService, PlayListService>();
@@ -98,46 +130,37 @@ builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5000, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
-});
-
-// Configure large file uploads
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 400_000_000;
-});
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.Limits.MaxRequestBodySize = 400_000_000; 
-});
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 400_000_000; 
-});
-
-builder.Services.AddAzureClients(clientBuilder =>
-{
-    clientBuilder.AddBlobServiceClient(builder.Configuration["BlobStorage:ConnectionString"]!);
-    clientBuilder.AddQueueServiceClient(builder.Configuration["BlobStorage:ConnectionString"]!);
-});
-
-builder.Services.AddSignalR();
 
 var app = builder.Build();
-var webSocketOptions = new WebSocketOptions
+
+// Ensure streams directory exists
+var streamsPath = Path.Combine(wwwrootPath, "streams");
+if (!Directory.Exists(streamsPath))
 {
-    KeepAliveInterval = TimeSpan.FromMinutes(2),
-    ReceiveBufferSize = 4 * 1024
-};
-app.UseWebSockets(webSocketOptions);
+    Directory.CreateDirectory(streamsPath);
+
+    // Set access permissions
+    var directoryInfo = new DirectoryInfo(streamsPath);
+    var accessControl = directoryInfo.GetAccessControl();
+    accessControl.AddAccessRule(new System.Security.AccessControl.FileSystemAccessRule(
+        "Everyone",
+        System.Security.AccessControl.FileSystemRights.FullControl,
+        System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
+        System.Security.AccessControl.PropagationFlags.None,
+        System.Security.AccessControl.AccessControlType.Allow
+    ));
+    directoryInfo.SetAccessControl(accessControl);
+}
+
+// Configure static files
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(wwwrootPath),
+    RequestPath = "",
+    ServeUnknownFileTypes = true,
+    DefaultContentType = "application/octet-stream"
+});
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -145,26 +168,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(builder => builder.WithOrigins("http://localhost:3000", "https://9dda-176-98-71-120.ngrok-free.app")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
-
 app.UseHttpsRedirection();
-app.Use(async (context, next) =>
-{
-    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
-    foreach (var header in context.Request.Headers)
-    {
-        Console.WriteLine($"{header.Key}: {header.Value}");
-    }
-    await next.Invoke();
-});
+app.UseRouting();
+app.UseCors("AllowAll");
+app.UseWebSockets();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.MapHub<ChatHub>("/hub");
-app.MapHub<WebRTCHub>("/webrtc");
 
 app.Run();

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -159,7 +159,7 @@ namespace WebApiVRoom.BLL.Services
                     var masterPlaylistBlobUrl = await _blobStorageService.UploadFileAsync(masterPlaylistStream, $"{sanitizedTitle}_master.m3u8");
                     if (string.IsNullOrEmpty(masterPlaylistBlobUrl.FileUrl))
                     {
-                        throw new Exception("URL мастер-плейлиста не было получено от Blob Storage.");
+                        throw new Exception("URL мастер-плейлиста не було отримано від Blob Storage.");
                     }
 
                     video.VideoUrl = masterPlaylistBlobUrl.FileUrl;
@@ -189,7 +189,6 @@ namespace WebApiVRoom.BLL.Services
                 // Привязка настроек канала и категорий
                 video.ChannelSettings = await _unitOfWork.ChannelSettings.GetById(videoDTO.ChannelSettingsId);
 
-
                 video.Categories = new List<Category>();
                 foreach (var categoryId in videoDTO.CategoryIds)
                 {
@@ -208,7 +207,6 @@ namespace WebApiVRoom.BLL.Services
                 VideoForAlgolia vid = CreateVideoForAlgolia(video);
 
                 await _algoliaService.AddOrUpdateVideoAsync(vid);
-
 
                 var temp_video = await _unitOfWork.Videos.GetById(video.Id);
 
@@ -355,16 +353,48 @@ namespace WebApiVRoom.BLL.Services
                 var video = await _unitOfWork.Videos.GetById(id);
                 if (video == null)
                 {
-                    throw new KeyNotFoundException("Video not found");
+                    throw new KeyNotFoundException($"Video with ID {id} not found");
                 }
-                await _blobStorageService.DeleteFileAsync(video.VideoUrl);
-                await _unitOfWork.Videos.Delete(id);
 
-                await _algoliaService.DeleteVideoAsync(video.ObjectID);
+                // First try to delete from Algolia
+                if (!string.IsNullOrEmpty(video.ObjectID))
+                {
+                    try
+                    {
+                        await _algoliaService.DeleteVideoAsync(video.ObjectID);
+                    }
+                    catch (Exception algoliaEx)
+                    {
+                        // Log but continue if Algolia deletion fails
+                        Debug.WriteLine($"Warning: Failed to delete video from Algolia: {algoliaEx.Message}");
+                    }
+                }
+
+                // Then try to delete the file from blob storage if URL exists
+                if (!string.IsNullOrEmpty(video.VideoUrl))
+                {
+                    try
+                    {
+                        await _blobStorageService.DeleteFileAsync(video.VideoUrl);
+                    }
+                    catch (Exception blobEx)
+                    {
+                        // Log but continue if blob deletion fails
+                        Debug.WriteLine($"Warning: Failed to delete video file from blob storage: {blobEx.Message}");
+                    }
+                }
+
+                // Delete video and its related records from database
+                await _unitOfWork.Videos.Delete(id);
+            }
+            catch (KeyNotFoundException)
+            {
+                throw; // Rethrow not found exception
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while deleting video", ex);
+                Debug.WriteLine($"Error deleting video {id}: {ex}");
+                throw new Exception($"Failed to delete video {id}. {ex.Message}", ex);
             }
         }
 
@@ -376,66 +406,57 @@ namespace WebApiVRoom.BLL.Services
                 var video = await _unitOfWork.Videos.GetById(videoDTO.Id);
                 if (video == null)
                 {
-                    throw new KeyNotFoundException("Video not found");
+                    throw new KeyNotFoundException($"Video with ID {videoDTO.Id} not found");
                 }
 
+                // Оновлюємо тільки дозволені для редагування поля
                 video.Tittle = videoDTO.Tittle;
                 video.Description = videoDTO.Description;
-                video.UploadDate = videoDTO.UploadDate;
-                video.Duration = videoDTO.Duration;
-                video.ViewCount = videoDTO.ViewCount;
-                video.LikeCount = videoDTO.LikeCount;
-                video.DislikeCount = videoDTO.DislikeCount;
-                video.IsShort = videoDTO.IsShort;
                 video.Cover = videoDTO.Cover;
                 video.Visibility = videoDTO.Visibility;
                 video.IsAgeRestriction = videoDTO.IsAgeRestriction;
                 video.IsCopyright = videoDTO.IsCopyright;
                 video.Audience = videoDTO.Audience;
 
+                // Оновлюємо категорії
                 video.Categories.Clear();
-                foreach (var categoryId in videoDTO.CategoryIds)
+                if (videoDTO.CategoryIds != null && videoDTO.CategoryIds.Any())
                 {
-                    video.Categories.Add(await _unitOfWork.Categories.GetById(categoryId));
-                }
-
-                video.Tags.Clear();
-                foreach (var tagId in videoDTO.TagIds)
-                {
-                    video.Tags.Add(await _unitOfWork.Tags.GetById(tagId));
-                }
-
-                if (!string.IsNullOrEmpty(videoDTO.VideoUrl))
-                {
-                    await _blobStorageService.DeleteFileAsync(video.VideoUrl);
-
-                    using (var stream = new MemoryStream())
+                    foreach (var categoryId in videoDTO.CategoryIds)
                     {
-                        var newVideoUrl = await _blobStorageService.UploadFileAsync(stream, $"{videoDTO.Tittle}-{Guid.NewGuid()}.mp4");
-                        video.VideoUrl = newVideoUrl.FileUrl;
+                        var category = await _unitOfWork.Categories.GetById(categoryId);
+                        if (category != null)
+                        {
+                            video.Categories.Add(category);
+                        }
                     }
                 }
 
-
-                video.VRoomVideoUrl = $"http://localhost:3000/shorts/{video.Id}";
-
-                if (videoDTO.IsShort == false)
+                // Оновлюємо теги
+                video.Tags.Clear();
+                if (videoDTO.TagIds != null && videoDTO.TagIds.Any())
                 {
-                    video.VRoomVideoUrl = $"http://localhost:3000/watch/{video.Id}";
+                    foreach (var tagId in videoDTO.TagIds)
+                    {
+                        var tag = await _unitOfWork.Tags.GetById(tagId);
+                        if (tag != null)
+                        {
+                            video.Tags.Add(tag);
+                        }
+                    }
                 }
-
 
                 await _unitOfWork.Videos.Update(video);
 
+                // Оновлюємо дані в Algolia
                 VideoForAlgolia vid = CreateVideoForAlgolia(video);
-
                 await _algoliaService.AddOrUpdateVideoAsync(vid);
 
                 return _mapper.Map<Video, VideoDTO>(video);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while updating video", ex);
+                throw new Exception($"Error while updating video: {ex.Message}", ex);
             }
         }
 
@@ -451,12 +472,6 @@ namespace WebApiVRoom.BLL.Services
 
                 video.Tittle = videoDTO.Tittle;
                 video.Description = videoDTO.Description;
-                video.UploadDate = videoDTO.UploadDate;
-                video.Duration = videoDTO.Duration;
-                video.ViewCount = videoDTO.ViewCount;
-                video.LikeCount = videoDTO.LikeCount;
-                video.DislikeCount = videoDTO.DislikeCount;
-                video.IsShort = videoDTO.IsShort;
                 video.Cover = videoDTO.Cover;
                 video.Visibility = videoDTO.Visibility;
                 video.IsAgeRestriction = videoDTO.IsAgeRestriction;
@@ -505,7 +520,7 @@ namespace WebApiVRoom.BLL.Services
                     throw new KeyNotFoundException("Video not found");
                 }
 
-                var videoUrl = video.VideoUrl; 
+                var videoUrl = video.VideoUrl;
                 if (string.IsNullOrEmpty(videoUrl))
                 {
                     throw new InvalidOperationException("Video URL is not available");
@@ -533,7 +548,6 @@ namespace WebApiVRoom.BLL.Services
                 throw new Exception("Error while retrieving video", ex);
             }
         }
-
 
         public async Task<IEnumerable<VideoWithStreamDTO>> GetAllVideoWithStream()
         {
@@ -564,8 +578,6 @@ namespace WebApiVRoom.BLL.Services
                         throw new InvalidOperationException("Failed to retrieve video stream.");
                     }
 
-
-
                     list.Add(new VideoWithStreamDTO
                     {
                         Metadata = videoDto,
@@ -592,7 +604,6 @@ namespace WebApiVRoom.BLL.Services
                 throw new Exception("Error while retrieving comments", ex);
             }
         }
-
 
         public async Task<List<VideoDTO>> GetByCategory(string categoryName)
         {
@@ -638,7 +649,6 @@ namespace WebApiVRoom.BLL.Services
         public async Task<List<VideoDTO>> GetVideosByChannelId(int channelId)
         {
             var videos = await _unitOfWork.Videos.GetVideosByChannelId(channelId);
-
 
             return _mapper.Map<List<Video>, List<VideoDTO>>(videos);
         }

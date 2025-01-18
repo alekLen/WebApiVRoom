@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +15,6 @@ namespace WebApiVRoom.BLL.DTO
         public bool Access { get; set; }
         public DateTime Date { get; set; }
         public List<int> VideosId { get; set; } = new List<int>();
+        public List<VideoDTO> Videos { get; set; } = new List<VideoDTO>();
     }
 }

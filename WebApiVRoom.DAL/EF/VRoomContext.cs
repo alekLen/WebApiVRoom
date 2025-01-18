@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Language> Languages { get; set; }
         public DbSet<HistoryOfBrowsing> HistoryOfBrowsings { get; set; }
         public DbSet<PlayList> PlayLists { get; set; }
-        public DbSet<PlayListVideo> PlayListVideo { get; set; }
+        public DbSet<PlayListVideo> PlayListVideos { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -55,32 +55,33 @@ namespace WebApiVRoom.DAL.EF
             modelBuilder.Entity<CommentPost>()
                     .HasOne(cp => cp.Post)
                     .WithMany(p => p.CommentPosts)
-                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+                    .OnDelete(DeleteBehavior.NoAction); 
 
             modelBuilder.Entity<CommentVideo>()
                     .HasOne(cp => cp.Video)
                     .WithMany(p => p.CommentVideos)
-                    .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+                    .OnDelete(DeleteBehavior.NoAction); 
 
             modelBuilder.Entity<HistoryOfBrowsing>()
                    .HasOne(cp => cp.Video)
                    .WithMany(p => p.HistoryOfBrowsings)
-                   .OnDelete(DeleteBehavior.NoAction); // Убираем каскадное удаление
+                   .OnDelete(DeleteBehavior.NoAction); 
 
-            modelBuilder.Entity<PlayListVideo>()
-         .HasKey(pv => new { pv.PlayListId, pv.VideoId }); // Первичный ключ составной
+            modelBuilder.Entity<PlayListVideo>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).UseIdentityColumn();
 
-            modelBuilder.Entity<PlayListVideo>()
-                .HasOne(pv => pv.PlayList)
-                .WithMany(p => p.PlayListVideos)
-                .HasForeignKey(pv => pv.PlayListId)
-                .OnDelete(DeleteBehavior.NoAction); // Отключаем каскадное удаление со стороны PlayList
+                entity.HasOne(d => d.PlayList)
+                    .WithMany(p => p.PlayListVideos)
+                    .HasForeignKey(d => d.PlayListId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<PlayListVideo>()
-                .HasOne(pv => pv.Video)
-                .WithMany(v => v.PlayListVideos)
-                .HasForeignKey(pv => pv.VideoId)
-                .OnDelete(DeleteBehavior.NoAction);
+                entity.HasOne(d => d.Video)
+                    .WithMany(v => v.PlayListVideos)
+                    .HasForeignKey(d => d.VideoId)
+                    .OnDelete(DeleteBehavior.NoAction);
+            });
 
             modelBuilder.Entity<Vote>()
                 .HasOne(pv => pv.Post)
@@ -96,4 +97,3 @@ namespace WebApiVRoom.DAL.EF
         }
     }
 }
-

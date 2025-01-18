@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +29,6 @@ namespace WebApiVRoom.DAL.Repositories
             var query = _context.Videos.Include(v => v.Categories).Include(v => v.Tags)
                 .Include(v => v.CommentVideos).Include(v => v.ChannelSettings).Include(v => v.PlayListVideos)
                 .Where(v => v.IsShort == isShort).Where(v => v.ChannelSettings.Id == id).AsQueryable();
-
 
             if (!string.IsNullOrEmpty(filter.Copyright))
             {
@@ -181,10 +180,32 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task Delete(int id)
         {
-            var video = await _context.Videos.FindAsync(id);
+            var video = await _context.Videos
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .FirstOrDefaultAsync(v => v.Id == id);
+
             if (video == null)
                 throw new KeyNotFoundException("Video not found");
 
+            // Remove related records
+            if (video.HistoryOfBrowsings != null)
+            {
+                _context.HistoryOfBrowsings.RemoveRange(video.HistoryOfBrowsings);
+            }
+
+            if (video.CommentVideos != null)
+            {
+                _context.CommentVideos.RemoveRange(video.CommentVideos);
+            }
+
+            if (video.PlayListVideos != null)
+            {
+                _context.PlayListVideos.RemoveRange(video.PlayListVideos);
+            }
+
+            // Remove the video
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
         }
@@ -345,10 +366,8 @@ namespace WebApiVRoom.DAL.Repositories
     .Include(v => v.ChannelSettings)
     .Include(v => v.PlayListVideos)
     .AsSplitQuery()
-    .Where(v => !v.IsShort && v.ChannelSettings.Id == channelId)
     .ToListAsync();
 
-            Console.WriteLine($"Videos found: {videos.Count}");
             return videos;
         }
 

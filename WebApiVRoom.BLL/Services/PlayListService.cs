@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,8 +60,40 @@ namespace WebApiVRoom.BLL.Services
                 if (pl == null)
                     return null;
 
-                var mapper = InitializeMapper();
-                var plDto = mapper.Map<PlayList, PlayListDTO>(pl);
+                // Отримуємо всі PlayListVideo для даного плейлиста
+                var playlistVideos = await Database.PlayListVideo.GetByPlayListIdAsync(id);
+                
+                // Створюємо список для зберігання повної інформації про відео
+                var videosInfo = new List<VideoDTO>();
+                
+                foreach (var plv in playlistVideos)
+                {
+                    var video = await Database.Videos.GetById(plv.VideoId);
+                    if (video != null)
+                    {
+                        videosInfo.Add(new VideoDTO
+                        {
+                            Id = video.Id,
+                            Tittle = video.Tittle,
+                            Description = video.Description,
+                            Cover = video.Cover,
+                            Duration = video.Duration,
+                            ViewCount = video.ViewCount,
+                            VRoomVideoUrl = video.VRoomVideoUrl
+                        });
+                    }
+                }
+
+                var plDto = new PlayListDTO
+                {
+                    Id = pl.Id,
+                    UserId = pl.User.Id,
+                    Title = pl.Title,
+                    Date = pl.Date,
+                    Access = pl.Access,
+                    VideosId = playlistVideos.Select(pv => pv.VideoId).ToList(),
+                    Videos = videosInfo
+                };
 
                 return plDto;
             }
