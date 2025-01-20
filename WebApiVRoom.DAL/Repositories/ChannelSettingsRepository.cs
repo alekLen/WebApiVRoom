@@ -41,7 +41,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<ChannelSettings> GetById(int id)
         {
-            return await db.ChannelSettings
+            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -55,6 +55,7 @@ namespace WebApiVRoom.DAL.Repositories
         public async Task<IEnumerable<ChannelSettings>> GetAll()
         {
             return await db.ChannelSettings
+                .Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -78,7 +79,8 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<ChannelSettings> FindByOwner(string ownerId)
         {
-            return await db.ChannelSettings
+            try { 
+            return await db.ChannelSettings.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -86,11 +88,16 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(cp => cp.Posts)
                 .Include(cp => cp.Subscriptions)
                 .FirstOrDefaultAsync(cs => cs.Owner.Clerk_Id == ownerId);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
                
         }
         public async Task<ChannelSettings> GetByUrl(string url)
         {
-            return await db.ChannelSettings
+            return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                 .Include(cp => cp.Owner)
                 .Include(cp => cp.Language)
                 .Include(cp => cp.Country)
@@ -104,19 +111,39 @@ namespace WebApiVRoom.DAL.Repositories
         {
             if (nikname == null)
             {
-                return await db.ChannelSettings
+                return await db.ChannelSettings//.Include(cp => cp.ChannelSections)
                     .Include(cp => cp.Owner)
                     .Include(cp => cp.Language)
                     .Include(cp => cp.Country)
                     .Include(cp => cp.Videos)
                     .Include(cp => cp.Posts)
                     .Include(cp => cp.Subscriptions)
-                    .FirstOrDefaultAsync(cs => cs.Channel_URL == nikname);
+                    .FirstOrDefaultAsync(cs => cs.ChannelNikName == nikname);
             }
             else
                 return null;
 
         }
+        public async Task<bool> IsNickNameUnique(string nickName, int chSettingsId)
+        {
+            return !await db.ChannelSettings.AnyAsync(u => u.ChannelNikName == nickName && u.Id != chSettingsId);
+        }
 
+        public async Task<List<DateTime>> GetUploadVideosCountByDiapasonAndChannel(DateTime start, DateTime end,int chId)
+        {
+            return await db.Videos
+               .Where(u => u.UploadDate>= start && u.UploadDate <= end)
+               .Where(u => u.ChannelSettings.Id == chId)
+               .Select(u => u.UploadDate)
+               .ToListAsync();
+        }
+        public async Task<List<DateTime>> GetUploadVideosCountByDiapason(DateTime start, DateTime end)
+        {
+            return await db.Videos
+               .Where(u => u.UploadDate >= start && u.UploadDate <= end)
+               .Select(u => u.UploadDate)
+               .ToListAsync();
+        }
+       
     }
 }

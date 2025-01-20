@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,18 +13,18 @@ namespace WebApiVRoom.DAL.EF
     public class VRoomContext : DbContext
     {
         public VRoomContext(DbContextOptions<VRoomContext> options)
-         : base(options)
+            : base(options)
         {
-            if (Database.EnsureCreated())
-            {
-
-
-            }
+           
         }
 
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Email> Emails { get; set; }
+        public DbSet<PinnedVideo> PinnedVideos { get; set; }
         public DbSet<ChannelSettings> ChannelSettings { get; set; }
+        public DbSet<ChannelSection> ChannelSections { get; set; }
+        public DbSet<ChSection> ChSections { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CommentPost> CommentPosts { get; set; }
         public DbSet<CommentVideo> CommentVideos { get; set; }
@@ -49,6 +50,11 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Vote> Voutes { get; set; }
         public DbSet<WebRTCSession> WebRTCSessions { get; set; }
         public DbSet<WebRTCConnection> WebRTCConnections { get; set; }
+        public DbSet<VideoView> VideoViews { get; set; }
+        public DbSet<ContentReport> ContentReports { get; set; }
+        public DbSet<Ad> Ads { get; set; }
+        public DbSet<AdminLog> AdminLogs { get; set; }
+        public DbSet<Subtitle> Subtitles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

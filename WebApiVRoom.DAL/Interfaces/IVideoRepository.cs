@@ -17,6 +17,8 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<IEnumerable<Video>> GetAllVideo();
         Task<IEnumerable<Video>> GetAllPaginated(int pageNumber, int pageSize);
         Task<IEnumerable<Video>> GetAllVideoPaginated(int pageNumber, int pageSize);
+        Task<List<Video>> GetAllShortsPaginated(int pageNumber, int pageSize);
+        Task<List<Video>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null);
         Task<List<Video>> GetByIds(List<int> ids);
         Task Add(Video video);
         Task<List<Video>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
@@ -29,6 +31,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetVideosByChannelId(int channelId);
         Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter);
         Task<Video> GetByVRoomVideoUrl(string url);
-
+        Task<List<Video>> GetShortsOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShorts);
     }
 }

@@ -27,6 +27,31 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(nf);
         }
+        [HttpPut("markasread/{id}")]
+        public async Task<ActionResult<NotificationDTO>> ReadNotification(int id)
+        {
+
+            var nf = await _nService.GetById(id);
+            if (nf == null)
+            {
+                return NotFound();
+            }
+            nf.IsRead = true;
+            var nf2= await _nService.Update(nf);
+            return new ObjectResult(nf2);
+        }
+        [HttpPut("markallasread/{userid}")]
+        public async Task<ActionResult<NotificationDTO>> ReadAllNotification(string userid)
+        {
+
+            List<NotificationDTO> nf = await _nService.GetByUser(userid);
+            foreach (NotificationDTO nf2 in nf)
+            {
+                nf2.IsRead = true;
+                await _nService.Update(nf2);
+            }
+            return Ok();
+        }
         [HttpPut("update")]
         public async Task<ActionResult<NotificationDTO>> UpdateNotification(NotificationDTO u)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using WebApiVRoom.BLL.DTO;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
@@ -33,26 +34,35 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getinfobychannelid/{id}")]
         public async Task<ActionResult<ChannelSettingsDTO>> GetChannelInfo([FromRoute] int id)
         {
-            try {  
-            var ch = await _chService.GetChannelSettings(id);
-            if (ch == null)
+            try
             {
-                return NotFound();
-            }
-            UserDTO u= await _uService.GetUser(ch.Owner_Id);
-            ChannelUserFor_CommentDTO user = new()
-            {
-                Clerk_Id =u.Clerk_Id,
-                ChannelBanner = ch.ChannelBanner,
-                ChannelName = ch.ChannelName,
-                ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                var ch = await _chService.GetChannelSettings(id);
+                string name = ch.ChannelName;
+                if (ch == null)
+                {
+                    return NotFound();
+                }
+                UserDTO u = await _uService.GetUser(ch.Owner_Id);
+                if (ch.ChannelNikName != null)
+                {
+                    name = ch.ChannelNikName;
+                }
+                ChannelUserFor_CommentDTO user = new()
+                {
+                    Clerk_Id = u.Clerk_Id,
+                    Channel_Id = ch.Id,
+                    ChannelBanner = ch.ChannelBanner,
+                    ChannelName = ch.ChannelName,
+                    ChannelNikName = name,
+                    ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                    Channel_URL = ch.Channel_URL,
 
-            };
-            return new ObjectResult(user);
+                };
+                return new ObjectResult(user);
             }
             catch (Exception ex) { return BadRequest(ModelState); }
         }
-
+      
         [HttpGet("getbyownerid/{clerk_id}")]
         public async Task<ActionResult<ChannelSettingsDTO>> ByOwner([FromRoute] string clerk_id)
         {
@@ -71,17 +81,25 @@ namespace WebApiVRoom.Controllers
             try
             {
                 var ch = await _chService.FindByOwner(clerkId);
+              
                 if (ch == null)
                 {
                     return NotFound();
                 }
-
+                string name = ch.ChannelName;
+                if (ch.ChannelNikName != null)
+                {
+                    name = ch.ChannelNikName;
+                }
                 ChannelUserFor_CommentDTO user = new()
                 {
                     Clerk_Id = clerkId,
+                    Channel_Id = ch.Id,
                     ChannelBanner = ch.ChannelBanner,
                     ChannelName = ch.ChannelName,
-                    ChannelProfilePhoto = ch.ChannelProfilePhoto
+                    ChannelNikName = name,
+                    ChannelProfilePhoto = ch.ChannelProfilePhoto,
+                    Channel_URL = ch.Channel_URL,
                 };
 
                 return new ObjectResult(user);
@@ -171,9 +189,16 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-            ChannelSettingsDTO chDto=await _chService.DeleteChannelSettings(id);
+            ChannelSettingsDTO chDto = await _chService.DeleteChannelSettings(id);
 
             return Ok(chDto);
+        }
+
+        [HttpGet("checknicknameunique/{nickName}/{chSettingsId}")]
+        public async Task<IActionResult> CheckNickNameUnique([FromRoute] string nickName, [FromRoute] int chSettingsId)
+        {
+            bool isUnique = await _chService.IsNickNameUnique(nickName, chSettingsId);
+            return new ObjectResult(new { isUnique });
         }
     }
 }

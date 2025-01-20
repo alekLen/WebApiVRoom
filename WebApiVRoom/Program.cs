@@ -31,7 +31,12 @@ var builder = WebApplication.CreateBuilder(args);
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
 string? containerName = builder.Configuration["BlobStorage:ContainerName"];
-builder.Services.AddVRoomContext(connection);
+
+//builder.Services.AddVRoomContext(connection);
+builder.Services.AddDbContext<VRoomContext>(options =>
+    options.UseSqlServer(
+       connection, b => b.MigrationsAssembly("WebApiVRoom.DAL")
+    ));
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton<IHLSService, HLSService>();
 builder.Services.AddSingleton(x => {
@@ -106,10 +111,15 @@ builder.Services.AddTransient<IBlobStorageService, BlobStorageService>(provider 
 });
 
 // Scoped services
+builder.Services.AddScoped<IPinnedVideoService, PinnedVideoService>();
+builder.Services.AddScoped<IContentReportService, ContentReportService>();
+builder.Services.AddScoped<IAdService, AdService>();
+builder.Services.AddScoped<IAdminLogService, AdminLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<ILanguageService, LanguageService>(); 
+builder.Services.AddScoped<IChannelSectionsService, ChannelSectionsService>();
 builder.Services.AddScoped<IChannelSettingsService, ChannelSettingsService>();
 builder.Services.AddScoped<IAnswerPostService, AnswerPostService>();
 builder.Services.AddScoped<IAnswerVideoService, AnswerVideoService>();
@@ -128,8 +138,14 @@ builder.Services.AddScoped<ILikesDislikesCPService, LikesDislikesCPService>();
 builder.Services.AddScoped<ILikesDislikesAVService, LikesDislikesAVService>();
 builder.Services.AddScoped<ILikesDislikesAPService, LikesDislikesAPService>();
 builder.Services.AddScoped<ILikesDislikesPService, LikesDislikesPService>();
+builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IOptionsForPostService, OptionsForPostService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVideoViewsService, VideoViewsService>();
+builder.Services.AddScoped<ISubtitleService, SubtitleService>();
+
+
 
 var app = builder.Build();
 
@@ -161,12 +177,34 @@ app.UseStaticFiles(new StaticFileOptions
     DefaultContentType = "application/octet-stream"
 });
 
+builder.Services.AddSignalR();
+
+var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<VRoomContext>();
+        context.Database.Migrate(); // Применение миграций
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Ошибка применения миграций: {ex.Message}");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Enable CORS
+app.UseCors(builder => builder.AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        );
 
 app.UseHttpsRedirection();
 app.UseRouting();

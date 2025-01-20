@@ -52,12 +52,14 @@ namespace WebApiVRoom.DAL.Repositories
             await db.SaveChangesAsync();
         }
 
+
         public async Task<HistoryOfBrowsing> GetById(int id)
         {
             return await db.HistoryOfBrowsings
                  .Include(m => m.User)
                 .Include(m => m.Video)
-                .FirstOrDefaultAsync(m =>m.Id==id);
+                 .Include(m => m.ChannelSettings)
+                .FirstOrDefaultAsync(m => m.Id == id);
         }
 
         public async Task<IEnumerable<HistoryOfBrowsing>> GetAll()
@@ -65,30 +67,54 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.HistoryOfBrowsings
                 .Include(m => m.User)
                 .Include(m => m.Video)
+                .Include(m => m.ChannelSettings)
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<HistoryOfBrowsing>> GetByUserId(int userId)
         {
-            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video)
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
                            .Where(h => h.User.Id == userId)
                            .ToListAsync();
         }
-        public async Task<IEnumerable<HistoryOfBrowsing>> GetByUserIdPaginated(int pageNumber, int pageSize,int userId)
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetByUserIdPaginated(int pageNumber, int pageSize, int userId)
         {
-            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video)
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
                            .Where(h => h.User.Id == userId)
                             .Skip((pageNumber - 1) * pageSize)
                            .Take(pageSize)
                            .ToListAsync();
         }
-
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetLatestVideoHistoryByUserIdPaginated(int pageNumber, int pageSize, int userId)
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
+                           .Where(h => h.User.Id == userId) // Фильтрация по UserId
+                    .OrderByDescending(h => h.Date) // Упорядочивание по убыванию даты просмотра
+                    .Skip((pageNumber - 1) * pageSize) // Пагинация
+                    .Take(pageSize)                   // Размер страницы
+                    .ToListAsync();
+        }
 
         public async Task<List<HistoryOfBrowsing>> GetByIds(List<int> ids)
         {
             return await db.HistoryOfBrowsings
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<HistoryOfBrowsing>> GetAllHistoryByIdGroupedByDate(int userId)
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
+                           .Where(h => h.User.Id == userId)
+                           .ToListAsync();
+        }
+
+        public async Task<HistoryOfBrowsing> GetByUserIdAndVideoId(string userId, int videoId )
+        {
+            return await db.HistoryOfBrowsings.Include(m => m.User).Include(m => m.Video).Include(m => m.ChannelSettings)
+                           .Where(h => h.User.Clerk_Id == userId)
+                            .Where(h => h.Video.Id == videoId)
+                           .FirstOrDefaultAsync();
         }
     }
 }
