@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,6 @@ namespace WebApiVRoom.DAL.Entities
         public string Title { get; set; }
         public bool Access {  get; set; }
         public DateTime Date {  get; set; }
-        public List<PlayListVideo> PlayListVideos { get; set; } = new List<PlayListVideo>() ;
+        public List<PlayListVideo> PlayListVideo { get; set; } = new List<PlayListVideo>();
     }
 }

@@ -35,14 +35,17 @@ namespace WebApiVRoom.BLL.Services
 
                 List<Video> list = new();
 
-                    await Database.Tags.Add(tag);
+                await Database.Tags.Add(tag);
+
+
+
+                        }
+                        catch 
+                    {
+                        throw new NotImplementedException();
                 }
-               
             }
-            catch (Exception ex)
-            {
-            }
-        }
+
 
         public async Task DeleteTag(int id)
         {

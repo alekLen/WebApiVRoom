@@ -17,16 +17,16 @@ using WebApiVRoom.DAL.Repositories;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.WebSockets;
-using Microsoft.Extensions.FileProviders;
+using WebApiVRoom.DAL.EF;
+
+
+
 var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 if (!Directory.Exists(wwwrootPath))
 {
     Directory.CreateDirectory(wwwrootPath);
 }
 var builder = WebApplication.CreateBuilder(args);
-
-// Ensure wwwroot directory exists
-
 
 string? connection = builder.Configuration.GetConnectionString("DefaultConnection");
 string? blobStorageConnectionString = builder.Configuration["BlobStorage:ConnectionString"];
@@ -39,10 +39,7 @@ builder.Services.AddDbContext<VRoomContext>(options =>
     ));
 builder.Services.AddUnitOfWorkService();
 builder.Services.AddSingleton<IHLSService, HLSService>();
-builder.Services.AddSingleton(x => {
-    string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-    return new BlobServiceClient(connectionString);
-});
+
 
 // CORS configuration
 builder.Services.AddCors(options =>
@@ -64,7 +61,7 @@ builder.Services.AddAutoMapper(cfg =>
         .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
         .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
         .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
-        .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
+        .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideo.Select(ch => ch.VideoId)));
 });
 
 builder.Services.Configure<FormOptions>(options =>
@@ -80,12 +77,6 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IWebRTCSessionRepository, WebRTCSessionRepository>();
 builder.Services.AddScoped<IWebRTCConnectionRepository, WebRTCConnectionRepository>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ICountryService, CountryService>();
-builder.Services.AddTransient<ICategoryService, CategoryService>();
-builder.Services.AddTransient<ILanguageService, LanguageService>();
-builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
-builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
 builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
 builder.Services.AddTransient<ICommentPostService, CommentPostService>();
 builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
@@ -118,7 +109,7 @@ builder.Services.AddScoped<IAdminLogService, AdminLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ILanguageService, LanguageService>(); 
+builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<IChannelSectionsService, ChannelSectionsService>();
 builder.Services.AddScoped<IChannelSettingsService, ChannelSettingsService>();
 builder.Services.AddScoped<IAnswerPostService, AnswerPostService>();
@@ -177,9 +168,6 @@ app.UseStaticFiles(new StaticFileOptions
     DefaultContentType = "application/octet-stream"
 });
 
-builder.Services.AddSignalR();
-
-var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -199,12 +187,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// Enable CORS
-app.UseCors(builder => builder.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        );
 
 app.UseHttpsRedirection();
 app.UseRouting();
