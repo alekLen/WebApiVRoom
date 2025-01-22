@@ -130,9 +130,14 @@ namespace WebApiVRoom.Controllers
         private IUserService _userService;
         private readonly ILogger<VideoController> _logger;
 
-        public VideoController(IVideoService videoService, IChannelSettingsService _ch,
-            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService, ILogger<VideoController> logger,
-             IVideoViewsService videoViewsService)
+        public VideoController(
+    IVideoService videoService,
+    IChannelSettingsService _ch,
+    ILikesDislikesVService likesService,
+    IHubContext<ChatHub> hubContext,
+    IUserService userService,
+    ILogger<VideoController> logger,
+    IVideoViewsService videoViewsService)
         {
             _videoService = videoService;
             _chService = _ch;

@@ -79,7 +79,7 @@ namespace WebApiVRoom.DAL.EF
                 entity.Property(e => e.Id).UseIdentityColumn();
 
                 entity.HasOne(d => d.PlayList)
-                    .WithMany(p => p.PlayListVideos)
+                    .WithMany(p => p.PlayListVideo)
                     .HasForeignKey(d => d.PlayListId)
                     .OnDelete(DeleteBehavior.Cascade);
 

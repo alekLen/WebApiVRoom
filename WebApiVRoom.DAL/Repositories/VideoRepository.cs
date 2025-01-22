@@ -454,7 +454,7 @@ namespace WebApiVRoom.DAL.Repositories
         //        .Include(v => v.Tags)
         //        .Include(v => v.CommentVideos)
         //         .Include(v => v.ChannelSettings)
-        //         .Include(v => v.PlayListVideos)
+        //         .Include(v => v.PlayListVideo)
         //        .Where(v => v.IsShort == false).Where(v => v.ChannelSettings.Id == channelId)
         //        .ToListAsync();
         //}
