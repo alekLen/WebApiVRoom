@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.BLL.Services;
 using WebApiVRoom.BLL.Infrastructure;
@@ -146,18 +146,36 @@ if (!Directory.Exists(streamsPath))
 {
     Directory.CreateDirectory(streamsPath);
 
-    // Set access permissions
-    var directoryInfo = new DirectoryInfo(streamsPath);
-    var accessControl = directoryInfo.GetAccessControl();
-    accessControl.AddAccessRule(new System.Security.AccessControl.FileSystemAccessRule(
-        "Everyone",
-        System.Security.AccessControl.FileSystemRights.FullControl,
-        System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
-        System.Security.AccessControl.PropagationFlags.None,
-        System.Security.AccessControl.AccessControlType.Allow
-    ));
-    directoryInfo.SetAccessControl(accessControl);
+    // Додаткові налаштування прав доступу для Linux
+    if (OperatingSystem.IsWindows())
+    {
+        // Для Windows: встановлення прав доступу через ACL
+        var directoryInfo = new DirectoryInfo(streamsPath);
+        var accessControl = directoryInfo.GetAccessControl();
+        accessControl.AddAccessRule(new System.Security.AccessControl.FileSystemAccessRule(
+            "Everyone",
+            System.Security.AccessControl.FileSystemRights.FullControl,
+            System.Security.AccessControl.InheritanceFlags.ContainerInherit | System.Security.AccessControl.InheritanceFlags.ObjectInherit,
+            System.Security.AccessControl.PropagationFlags.None,
+            System.Security.AccessControl.AccessControlType.Allow
+        ));
+        directoryInfo.SetAccessControl(accessControl);
+    }
+    else
+    {
+        // Для Linux: зміна прав доступу через chmod
+        try
+        {
+            // Змінюємо права доступу до створеної папки (777 - повний доступ для всіх)
+            System.Diagnostics.Process.Start("chmod", "777 " + streamsPath)?.WaitForExit();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Не вдалося змінити права доступу: {ex.Message}");
+        }
+    }
 }
+
 
 // Configure static files
 app.UseStaticFiles(new StaticFileOptions
@@ -174,11 +192,11 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<VRoomContext>();
-        context.Database.Migrate(); // ���������� ��������
+        context.Database.Migrate(); // Ïðèìåíåíèå ìèãðàöèé
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"������ ���������� ��������: {ex.Message}");
+        Console.WriteLine($"Îøèáêà ïðèìåíåíèÿ ìèãðàöèé: {ex.Message}");
     }
 }
 
