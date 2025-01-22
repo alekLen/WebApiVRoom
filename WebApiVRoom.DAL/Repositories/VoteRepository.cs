@@ -25,27 +25,27 @@ namespace WebApiVRoom.DAL.Repositories
             {
                 throw new ArgumentNullException(nameof(tag));
             }
-            await db.Voutes.AddAsync(tag);
+            await db.Votes.AddAsync(tag);
             await db.SaveChangesAsync();
         }
 
         public async Task Delete(int id)
         {
-            var u = await db.Voutes.FindAsync(id);
+            var u = await db.Votes.FindAsync(id);
             if (u == null)
             {
                 throw new ArgumentNullException(nameof(u));
             }
             else
             {
-                db.Voutes.Remove(u);
+                db.Votes.Remove(u);
                 await db.SaveChangesAsync();
             }
         }
 
         public async Task<IEnumerable<Vote>> GetAll()
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option).ToListAsync();
@@ -53,7 +53,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<IEnumerable<Vote>> GetAllPaginated(int pageNumber, int pageSize)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
@@ -63,7 +63,7 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task<Vote> GetById(int id)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
@@ -72,7 +72,7 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task<Vote> GetVoteByUserAndPost(string clerkId,int postId)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
@@ -80,7 +80,7 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task<Vote> GetByPost(int postId)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
@@ -89,20 +89,20 @@ namespace WebApiVRoom.DAL.Repositories
 
         public async Task Update(Vote tag)
         {
-            var u = await db.Voutes.FindAsync(tag.Id);
+            var u = await db.Votes.FindAsync(tag.Id);
             if (u == null)
             {
                 throw new ArgumentNullException(nameof(u));
             }
             else
             {
-                db.Voutes.Update(u);
+                db.Votes.Update(u);
                 await db.SaveChangesAsync();
             }
         }
         public async Task<List<Vote>> GetByIds(List<int> ids)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
@@ -111,7 +111,7 @@ namespace WebApiVRoom.DAL.Repositories
         }
         public async Task<List<Vote>> GetByPostIdAndOptionId(int postId, int opId)
         {
-            return await db.Voutes
+            return await db.Votes
                 .Include(m => m.Post)
                 .Include(m => m.User)
                 .Include(m => m.Option)
