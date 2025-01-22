@@ -17,7 +17,8 @@ using WebApiVRoom.DAL.Repositories;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.WebSockets;
-using Microsoft.Extensions.FileProviders;
+using WebApiVRoom.DAL.EF;
+
 var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 if (!Directory.Exists(wwwrootPath))
 {
@@ -38,11 +39,7 @@ builder.Services.AddDbContext<VRoomContext>(options =>
        connection, b => b.MigrationsAssembly("WebApiVRoom.DAL")
     ));
 builder.Services.AddUnitOfWorkService();
-builder.Services.AddSingleton<IHLSService, HLSService>();
-builder.Services.AddSingleton(x => {
-    string? connectionString = builder.Configuration.GetConnectionString("AzureBlobConnectionString");
-    return new BlobServiceClient(connectionString);
-});
+builder.Services.AddSingleton<IHLSService, HLSService>(); 
 
 // CORS configuration
 builder.Services.AddCors(options =>
@@ -80,12 +77,6 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IWebRTCSessionRepository, WebRTCSessionRepository>();
 builder.Services.AddScoped<IWebRTCConnectionRepository, WebRTCConnectionRepository>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<ICountryService, CountryService>();
-builder.Services.AddTransient<ICategoryService, CategoryService>();
-builder.Services.AddTransient<ILanguageService, LanguageService>();
-builder.Services.AddTransient<IChannelSettingsService, ChannelSettingsService>();
-builder.Services.AddTransient<IAnswerPostService, AnswerPostService>();
 builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
 builder.Services.AddTransient<ICommentPostService, CommentPostService>();
 builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
@@ -177,9 +168,7 @@ app.UseStaticFiles(new StaticFileOptions
     DefaultContentType = "application/octet-stream"
 });
 
-builder.Services.AddSignalR();
 
-var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -200,11 +189,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Enable CORS
-app.UseCors(builder => builder.AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        );
 
 app.UseHttpsRedirection();
 app.UseRouting();

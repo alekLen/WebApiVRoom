@@ -253,7 +253,7 @@ namespace WebApiVRoom.DAL.Repositories
 
             if (video.PlayListVideos != null)
             {
-                _context.PlayListVideos.RemoveRange(video.PlayListVideos);
+                _context.PlayListVideo.RemoveRange(video.PlayListVideos);
             }
 
             // Remove the video

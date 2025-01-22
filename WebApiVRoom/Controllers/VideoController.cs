@@ -131,8 +131,8 @@ namespace WebApiVRoom.Controllers
         private readonly ILogger<VideoController> _logger;
 
         public VideoController(IVideoService videoService, IChannelSettingsService _ch,
-            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService, ILogger<VideoController> logger)
-            IUserService userService, IVideoViewsService videoViewsService)
+            ILikesDislikesVService likesService, IHubContext<ChatHub> hubContext, IUserService userService, ILogger<VideoController> logger,
+             IVideoViewsService videoViewsService)
         {
             _videoService = videoService;
             _chService = _ch;
@@ -674,12 +674,6 @@ namespace WebApiVRoom.Controllers
 
             return Ok(videoInfoList);
         }
-                ChannelSettingsDTO channelSettings = await _chService.GetChannelSettings(video.ChannelSettingsId);
-                VideoInfoDTO videoInfo = ConvertVideoToVideoInfo(video, channelSettings);
-                v.Add(videoInfo);
-            }
-            return Ok(v);
-        }
 
         [HttpGet("getvideolistbytag/{name}")]
         public async Task<ActionResult<List<VideoInfoDTO>>> GetVideoListByTag([FromRoute] string name)
@@ -716,14 +710,7 @@ namespace WebApiVRoom.Controllers
         }
 
 
-
-
-
-
-
     }
 }
 
 
-    }
-}
