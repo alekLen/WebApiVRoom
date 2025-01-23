@@ -12,6 +12,7 @@ import { Upload, X, Plus, Info } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import api from '@/services/axiosApi'
 import { IChannel } from '@/types/channelinfo.interface'
+import crypto from 'crypto';
 
 interface Category {
     id: number
@@ -302,7 +303,7 @@ const VideoUploadInterface: React.FC = () => {
         // Створюємо об'єкт videoData відповідно до очікувань сервера
         const videoData = {
             id: 0,
-            objectID: 'ffff',
+            objectID: crypto.randomUUID(),
             channelSettingsId: userChannel?.id || 0,
             tittle: videoName,
             description: description,
@@ -314,7 +315,7 @@ const VideoUploadInterface: React.FC = () => {
             likeCount: 0,
             dislikeCount: 0,
             isShort: false,
-            cover: thumbnail ? `data:${thumbnail.type};base64,${thumbnailBase64}` : "", // Змінено формат
+            cover: thumbnailBase64 || "",
             visibility: visibility === 'public',
             isAgeRestriction: isAgeRestricted,
             isCopyright: isCopyright,
