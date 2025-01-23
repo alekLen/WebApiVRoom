@@ -47,11 +47,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", builder =>
     {
         builder
-            //.WithOrigins("http://localhost:3000") // React app URL
-            .AllowAnyOrigin()
+            .WithOrigins("http://localhost:3000", "https://c7ad-195-230-183-105.ngrok-free.app", "https://vr-oom.vercel.app") // React app URL
             .AllowAnyMethod()
             .AllowAnyHeader()
-            //.AllowCredentials()
+            .AllowCredentials()
             ;
     });
 });

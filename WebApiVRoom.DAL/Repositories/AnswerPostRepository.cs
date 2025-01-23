@@ -69,9 +69,15 @@ namespace WebApiVRoom.DAL.Repositories
             var u = await db.AnswerPosts.FindAsync(Id);
             if (u != null)
             {
+               await  DeleteAllDependencies(u);
                 db.AnswerPosts.Remove(u);
                 await db.SaveChangesAsync();
             }
+        }
+        async Task DeleteAllDependencies(AnswerPost answer)
+        {
+                var likes = await db.LikesAP.Where(m => m.Equals(answer)).ToListAsync();
+                db.LikesAP.RemoveRange(likes);
         }
         public async Task<IEnumerable<AnswerPost>> GetAll()
         {
