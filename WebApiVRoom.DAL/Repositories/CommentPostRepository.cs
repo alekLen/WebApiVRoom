@@ -117,9 +117,30 @@ namespace WebApiVRoom.DAL.Repositories
             var u = await db.CommentPosts.FindAsync(Id);
             if (u != null)
             {
+                await DeleteAllDependencies(u);
                 db.CommentPosts.Remove(u);
                 await db.SaveChangesAsync();
             }
+        }
+
+        async Task DeleteAllDependencies(CommentPost comment)
+        {
+           
+                var answs = await db.AnswerPosts.Where(m => m.CommentPost_Id == comment.Id).ToListAsync();
+                foreach (var answer in answs)
+                {
+                    var likes = await db.LikesAP.Where(m => m.answerPost ==answer).ToListAsync();
+                    foreach (var lik in likes)
+                    {
+                        db.LikesAP.Remove(lik);
+                    }
+                    db.AnswerPosts.Remove(answer);
+                }
+                var likes2 = await db.LikesCP.Where(m => m.commentPost==comment).ToListAsync();
+                foreach (var com in likes2)
+                {
+                    db.LikesCP.Remove(com);
+                }
         }
 
         public async Task<List<CommentPost>> GetByIds(List<int> ids)

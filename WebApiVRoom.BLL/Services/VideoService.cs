@@ -212,11 +212,11 @@ namespace WebApiVRoom.BLL.Services
 
                 var temp_video = await _unitOfWork.Videos.GetById(video.Id);
 
-                temp_video.VRoomVideoUrl = $"http://localhost:3000/shorts/{temp_video.Id}";
+                temp_video.VRoomVideoUrl = $"https://vr-oom.vercel.app/shorts/{temp_video.Id}";
 
                 if (temp_video.IsShort == false)
                 {
-                    temp_video.VRoomVideoUrl = $"http://localhost:3000/watch/{temp_video.Id}";
+                    temp_video.VRoomVideoUrl = $"https://vr-oom.vercel.app/watch/{temp_video.Id}";
                 }
                 await _unitOfWork.Videos.Update(video);
 
@@ -538,11 +538,11 @@ namespace WebApiVRoom.BLL.Services
                 video.IsCopyright = videoDTO.IsCopyright;
                 video.Audience = videoDTO.Audience;
 
-                video.VRoomVideoUrl = $"http://localhost:3000/shorts/{video.Id}";
+                video.VRoomVideoUrl = $"https://vr-oom.vercel.app/shorts/{video.Id}";
 
                 if (videoDTO.IsShort == false)
                 {
-                    video.VRoomVideoUrl = $"http://localhost:3000/watch/{video.Id}";
+                    video.VRoomVideoUrl = $"https://vr-oom.vercel.app/watch/{video.Id}";
                 }
 
                 await _unitOfWork.Videos.Update(video);

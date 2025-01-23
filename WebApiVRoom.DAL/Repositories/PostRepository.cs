@@ -1,5 +1,6 @@
 ﻿using Azure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,9 +39,46 @@ namespace WebApiVRoom.DAL.Repositories
             }
             else
             {
+                await DeleteAllDependencies(u);
                 db.Posts.Remove(u);
                 await db.SaveChangesAsync();
             }
+        }
+
+        async Task DeleteAllDependencies(Post u)
+        {
+            var comments = await db.CommentPosts.Where(m => m.Post == u).ToListAsync();
+
+            foreach (var comment in comments)
+            {
+                var answs = await db.AnswerPosts.Where(m => m.CommentPost_Id == comment.Id).ToListAsync();
+                foreach (var answer in answs)
+                {
+                    var likes = await db.LikesAP.Where(m=>m.answerPost==answer).ToListAsync();
+                    if (likes != null)
+                        db.LikesAP.RemoveRange(likes);
+                   
+                    db.AnswerPosts.Remove(answer);
+                }
+                var likes2 = await db.LikesCP.Where(m => m.commentPost==comment).ToListAsync();
+                if (likes2 != null)
+                   db.LikesCP.RemoveRange(likes2);
+               
+                db.CommentPosts.Remove(comment);
+            }
+
+            var likes3 = await db.LikesP.Where(m => m.Post==u).ToListAsync();
+            if (likes3 != null)
+                db.LikesP.RemoveRange(likes3);
+            
+            var votes = await db.Votes.Where(m => m.Post ==u).ToListAsync();
+            if(votes != null)
+               db.Votes.RemoveRange(votes);
+
+            var options = await db.Options.Where(m => m.Post == u).ToListAsync();
+            if(options != null)
+               db.Options.RemoveRange(options);
+
         }
 
         public async Task<IEnumerable<Post>> GetAll()
