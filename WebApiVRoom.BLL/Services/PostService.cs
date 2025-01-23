@@ -106,15 +106,15 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                //var c = await Database.CommentPosts.GetByPost(id);
-                //if (c != null)
-                //{
-                //    List<CommentPost> comments = c.ToList();
-                //    foreach (CommentPost com in comments)
-                //    {
-                //        await Database.CommentPosts.Delete(com.Id);
-                //    }
-                //}
+                var c = await Database.CommentPosts.GetByPost(id);
+                if (c != null)
+                {
+                    List<CommentPost> comments = c.ToList();
+                    foreach (CommentPost com in comments)
+                    {
+                        await Database.CommentPosts.Delete(com.Id);
+                    }
+                }
                 await Database.Posts.Delete(id);
 
             }

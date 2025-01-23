@@ -11,7 +11,6 @@ using Azure.Storage.Blobs;
 using Microsoft.Identity.Client;
 using System.Threading.Channels;
 using Azure;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 
 namespace WebApiVRoom.DAL.Repositories
@@ -247,53 +246,19 @@ namespace WebApiVRoom.DAL.Repositories
                 _context.HistoryOfBrowsings.RemoveRange(video.HistoryOfBrowsings);
             }
 
-            //if (video.CommentVideos != null)
-            //{
-            //    _context.CommentVideos.RemoveRange(video.CommentVideos);
-            //}
+            if (video.CommentVideos != null)
+            {
+                _context.CommentVideos.RemoveRange(video.CommentVideos);
+            }
 
             if (video.PlayListVideos != null)
             {
                 _context.PlayListVideo.RemoveRange(video.PlayListVideos);
             }
 
-            await DeleteAllDependencies(video);
-
             // Remove the video
             _context.Videos.Remove(video);
             await _context.SaveChangesAsync();
-        }
-
-        async Task DeleteAllDependencies(Video u)
-        {
-            var comments = await _context.CommentVideos.Where(m => m.Video == u).ToListAsync();
-
-            foreach (var comment in comments)
-            {
-                var answs = await _context.AnswerVideos.Where(m => m.CommentVideo_Id == comment.Id).ToListAsync();
-                foreach (var answer in answs)
-                {
-                    var likes = await _context.LikesAV.Where(m => m.answerVideo == answer).ToListAsync();
-                    if (likes != null)
-                    _context.LikesAV.RemoveRange(likes);
-                    
-                    _context.AnswerVideos.Remove(answer);
-                }
-                var likes2 = await _context.LikesCV.Where(m => m.commentVideo == comment).ToListAsync();
-                if(likes2 != null)
-                 _context.LikesCV.RemoveRange(likes2);
-                
-                _context.CommentVideos.Remove(comment);
-            }
-
-            var likes3 = await _context.LikesV.Where(m => m.Video == u).ToListAsync();
-            if (likes3 != null)
-                _context.LikesV.RemoveRange(likes3);
-
-            var views = await _context.VideoViews.Where(m=>m.Video ==u).ToListAsync();
-            if (views != null)
-                _context.VideoViews.RemoveRange(views);
-
         }
 
         public async Task<Video> GetByTitle(string title)
