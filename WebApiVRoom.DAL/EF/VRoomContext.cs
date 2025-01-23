@@ -47,7 +47,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
-        public DbSet<Vote> Voutes { get; set; }
+        public DbSet<Vote> Votes { get; set; }
         public DbSet<WebRTCSession> WebRTCSessions { get; set; }
         public DbSet<WebRTCConnection> WebRTCConnections { get; set; }
         public DbSet<VideoView> VideoViews { get; set; }
