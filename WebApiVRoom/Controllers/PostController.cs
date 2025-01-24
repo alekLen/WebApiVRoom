@@ -114,7 +114,6 @@ namespace WebApiVRoom.Controllers
 
             object obj = ConvertObject(post);
 
-            //await WebSocketHelper.SendMessageToAllAsync("post_deleted", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "post_deleted", payload = obj });
         
 
@@ -141,7 +140,6 @@ namespace WebApiVRoom.Controllers
 
                 PostDTO c = await _postService.UpdatePost(ans);
                 object obj = ConvertObject(c);
-                //await WebSocketHelper.SendMessageToAllAsync("new_likepost", obj);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_likepost", payload = obj });
 
                 return Ok();

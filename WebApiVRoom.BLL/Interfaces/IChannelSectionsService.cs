@@ -11,18 +11,13 @@ namespace WebApiVRoom.BLL.Interfaces
 {
     public interface IChannelSectionsService
     {
-        //Task<ChannelSectionsDTO> GetChannelSectionsById(int id);
         Task AddRangeChannelSectionsByClerkId(string clerkId, List<ChannelSectionDTO> t);
         Task UpdateRangeChannelSectionsByClerkId(string clerkId, List<ChannelSectionDTO> t);
         Task<List<ChannelSectionDTO>> GetChannelSectionsAsync(int channelOwnerId);
         Task<List<ChannelSectionDTO>> FindChannelSectionsByChannelOwnerId(string channelOwnerId);
         Task<List<ChannelSectionDTO>> GetChannelSectionsByChannelUrl(string channelUrl);
         Task<List<ChannelSectionDTO>> GetChannelSectionsByChannelNikName(string channelNikname);
-
         Task<List<ChSectionDTO>> GetAvailableChannelSectionsByChannelOwnerId(string channelOwnerId);
-
-
-
         Task<IEnumerable<ChSectionDTO>> GetAllChSection();
         Task<ChSectionDTO> GetChSectionByTitle(string title);
         Task<ChSectionDTO> GetChSectionById(int id);

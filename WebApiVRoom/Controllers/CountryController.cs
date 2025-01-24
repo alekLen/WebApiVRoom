@@ -25,7 +25,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult( await _countryService.GetAllCountries());
         }
 
-        // GET: CountryController/GetCountry/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryDTO>> GetCountry(int id)
         {
@@ -37,7 +36,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(country);
         }
 
-        // GET: CountryController/GetCountryByCode/5
         [HttpGet("getbycountrycode/{countryCode}")]
         public async Task<ActionResult<CountryDTO>> GetCountryByCode(string countryCode)
         {
@@ -49,7 +47,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(country);
         }
 
-        // GET: CountryController/GetByCountryName/5
         [HttpGet("getbycountryname/{countryName}")]
         public async Task<ActionResult<CountryDTO>> GetByCountryName(string countryName)
         {
@@ -61,7 +58,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(country);
         }
 
-        // GET: CountryController/Create
         [HttpPost("add")]
         public async Task<ActionResult<CountryDTO>> AddCountry(CountryDTO countryDTO)
         {
@@ -75,8 +71,6 @@ namespace WebApiVRoom.Controllers
         }
 
 
-
-        // GET: CountryController/Edit/5
         [HttpPut("update")]
         public async Task<ActionResult<CountryDTO>> UpdateCountry(CountryDTO u)
         {
@@ -95,7 +89,6 @@ namespace WebApiVRoom.Controllers
             return Ok(country_new);
         }
 
-        // GET: CountryController/Delete/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<CountryDTO>> DeleteCountry(int id)
         {

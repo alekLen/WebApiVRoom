@@ -20,9 +20,7 @@ namespace WebApiVRoom.DAL.Entities
         public bool SubscribedOnOthersMentionOnMyChannel { get; set; } = true;
         public bool SubscribedOnShareMyContent { get; set; } = true;
         public bool SubscribedOnPromotionalContent { get; set; } = true;
-
-        public bool SubscribedOnMainEmailNotifications { get; set; } = true;
-       
+        public bool SubscribedOnMainEmailNotifications { get; set; } = true;      
         public bool EmailSubscribedOnMySubscriptionChannelActivity { get; set; } = false;
         public bool EmailSubscribedOnActivityOnMyChannel { get; set; } = false;
         public bool EmailSubscribedOnRecomendedVideo { get; set; } = false;

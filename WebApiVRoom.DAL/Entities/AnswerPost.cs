@@ -9,7 +9,6 @@ namespace WebApiVRoom.DAL.Entities
     public class AnswerPost
     {
         public int Id { get; set; }
-        //public User User { get; set; }
         public string clerkId { get; set; } = null;
         public ChannelSettings User { get; set; }
         public int CommentPost_Id { get; set; }

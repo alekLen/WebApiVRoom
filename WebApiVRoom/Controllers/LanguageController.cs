@@ -25,7 +25,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult( await _languageService.GetAllLanguages());
         }
 
-        // GET: LanguageController/GetCountry/5
         [HttpGet("{id}")]
         public async Task<ActionResult<LanguageDTO>> GetLanguage(int id)
         {
@@ -37,8 +36,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(language);
         }
 
-
-        // GET: LanguageController/GetByCountryName/5
         [HttpGet("getbylanguagename/{languageName}")]
         public async Task<ActionResult<LanguageDTO>> GetByLanguageName(string languageName)
         {
@@ -50,7 +47,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(language);
         }
 
-        // GET: LanguageController/Create
         [HttpPost("add")]
         public async Task<ActionResult<LanguageDTO>> AddLanguage(LanguageDTO languageDTO)
         {
@@ -63,9 +59,6 @@ namespace WebApiVRoom.Controllers
             return Ok(languageDTO);
         }
 
-
-
-        // GET: LanguageController/Edit/5
         [HttpPut("update")]
         public async Task<ActionResult<LanguageDTO>> UpdateLanguage(LanguageDTO u)
         {
@@ -84,7 +77,6 @@ namespace WebApiVRoom.Controllers
             return Ok(language_new);
         }
 
-        // GET: LanguageController/Delete/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<LanguageDTO>> DeleteCountry(int id)
         {

@@ -47,7 +47,7 @@ namespace WebApiVRoom.Controllers
         [HttpGet("channelid/{channelId}")]
         public async Task<IActionResult> GetChannelSections(int channelId)
         {
-            //var ownCh = await _chService.FindByOwner(channelOwnerId);
+
             var userSections = await _chsService.GetChannelSectionsAsync(channelId);
             return Ok(userSections);
         }

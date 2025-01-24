@@ -97,8 +97,7 @@ namespace WebApiVRoom.BLL.Services
                 channelSettings.Description = chDto.Description == null ? "" : chDto.Description;
                 channelSettings.Notification = chDto.Notification;
                 channelSettings.SubscriptionCount = chDto.SubscriptionCount;
-                //channelSettings.ChannelBanner = chDto.ChannelBanner;
-                //channelSettings.ChannelPlofilePhoto = chDto.ChannelPlofilePhoto;
+
                 if (channelImg != null)
                 {
                     if (channelImg[0] != null)//если нет баннера оставляем старую ссылку
@@ -113,9 +112,7 @@ namespace WebApiVRoom.BLL.Services
                     }
                 }
 
-                channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);
-                //channelSettings.ChannelSections = await Database.ChannelSections.GetChannelSectionsAsync(channelSettings.Owner.Clerk_Id);
-                
+                channelSettings.Owner = await Database.Users.GetById(chDto.Owner_Id);                
                 channelSettings.Language = await Database.Languages.GetById(chDto.Language_Id);
                 channelSettings.Country = await Database.Countries.GetById(chDto.Country_Id);
                 channelSettings.Videos = await Database.Videos.GetByIds(chDto.Videos);
@@ -268,8 +265,6 @@ namespace WebApiVRoom.BLL.Services
         }
         public async Task<ChannelSettingsDTO> SetLanguageToChannel(string clerkId, string lang)
         {
-            //User user = await Database.Users.GetByClerk_Id(clerkId);
-            //if (user == null) { return null; }
             var channelSettings = await Database.ChannelSettings.FindByOwner(clerkId);
             if (channelSettings == null)
             {

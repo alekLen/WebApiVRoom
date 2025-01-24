@@ -15,10 +15,7 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<ChannelSection>> FindChannelSectionsByChannelOwnerId(string channelOwnerId);
         Task<List<ChannelSection>> GetChannelSectionsByChannelUrl(string channelUrl);
         Task<List<ChannelSection>> GetChannelSectionsByChannelNikName(string channelNikname);
-
-
         Task<IEnumerable<ChSection>> GetAllChSection();
-
         Task<ChSection> GetChSectionById(int id);
         Task<ChSection> GetChSectionByTitle(string title);
         Task AddChSection(ChSection ch);

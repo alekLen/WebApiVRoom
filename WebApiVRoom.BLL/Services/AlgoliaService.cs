@@ -21,25 +21,22 @@ namespace WebApiVRoom.BLL.Services
             var t = configuration.GetConnectionString("AlgoliaAppId");
             var s = configuration.GetConnectionString("AlgoliaKey");
             var algoliaClient = new SearchClient(t, s);
-            _index = algoliaClient.InitIndex("videos");// "videos" — имя вашего индекса
+            _index = algoliaClient.InitIndex("videos");// "videos" — имя  индекса
         }
 
         public async Task<string> AddOrUpdateVideoAsync(VideoForAlgolia video)
         {
             if (string.IsNullOrEmpty(video.ObjectID))
             {
-                // Генерация уникального идентификатора
                 video.ObjectID = Guid.NewGuid().ToString();
             }
 
-            // Сохраняем или обновляем объект в индексе
             await _index.SaveObjectAsync(video);
             return video.ObjectID;
         }
 
         public async Task DeleteVideoAsync(string id)
         {
-            // Удаляем объект по его идентификатору
             await _index.DeleteObjectAsync(id);
         }
 
@@ -63,7 +60,6 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex)
             {
-                // Логируем ошибку или выбрасываем исключение дальше
                 Console.WriteLine($"Ошибка при выполнении поиска: {ex.Message}");
                 throw;
             }

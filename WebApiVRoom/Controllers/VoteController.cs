@@ -26,30 +26,7 @@ namespace WebApiVRoom.Controllers
         [HttpGet("getbypostanduser/{postId}/{userId}")]
         public async Task<ActionResult<VotesForResponse>> GetVotesByPost([FromRoute] int postId, [FromRoute] string userId)
         {
-            //VoteDTO v = await _vService.GetVoteByUserAndPost(userId, postId);
-            //List <OptionVotes> options = await _vService.GetAllVotesByPostIdAndOptionId(postId);
-            //List<OptionVotesResponse> opt= new List<OptionVotesResponse>();
-
-            //VotesForResponse response = new VotesForResponse();
-            //response.AllVotes = 0;
-            //foreach (var vout in options)
-            //{
-            //    response.AllVotes += vout.AllCounts;
-            //}
-            //foreach (var vout in options)
-            //{
-            //    OptionVotesResponse o =new OptionVotesResponse();
-            //    o.AllCounts = vout.AllCounts;
-            //    o.Index= vout.Index;
-            //    double number = response.AllVotes != 0 ? vout.AllCounts * 1.0 / response.AllVotes * 100 : 0;
-            //    o.Rate = Math.Round(number, 2);
-            //    opt.Add(o);
-            //}
-            //if (v != null) {response.IsVoted = true;}
-            //else {response.IsVoted = false;}
-            //response.Options = opt;
             VotesForResponse response = await GetVotes(postId, userId);
-
 
             return new ObjectResult(response);
         }

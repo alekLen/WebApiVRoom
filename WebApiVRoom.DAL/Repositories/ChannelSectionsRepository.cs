@@ -159,13 +159,6 @@ namespace WebApiVRoom.DAL.Repositories
         }
 
 
-        //public Task Delete(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //
-
         public async Task<IEnumerable<ChSection>> GetAllChSection()
         {
             return await db.ChSections.ToListAsync();

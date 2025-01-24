@@ -99,32 +99,7 @@ namespace WebApiVRoom.BLL.Services
             }
             catch (Exception ex) { throw ex; }
         }
-        //public async Task<PlayListDTO> Add(PlayListDTO pl)
-        //{
-        //    try
-        //    {
-        //        User user = await Database.Users.GetById(pl.UserId);
-
-        //        PlayList playlist = new PlayList();
-        //        playlist.User = user;
-        //        playlist.Title = pl.Title;
-        //        playlist.Date = pl.Date;   
-        //        playlist.Access = pl.Access;
-
-
-        //        await Database.PlayLists.Add(playlist);
-
-        //        var mapper = InitializeMapper();
-        //        var plDto = mapper.Map<PlayList, PlayListDTO>(playlist);
-
-        //        return plDto;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
+       
         public async Task<PlayListDTO> Add(PlayListDTO pl)
         {
             try

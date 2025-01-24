@@ -50,7 +50,7 @@ namespace WebApiVRoom.Controllers
                 }
                 var stream = new MemoryStream();
                 await blobClient.DownloadToAsync(stream);
-                stream.Position = 0; // Сбрасываем позицию потока
+                stream.Position = 0; 
 
                 return File(stream, "text/vtt", Path.GetFileName(fileName));
             }

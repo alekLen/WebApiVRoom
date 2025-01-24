@@ -36,8 +36,6 @@ namespace WebApiVRoom.BLL.Services
                     .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                     .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                      .ForMember(dest => dest.users, opt => opt.MapFrom(src => src.users.Select(s => s.Id).ToList()));
-                      //.ForMember(dest => dest.AnswerVideoIds, opt => opt.Ignore());
-                //.ForMember(dest => dest.AnswerVideoId, opt => opt.MapFrom(src => src.AnswerVideo != null ? src.AnswerVideo.Id : (int?)null));
 
                 cfg.CreateMap<CommentVideoDTO, CommentVideo>()
                    .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
@@ -47,11 +45,9 @@ namespace WebApiVRoom.BLL.Services
                    .ForMember(dest => dest.IsPinned, opt => opt.MapFrom(src => src.IsPinned))
                    .ForMember(dest => dest.IsEdited, opt => opt.MapFrom(src => src.IsEdited))
                    .ForMember(dest => dest.clerkId, opt => opt.MapFrom(src => src.UserId))
-                   .ForMember(dest => dest.User, opt => opt.Ignore()) // Обработка вручную
-                    .ForMember(dest => dest.users, opt => opt.Ignore()) // Обработка вручную
-                   /* .ForMember(dest => dest.clerkId, opt => opt.Ignore())*/ // Обработка вручную
-                   .ForMember(dest => dest.Video, opt => opt.Ignore()); // Обработка вручную
-                /*   .ForMember(dest => dest.AnswerVideos, opt => opt.Ignore());*/// Обработка вручную
+                   .ForMember(dest => dest.User, opt => opt.Ignore()) 
+                    .ForMember(dest => dest.users, opt => opt.Ignore()) 
+                   .ForMember(dest => dest.Video, opt => opt.Ignore()); 
 
             });
             Mapper = new Mapper(config);

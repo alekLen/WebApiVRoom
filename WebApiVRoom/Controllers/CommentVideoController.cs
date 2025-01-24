@@ -51,7 +51,6 @@ namespace WebApiVRoom.Controllers
             CommentVideoDTO c = await _comService.UpdateCommentVideo(u);
             object com= ConvertObject(c);
 
-            //await WebSocketHelper.SendMessageToAllAsync("update_comment", com);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "update_comment", payload = com });
 
             return Ok(c);
@@ -77,7 +76,6 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment", payload = c });
                 return Ok();
             }
@@ -105,7 +103,6 @@ namespace WebApiVRoom.Controllers
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-                //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment", payload = c });
 
                 return Ok();
@@ -131,7 +128,6 @@ namespace WebApiVRoom.Controllers
 
                 CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment", payload = c });
 
             return Ok();
@@ -154,7 +150,6 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO c = await _comService.UpdateCommentVideo(ans);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment" });
 
             return Ok();
@@ -170,7 +165,6 @@ namespace WebApiVRoom.Controllers
 
             CommentVideoDTO ans = await _comService.AddCommentVideo(request);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_comment", null);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment" });
 
             return Ok(ans);
@@ -192,7 +186,6 @@ namespace WebApiVRoom.Controllers
 
             await _comService.DeleteCommentVideo(id);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_comment",null);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_comment" });
 
             return Ok(ans);

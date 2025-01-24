@@ -47,13 +47,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", builder =>
     {
         builder
-           // .WithOrigins("http://localhost:3000", "https://c7ad-195-230-183-105.ngrok-free.app", "https://vr-oom.vercel.app") // React app URL
-            .AllowAnyOrigin()
+            .WithOrigins( "https://c7ad-195-230-183-105.ngrok-free.app", "https://vr-oom.vercel.app" ) // React app URL
             .AllowAnyMethod()
             .AllowAnyHeader()
-           // .AllowCredentials()
-            ;
+            .AllowCredentials() ;
     });
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5024); // Слухає на всіх IP
 });
 
 builder.Services.AddAutoMapper(cfg =>
@@ -79,16 +82,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IWebRTCSessionRepository, WebRTCSessionRepository>();
 builder.Services.AddScoped<IWebRTCConnectionRepository, WebRTCConnectionRepository>();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddTransient<IAnswerVideoService, AnswerVideoService>();
-builder.Services.AddTransient<ICommentPostService, CommentPostService>();
-builder.Services.AddTransient<ICommentVideoService, CommentVideoService>();
-builder.Services.AddTransient<IHistoryOfBrowsingService, HistoryOfBrowsingService>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
-builder.Services.AddTransient<IPlayListService, PlayListService>();
-builder.Services.AddTransient<IPostService, PostService>();
-builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
-builder.Services.AddTransient<ITagService, TagService>();
-builder.Services.AddTransient<IVideoService, WebApiVRoom.BLL.Services.VideoService>();
+
 if (string.IsNullOrEmpty(blobStorageConnectionString))
 {
     throw new ArgumentNullException("ConnectionString", "Blob Storage connection string is not configured properly.");

@@ -25,7 +25,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult( await _categoryService.GetAllCategories());
         }
 
-        // GET: CategoryController/GetCountry/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryDTO>> GetCategory(int id)
         {
@@ -37,7 +36,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(category);
         }
 
-        // GET: CategoryController/GetByCountryName/5
         [HttpGet("getbycategoryname/{categoryName}")]
         public async Task<ActionResult<CategoryDTO>> GetByCategoryName(string categoryName)
         {
@@ -49,7 +47,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(category);
         }
 
-        // GET: CategoryController/Create
         [HttpPost("add")]
         public async Task<ActionResult<CategoryDTO>> AddCategory(CategoryDTO categoryDTO)
         {
@@ -63,8 +60,6 @@ namespace WebApiVRoom.Controllers
         }
 
 
-
-        // GET: CategoryController/Edit/5
         [HttpPut("update")]
         public async Task<ActionResult<CategoryDTO>> UpdateCategory(CategoryDTO u)
         {
@@ -83,7 +78,6 @@ namespace WebApiVRoom.Controllers
             return Ok(category_new);
         }
 
-        // GET: CategoryController/Delete/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<CategoryDTO>> DeleteCategory(int id)
         {

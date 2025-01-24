@@ -117,26 +117,7 @@ namespace WebApiVRoom.Controllers
                     await AddNotification(user, "Добро пожаловать на на сайт!");
 
                     return Ok(user);
-                }
-                //if (request.type == "user.deleted")//old
-                //{
-                //        UserDTO user = await _userService.GetUserByClerkId(request.data.id);
-                //        List<VideoDTO> videos = await _videoService.GetByChannelId(user.ChannelSettings_Id);
-                //        foreach (VideoDTO video in videos)
-                //        {
-                //            await _videoService.DeleteVideo(video.Id);
-                //        }
-                //        foreach (var item in request.data.email_addresses)//error
-                //        {
-                //            if (item.id == request.data.primary_email_address_id)
-                //            {
-                //                SendEmailHelper.SendEmailMessage(request.data.first_name + " " + request.data.last_name,
-                //                    item.email_address, ", Your regestration on VRoom has been deleted. We are waiting for you back ");
-                //            }
-                //        }
-                //        UserDTO user2 = await _userService.Delete(request.data.id);              
-                //    return Ok(user2);
-                //}
+                }               
                 if (request.type == "user.deleted")//new
                 {
                     UserDTO user = await _userService.GetUserByClerkId(request.data.id);
@@ -177,6 +158,7 @@ namespace WebApiVRoom.Controllers
                             email.IsPrimary = false;
                         await _emailService.AddEmail(email);
                     }
+                    return Ok();
                 }
             }
             catch (Exception ex) { return BadRequest(ModelState); }

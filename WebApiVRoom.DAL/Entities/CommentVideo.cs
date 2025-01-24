@@ -25,21 +25,4 @@ namespace WebApiVRoom.DAL.Entities
         public List<LikesDislikesCV> users { get; set; } = new List<LikesDislikesCV>();
     }
 
-
-    //public class CommentVideo
-    //{
-    //    public int Id { get; set; }
-    //    public string clerkId { get; set; } = null;
-    //    public ChannelSettings User { get; set; }
-    //    public Video Video { get; set; }
-    //    public string Comment { get; set; }
-    //    public DateTime Date { get; set; }
-    //    public int LikeCount { get; set; }
-    //    public int DislikeCount { get; set; }
-    //    //public AnswerVideo? AnswerVideo { get; set; }
-    //    public bool IsPinned { get; set; }
-    //    public bool IsEdited { get; set; }
-    //    public List<LikesDislikesCV> users { get; set; } = new List<LikesDislikesCV>();
-    //    //public List<AnswerVideo> AnswerVideos { get; set; } =new List<AnswerVideo>();
-    //}
 }

@@ -24,7 +24,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Video>> GetByChannelIdPaginated(int pageNumber, int pageSize, int channelId);
         Task<List<Video>> GetByChannelId(int channelId);
         Task<Video> GetById(int? videoId);
-
         Task<List<Video>> GetShortVideosByChannelId(int channelId);
         Task<List<Video>> GetShortVideosByChannelIdVisibility(int channelId, bool visibility);
         Task<List<Video>> GetVideosByChannelIdVisibility(int channelId, bool visibility);

@@ -21,16 +21,12 @@ namespace WebApiVRoom.BLL.Services
         IUnitOfWork Database { get; set; }
         private readonly IBlobStorageService _blobStorageService;
         private readonly IVideoService _videoService;
-        //private readonly IOptionsForPostService _opService;
-        //private readonly IVouteService _vouteService;
 
         public PostService(IUnitOfWork database, IBlobStorageService blobStorageService, IVideoService videoService)
         {
             Database = database;
             _blobStorageService = blobStorageService;
             _videoService = videoService;
-            //_opService= opService;
-            //_vouteService = vouteService;
         }
         public static IMapper InitializeMapper()
         {
@@ -126,14 +122,6 @@ namespace WebApiVRoom.BLL.Services
         {
             try
             {
-                //var config = new MapperConfiguration(cfg =>
-                //{
-                //    cfg.CreateMap<Post, PostDTO>()
-                //        .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-                //        .ForMember(dest => dest.ChannelSettingsId, opt => opt.MapFrom(src => src.ChannelSettings.Id))
-                //        .ForMember(dest => dest.CommentPostsId, opt => opt.MapFrom(src => src.CommentPosts.Select(ch => new CommentPost { Id = ch.Id })));
-                //});
-
                 IMapper mapper = InitializeMapper();
                 return mapper.Map<IEnumerable<Post>, IEnumerable<PostDTO>>(await Database.Posts.GetAll());
             }
@@ -164,29 +152,6 @@ namespace WebApiVRoom.BLL.Services
 
             return post;
         }
-
-        //public async Task<PostDTO> GetPostByChannelName(string name)
-        //{
-        //    var a = await Database.Posts.GetByChannelName(name);
-
-        //    if (a == null)
-        //        throw new ValidationException("Wrong country!", "");
-
-        //    PostDTO post = new PostDTO();
-        //    post.Id = a.Id;
-        //    post.Text = a.Text;
-
-        //    var channelSettings = await Database.ChannelSettings.GetById(a.Id);
-        //    post.ChannelSettingsId = channelSettings.Id;
-
-        //    post.CommentPostsId = new List<int>();
-        //    foreach (CommentPost comment in a.CommentPosts)
-        //    {
-        //        post.CommentPostsId.Add(comment.Id);
-        //    }
-
-        //    return post;
-        //}
 
         public async Task<List<PostDTO>> GetPostByChannellId(int chId)
         {

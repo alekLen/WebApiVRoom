@@ -71,7 +71,6 @@ namespace WebApiVRoom.BLL.Services
 
                 if (t.Count > 8)
                     throw new ArgumentException("Cannot have more than 8 sections.");
-                //    await Database.ChannelSections.Add(channelSections);
 
 
                 var mapper = InitializeListMapper();
@@ -81,8 +80,6 @@ namespace WebApiVRoom.BLL.Services
 
                 await Database.ChannelSections.AddRangeChannelSectionsByClerkId(chsettings.Id, ChannelSectionsDto);
 
-
-                //return ChannelSectionsDto;
             }
             catch (Exception ex) { throw ex; }
         }

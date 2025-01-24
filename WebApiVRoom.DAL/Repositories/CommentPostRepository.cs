@@ -24,7 +24,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                 .Include(cv => cv.User)
                 .Include(cv => cv.Post)
-                //.Include(cv => cv.AnswerPosts)
                  .Include(cv => cv.users)
                 .ToListAsync();
         }
@@ -33,7 +32,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                    .Include(cp => cp.User)
                    .Include(cp => cp.Post)
-                   //.Include(cp => cp.AnswerPosts)
                     .Include(cv => cv.users)
                    .FirstOrDefaultAsync(m => m.Id == id);
         }
@@ -42,7 +40,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                   .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                   .Where(m => m.Post.Id == postId)
                   .ToListAsync();   
@@ -52,7 +49,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                   .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                   .Where(m => m.Post.Id == postId)
                    .Skip((pageNumber - 1) * pageSize)
@@ -64,7 +60,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                   .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                   .Where(m => m.User.Id == userId)
                   .ToListAsync();   
@@ -74,7 +69,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                   .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                   .Where(m => m.User.Id == userId)
                    .Skip((pageNumber - 1) * pageSize)
@@ -87,7 +81,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                   .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                   .Where(m => m.Date == date)
                   .ToListAsync();   
@@ -127,7 +120,6 @@ namespace WebApiVRoom.DAL.Repositories
             return await db.CommentPosts
                  .Include(cp => cp.User)
                   .Include(cp => cp.Post)
-                  //.Include(cp => cp.AnswerPosts)
                    .Include(cv => cv.users)
                 .Where(s => ids.Contains(s.Id))
                 .ToListAsync();

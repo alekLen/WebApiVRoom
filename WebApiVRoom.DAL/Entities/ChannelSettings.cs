@@ -16,10 +16,7 @@ namespace WebApiVRoom.DAL.Entities
         public string ChannelPlofilePhoto { get; set; } = string.Empty;
         public string Channel_URL { get; set; } = string.Empty;
         public string? ChannelNikName { get; set; } = string.Empty;
-
         public List<ChannelSection> ChannelSections { get; set; } = new List<ChannelSection>();//
-
-
         public PinnedVideo? PinnedVideo { get; set; }
         public User Owner { get; set; }
         public Language Language { get; set; }
@@ -36,7 +33,6 @@ namespace WebApiVRoom.DAL.Entities
         public List<AnswerPost> AnswerPosts { get; set; } = new List<AnswerPost>();
         public List<AnswerVideo> AnswerVideos { get; set; } = new List<AnswerVideo>();
         public List<Notification> Notifications { get; set; } = new List<Notification>();
-
 
 
         public static explicit operator ChannelSettings(Task<ChannelSettings> v)

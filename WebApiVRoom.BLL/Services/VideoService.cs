@@ -125,8 +125,7 @@ namespace WebApiVRoom.BLL.Services
                 {
                     await fileStream.CopyToAsync(fileStreamOutput);
                 }
-                //string optimizedFilePath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}_optimized.mp4");
-                //await RunFfmpegCommand(GetFaststartArguments(tempFilePath, optimizedFilePath));
+
                 // Генерация аргументов для FFmpeg
                 var tasks = new List<Task>
                 {
@@ -212,11 +211,11 @@ namespace WebApiVRoom.BLL.Services
 
                 var temp_video = await _unitOfWork.Videos.GetById(video.Id);
 
-                temp_video.VRoomVideoUrl = $"http://localhost:3000/shorts/{temp_video.Id}";
+                temp_video.VRoomVideoUrl = $"https://vr-oom.vercel.app/shorts/{temp_video.Id}";
 
                 if (temp_video.IsShort == false)
                 {
-                    temp_video.VRoomVideoUrl = $"http://localhost:3000/watch/{temp_video.Id}";
+                    temp_video.VRoomVideoUrl = $"https://vr-oom.vercel.app/watch/{temp_video.Id}";
                 }
                 await _unitOfWork.Videos.Update(video);
 
@@ -304,28 +303,6 @@ namespace WebApiVRoom.BLL.Services
                   };
         }
 
-        //public async Task<File> GetSubtitleFile(string puthtofile)
-        //{
-
-        //    try
-        //    {
-        //        var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
-        //        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
-        //        var decodedUrl = Uri.UnescapeDataString(puthtofile);
-        //        var blobClient = containerClient.GetBlobClient(decodedUrl);
-
-        //        var stream = new MemoryStream();
-        //        await blobClient.DownloadToAsync(stream);
-        //        stream.Position = 0; // Сбрасываем позицию потока
-
-        //        return File(stream, "text/vtt", Path.GetFileName(decodedUrl));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public async Task<string> UploadFileAsync(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -346,12 +323,7 @@ namespace WebApiVRoom.BLL.Services
             return blobClient.Uri.ToString();
         }
 
-        //private async Task DeleteFileAsync(string fileUrl)
-        //{
-        //    var blobUri = new Uri(fileUrl);
-        //    var blobClient = new BlobClient(blobUri);
-        //    await blobClient.DeleteIfExistsAsync();
-        //}
+    
         private async Task<string> UploadFileAsync(string videoUrl)
         {
             throw new NotImplementedException();
@@ -538,11 +510,11 @@ namespace WebApiVRoom.BLL.Services
                 video.IsCopyright = videoDTO.IsCopyright;
                 video.Audience = videoDTO.Audience;
 
-                video.VRoomVideoUrl = $"http://localhost:3000/shorts/{video.Id}";
+                video.VRoomVideoUrl = $"https://vr-oom.vercel.app/shorts/{video.Id}";
 
                 if (videoDTO.IsShort == false)
                 {
-                    video.VRoomVideoUrl = $"http://localhost:3000/watch/{video.Id}";
+                    video.VRoomVideoUrl = $"https://vr-oom.vercel.app/watch/{video.Id}";
                 }
 
                 await _unitOfWork.Videos.Update(video);

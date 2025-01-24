@@ -49,7 +49,6 @@ namespace WebApiVRoom.Controllers
             CommentPostDTO c = await _comService.UpdateCommentPost(u);
             object com = ConvertObject(c);
 
-            //await WebSocketHelper.SendMessageToAllAsync("update_commentpost", com);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "update_commentpost", payload = com });
 
             return Ok(c);
@@ -66,7 +65,6 @@ namespace WebApiVRoom.Controllers
             CommentPostDTO ans = await _comService.AddCommentPost(request);
             object com = ConvertObject(ans);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_commentpost", com);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_commentpost", payload = com });
 
             return Ok(ans);
@@ -146,7 +144,6 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                //await WebSocketHelper.SendMessageToAllAsync("like_commentpost", null);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "like_commentpost", payload = c });
 
                 return Ok();
@@ -175,7 +172,6 @@ namespace WebApiVRoom.Controllers
 
                 CommentPostDTO c = await _comService.UpdateCommentPost(ans);
 
-                //await WebSocketHelper.SendMessageToAllAsync("dislike_commentpost", null);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "dislike_commentpost", payload = c });
 
                 return Ok();
@@ -201,7 +197,6 @@ namespace WebApiVRoom.Controllers
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
             object com = ConvertObject(c);
-            //await WebSocketHelper.SendMessageToAllAsync("pin_commentpost", com);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "pin_commentpost", payload = com });
 
             return Ok();
@@ -224,7 +219,6 @@ namespace WebApiVRoom.Controllers
 
             CommentPostDTO c = await _comService.UpdateCommentPost(ans);
             object com = ConvertObject(c);
-            //await WebSocketHelper.SendMessageToAllAsync("pin_commentpost",com);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "pin_commentpost", payload = com });
 
             return Ok();

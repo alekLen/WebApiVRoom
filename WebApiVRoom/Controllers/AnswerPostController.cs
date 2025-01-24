@@ -53,7 +53,6 @@ namespace WebApiVRoom.Controllers
 
             object obj = ConvertObject(answer);
 
-            //await WebSocketHelper.SendMessageToAllAsync("update_answerpost", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "update_answerpost", payload = obj });
 
 
@@ -71,7 +70,6 @@ namespace WebApiVRoom.Controllers
             AnswerPostDTO ans = await _answerService.Add(request);
             object obj = ConvertObject(ans);
 
-            //await WebSocketHelper.SendMessageToAllAsync("new_answerpost", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "new_answerpost", payload = obj });
 
             return Ok(ans);
@@ -94,7 +92,6 @@ namespace WebApiVRoom.Controllers
             await _answerService.Delete(id);
             object obj = ConvertObject(ans);
 
-            //await WebSocketHelper.SendMessageToAllAsync("delete_answerpost", obj);
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "delete_answerpost", payload = obj });
 
             return Ok(ans);
@@ -146,7 +143,6 @@ namespace WebApiVRoom.Controllers
                 AnswerPostDTO c = await _answerService.Update(ans);
                 object obj = ConvertObject(c);
 
-                //await WebSocketHelper.SendMessageToAllAsync("like_answerpost", obj);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "like_answerpost", payload = obj });
 
                 return Ok();
@@ -176,7 +172,6 @@ namespace WebApiVRoom.Controllers
                 AnswerPostDTO c = await _answerService.Update(ans);
                 object obj = ConvertObject(c);
 
-                //await WebSocketHelper.SendMessageToAllAsync("dislike_answerpost", obj);
                 await _hubContext.Clients.All.SendAsync("ReceiveMessage", new { type = "dislike_answerpost", payload = obj });
 
                 return Ok();

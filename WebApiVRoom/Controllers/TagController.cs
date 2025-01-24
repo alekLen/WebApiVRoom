@@ -66,7 +66,6 @@ namespace WebApiVRoom.Controllers
 
 
 
-        // GET: CategoryController/Edit/5
         [HttpPut("update")]
         public async Task<ActionResult<TagDTO>> UpdateTag(TagDTO u)
         {
@@ -85,7 +84,6 @@ namespace WebApiVRoom.Controllers
             return Ok(tag_new);
         }
 
-        // GET: CategoryController/Delete/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<TagDTO>> DeleteTag(int id)
         {

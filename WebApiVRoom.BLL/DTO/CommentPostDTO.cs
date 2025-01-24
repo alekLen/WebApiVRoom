@@ -19,7 +19,6 @@ namespace WebApiVRoom.BLL.DTO
         public DateTime Date { get; set; }
         public int LikeCount { get; set; }
         public int DislikeCount { get; set; }
-        //public List<int>? AnswerPostIds { get; set; } = new List<int>();
         public bool IsPinned { get; set; }
         public bool IsEdited { get; set; }
     }

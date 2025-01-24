@@ -10,7 +10,6 @@ namespace WebApiVRoom.BLL.Interfaces
     public interface IUserService
     {     
         Task<UserDTO> GetUser(int id);
-        //Task<UserDTO> AddUser(string clerk_id, string language, string country, string countryCode);
         Task<List<DateTime> > GetUsersByDateDiapason(DateTime start, DateTime end);
         Task<UserDTO> AddUser(string clerk_id, string imgurl);
         Task<UserDTO> GetUserByClerkId(string clerkId);
