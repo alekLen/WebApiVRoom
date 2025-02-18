@@ -47,17 +47,17 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", builder =>
     {
         builder
-            .WithOrigins( "https://c7ad-195-230-183-105.ngrok-free.app", "https://vr-oom.vercel.app" ) // React app URL
+            .WithOrigins( "https://c7ad-195-230-183-105.ngrok-free.app", "https://vr-oom.vercel.app", "http://localhost:3000") // React app URL
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials() ;
     });
 });
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5024); // Слухає на всіх IP
-});
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(5024); // Слухає на всіх IP
+//});
 
 builder.Services.AddAutoMapper(cfg =>
 {
