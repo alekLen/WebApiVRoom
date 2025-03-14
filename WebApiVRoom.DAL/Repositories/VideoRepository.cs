@@ -11,7 +11,6 @@ using Azure.Storage.Blobs;
 using Microsoft.Identity.Client;
 using System.Threading.Channels;
 
-
 namespace WebApiVRoom.DAL.Repositories
 {
     public class VideoRepository : IVideoRepository
@@ -22,7 +21,6 @@ namespace WebApiVRoom.DAL.Repositories
         {
             _context = context;
         }
-
 
         public async Task<List<Video>> GetFilteredVideosAsync(int id, bool isShort, VideoFilter filter)
         {
@@ -41,7 +39,6 @@ namespace WebApiVRoom.DAL.Repositories
                     query = query.Where(v => v.IsCopyright == false);
                 }
             }
-
 
             if (!string.IsNullOrEmpty(filter.AgeRestriction))
             {
@@ -72,13 +69,11 @@ namespace WebApiVRoom.DAL.Repositories
                 }
             }
 
-
             if (!string.IsNullOrEmpty(filter.Title))
                 query = query.Where(v => v.Tittle.Contains(filter.Title));
 
             if (!string.IsNullOrEmpty(filter.Description))
                 query = query.Where(v => v.Description.Contains(filter.Description));
-
 
             if (filter.MinViews != 0 && filter.MaxViews != 0)
             {
@@ -93,9 +88,9 @@ namespace WebApiVRoom.DAL.Repositories
                 query = query.Where(v => v.ViewCount <= filter.MaxViews);
             }
 
-
             return await query.ToListAsync();
         }
+
         public async Task<IEnumerable<Video>> GetAll()//видео и короткие видео вмести
         {
             return await _context.Videos
@@ -107,6 +102,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Include(v => v.PlayListVideos)
                 .ToListAsync();
         }
+
         public async Task<IEnumerable<Video>> GetAllVideo()
         {
             return await _context.Videos
@@ -133,6 +129,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
         public async Task<IEnumerable<Video>> GetAllVideoPaginated(int pageNumber, int pageSize)
         {
             return await _context.Videos
@@ -147,6 +144,58 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<List<Video>> GetAllShortsPaginated(int pageNumber, int pageSize)
+        {
+            return await _context.Videos
+                .Include(v => v.ChannelSettings)
+                .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.HistoryOfBrowsings)
+                .Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos)
+                .Where(v => v.IsShort == true)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Video>> GetAllShortsPaginatedWith1VById(int pageNumber, int pageSize, int? videoId = null)
+        {
+            // Сначала получаем одно видео с конкретным id (если оно указано)
+            Video specificVideo = null;
+            int count = pageSize;
+
+            if (videoId.HasValue && videoId.Value != 0)
+            {
+                specificVideo = await _context.Videos.Include(v => v.ChannelSettings).Include(v => v.Categories)
+                    .Include(v => v.Tags).Include(v => v.HistoryOfBrowsings).Include(v => v.CommentVideos)
+                    .Include(v => v.PlayListVideos).Where(v => v.IsShort == true && v.Id == videoId.Value)
+                    .FirstOrDefaultAsync();
+                count--;
+            }
+
+            // Затем получаем остальные видео с пагинацией, исключая видео с конкретным id (если оно было найдено)
+            var remainingVideosQuery = _context.Videos.Include(v => v.ChannelSettings).Include(v => v.Categories)
+                .Include(v => v.Tags).Include(v => v.HistoryOfBrowsings).Include(v => v.CommentVideos)
+                .Include(v => v.PlayListVideos).Where(v => v.IsShort == true && v.Id != videoId.Value);
+
+            if (videoId.HasValue && specificVideo != null)
+            {
+                remainingVideosQuery = remainingVideosQuery.Where(v => v.Id != videoId.Value);
+            }
+
+            var remainingVideos = await remainingVideosQuery.Skip((pageNumber - 1) * count).Take(count).ToListAsync();
+
+            // Если видео с конкретным id существует, добавляем его в начало списка
+            if (specificVideo != null)
+            {
+                remainingVideos.Insert(0, specificVideo);
+            }
+
+            return remainingVideos;
+        }
+
         public async Task Add(Video video)
         {
             ValidateVideo(video);
@@ -177,37 +226,43 @@ namespace WebApiVRoom.DAL.Repositories
             Console.WriteLine("After update:", updatedVideo);
         }
 
-
         public async Task Delete(int id)
         {
-            var video = await _context.Videos
-                .Include(v => v.HistoryOfBrowsings)
-                .Include(v => v.CommentVideos)
-                .Include(v => v.PlayListVideos)
-                .FirstOrDefaultAsync(v => v.Id == id);
-
-            if (video == null)
-                throw new KeyNotFoundException("Video not found");
-
-            // Remove related records
-            if (video.HistoryOfBrowsings != null)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                _context.HistoryOfBrowsings.RemoveRange(video.HistoryOfBrowsings);
-            }
+                // Встановлюємо таймаут для команди
+                _context.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 
-            if (video.CommentVideos != null)
-            {
-                _context.CommentVideos.RemoveRange(video.CommentVideos);
-            }
+                // Видаляємо пов'язані записи окремими запитами для кращої продуктивності
+                await _context.HistoryOfBrowsings
+                    .Where(h => h.Video.Id == id)
+                    .ExecuteDeleteAsync();
 
-            if (video.PlayListVideos != null)
+                await _context.CommentVideos
+                    .Where(c => c.Video.Id == id)
+                    .ExecuteDeleteAsync();
+
+                await _context.PlayListVideo
+                    .Where(p => p.Video.Id == id)
+                    .ExecuteDeleteAsync();
+
+                // Отримуємо і видаляємо саме відео
+                var video = await _context.Videos
+                    .FirstOrDefaultAsync(v => v.Id == id);
+
+                if (video == null)
+                    throw new KeyNotFoundException("Video not found");
+
+                _context.Videos.Remove(video);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
             {
                 _context.PlayListVideos.RemoveRange(video.PlayListVideos);
             }
-
-            // Remove the video
-            _context.Videos.Remove(video);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<Video> GetByTitle(string title)
@@ -264,8 +319,6 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
-
 
         public async Task<List<Video>> GetMostPopularVideos(int topCount)
         {
@@ -345,6 +398,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.IsShort)
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetShortVideosByChannelId(int channelId)
         {
             return await _context.Videos
@@ -383,6 +437,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.Visibility).Where(v => v.ChannelSettings.Id == channelId)
                 .ToListAsync();
         }
+
         public async Task<List<Video>> GetShortVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId)
         {
             return await _context.Videos
@@ -419,6 +474,7 @@ namespace WebApiVRoom.DAL.Repositories
                 .Where(v => v.Visibility == false).Where(v => v.ChannelSettings.Id == channelId)
                 .ToListAsync();
         }
+
         public async Task<bool> Exists(int id)
         {
             return await _context.Videos.AnyAsync(v => v.Id == id);
@@ -494,7 +550,6 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
-
         public async Task<Video> GetById(int id)
         {
             var video = await _context.Videos
@@ -511,6 +566,7 @@ namespace WebApiVRoom.DAL.Repositories
 
             return video;
         }
+
         public async Task<Video> GetByVRoomVideoUrl(string url)
         {
             var video = await _context.Videos

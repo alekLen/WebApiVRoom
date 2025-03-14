@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiVRoom.BLL", "WebApiVR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiVRoom.DAL", "WebApiVRoom.DAL\WebApiVRoom.DAL.csproj", "{1664717B-0E94-4932-AE3D-84DA8506E1DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiVRoom.BLLTests", "WebApiVRoom.BLLTests\WebApiVRoom.BLLTests.csproj", "{76670B20-5557-4250-971B-1EE9EF6AB36D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1664717B-0E94-4932-AE3D-84DA8506E1DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1664717B-0E94-4932-AE3D-84DA8506E1DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1664717B-0E94-4932-AE3D-84DA8506E1DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76670B20-5557-4250-971B-1EE9EF6AB36D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76670B20-5557-4250-971B-1EE9EF6AB36D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76670B20-5557-4250-971B-1EE9EF6AB36D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76670B20-5557-4250-971B-1EE9EF6AB36D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

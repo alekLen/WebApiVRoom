@@ -26,7 +26,9 @@ namespace WebApiVRoom.BLL.Services
             {
                 cfg.CreateMap<HistoryOfBrowsing, HistoryOfBrowsingDTO>()
                     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Clerk_Id))
+                 
                     .ForMember(dest => dest.VideoId, opt => opt.MapFrom(src => src.Video.Id))
+                 
                     .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
                     .ForMember(dest => dest.TimeCode, opt => opt.MapFrom(src => src.TimeCode));
              });

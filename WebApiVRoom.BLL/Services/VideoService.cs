@@ -353,43 +353,57 @@ namespace WebApiVRoom.BLL.Services
                 var video = await _unitOfWork.Videos.GetById(id);
                 if (video == null)
                 {
-                    throw new KeyNotFoundException($"Video with ID {id} not found");
+                    throw new KeyNotFoundException("Video not found");
                 }
 
-                // First try to delete from Algolia
+                // Створюємо список завдань для паралельного виконання
+                var tasks = new List<Task>();
+
+                // Видалення з Algolia
                 if (!string.IsNullOrEmpty(video.ObjectID))
                 {
-                    try
+                    tasks.Add(Task.Run(async () =>
                     {
-                        await _algoliaService.DeleteVideoAsync(video.ObjectID);
-                    }
-                    catch (Exception algoliaEx)
-                    {
-                        // Log but continue if Algolia deletion fails
-                        Debug.WriteLine($"Warning: Failed to delete video from Algolia: {algoliaEx.Message}");
-                    }
+                        try
+                        {
+                            await _algoliaService.DeleteVideoAsync(video.ObjectID);
+                        }
+                        catch (Exception algoliaEx)
+                        {
+                            Debug.WriteLine($"Warning: Failed to delete video from Algolia: {algoliaEx.Message}");
+                        }
+                    }));
                 }
 
-                // Then try to delete the file from blob storage if URL exists
+                // Видалення файлу з blob storage
                 if (!string.IsNullOrEmpty(video.VideoUrl))
                 {
-                    try
+                    tasks.Add(Task.Run(async () =>
                     {
-                        await _blobStorageService.DeleteFileAsync(video.VideoUrl);
-                    }
-                    catch (Exception blobEx)
-                    {
-                        // Log but continue if blob deletion fails
-                        Debug.WriteLine($"Warning: Failed to delete video file from blob storage: {blobEx.Message}");
-                    }
+                        try
+                        {
+                            await _blobStorageService.DeleteFileAsync(video.VideoUrl);
+                        }
+                        catch (Exception blobEx)
+                        {
+                            Debug.WriteLine($"Warning: Failed to delete video file from blob storage: {blobEx.Message}");
+                        }
+                    }));
                 }
 
-                // Delete video and its related records from database
+                // Чекаємо завершення всіх асинхронних операцій з таймаутом
+                await Task.WhenAll(tasks).WaitAsync(TimeSpan.FromMinutes(2));
+
+                // Видаляємо відео з бази даних
                 await _unitOfWork.Videos.Delete(id);
+            }
+            catch (TimeoutException)
+            {
+                throw new Exception($"Operation timed out while deleting video {id}");
             }
             catch (KeyNotFoundException)
             {
-                throw; // Rethrow not found exception
+                throw;
             }
             catch (Exception ex)
             {
