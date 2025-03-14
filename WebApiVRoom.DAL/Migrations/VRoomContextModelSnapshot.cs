@@ -17,7 +17,7 @@ namespace WebApiVRoom.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1168,6 +1168,7 @@ namespace WebApiVRoom.DAL.Migrations
                     b.HasOne("WebApiVRoom.DAL.Entities.Video", "Video")
                         .WithMany("PlayListVideos")
                         .HasForeignKey("VideoId")
+                        .HasPrincipalKey("TempId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

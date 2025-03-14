@@ -10,6 +10,7 @@ namespace WebApiVRoom.DAL.Interfaces
     public interface IUnitOfWork
     {      
         IUserRepository Users { get; }
+        IPinnedVideoRepository PinnedVideos { get; }
         ICategoryRepository Categories { get; }
         ICommentPostRepository CommentPosts { get; }
         IAnswerPostRepository AnswerPosts { get; }
@@ -17,6 +18,7 @@ namespace WebApiVRoom.DAL.Interfaces
         ICommentVideoRepository CommentVideos { get; }
         ICountryRepository Countries { get; }
         ILanguageRepository Languages { get; }
+        IChannelSectionRepository ChannelSections { get; }
         IChannelSettingsRepository ChannelSettings { get; }
         IHistoryOfBrowsingRepository HistoryOfBrowsings { get; }
         INotificationRepository Notifications { get; }
@@ -36,5 +38,11 @@ namespace WebApiVRoom.DAL.Interfaces
         IVoteRepository Votes { get; }
         IWebRTCConnectionRepository WebRTCConnections { get; }
         IWebRTCSessionRepository WebRTCSessions { get; }
+        IEmailRepository Emails { get; }
+        IVideoViewsRepository VideoViews { get; }
+        IAdRepository Ads { get; }
+        IContentReportRepository ContentReports { get; }
+        IAdminLogRepository AdminLogs { get; }
+        ISubtitleRepository Subtitles { get; }
     }
 }

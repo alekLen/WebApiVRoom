@@ -11,5 +11,6 @@ namespace WebApiVRoom.DAL.Interfaces
     {
         Task<User> GetByClerk_Id(string clerk_id);
         Task<IEnumerable<User>> GetAllPaginated(int pageNumber, int pageSize);
+        Task<IEnumerable<DateTime>> GetUsersByDiapason(DateTime start, DateTime end);
     }
 }

@@ -7,6 +7,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
@@ -67,14 +68,10 @@ namespace WebApiVRoom.BLL.Services
                 commentPost.clerkId= commentPostDTO.UserId;
                 commentPost.Post = await Database.Posts.GetById(commentPostDTO.PostId);
 
-                //if (commentPostDTO.AnswerPostIds != null)
-                //{
-                //    commentPost.AnswerPosts = await Database.AnswerPosts.GetByIds(commentPostDTO.AnswerPostIds);
-                //}
-
                 commentPost.Date = DateTime.UtcNow;
 
                 await Database.CommentPosts.Add(commentPost);
+                SendNotificationsOfComments(commentPost.Post);
 
                 return _mapper.Map<CommentPost, CommentPostDTO>(commentPost);
             }
@@ -195,6 +192,25 @@ namespace WebApiVRoom.BLL.Services
                 throw new Exception(ex.Message);
             }
         }
-
+        public async Task SendNotificationsOfComments(Post post)
+        {
+            ChannelSettings ch = await Database.ChannelSettings.GetById(post.ChannelSettings.Id);
+            if (ch.Owner.SubscribedOnActivityOnMyChannel == true)
+            {
+                Notification notification = new Notification();
+                notification.Date = DateTime.Now;
+                notification.User = post.ChannelSettings.Owner;
+                notification.IsRead = false;
+                notification.Message = "A new comment to your post ";
+                await Database.Notifications.Add(notification);
+            }
+            if (ch.Owner.EmailSubscribedOnActivityOnMyChannel == true)
+            {
+                Email email = await Database.Emails.GetByUserPrimary(ch.Owner.Clerk_Id);
+                ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(ch.Owner.Clerk_Id);
+                SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName, email.EmailAddress,
+                  "A new comment to your post ");
+            }
+        }
     }
 }

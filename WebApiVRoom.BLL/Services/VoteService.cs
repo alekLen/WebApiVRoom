@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
@@ -15,16 +16,12 @@ namespace WebApiVRoom.BLL.Services
     public class VoteService: IVoteService
     {
         IUnitOfWork Database { get; set; }
-        //private readonly IOptionsForPostRepository _opService;
-        //private readonly IPostRepository _postpService;
-        //private readonly IUserRepository _userpService;
+
 
         public VoteService(IUnitOfWork database)
         {
             Database = database;
-            //_opService = opService;
-            //_postpService = postpService;
-            //_userpService = userpService;
+
         }
 
         public async Task AddVote(int postId, string clerkId, int optionId)
@@ -41,6 +38,7 @@ namespace WebApiVRoom.BLL.Services
                 voute.Post = post;
 
                 await Database.Votes.Add(voute);
+                await SendNotifications( post);
             }
             catch (Exception ex)
             {
@@ -111,6 +109,26 @@ namespace WebApiVRoom.BLL.Services
             }
             catch { return null; }
         }
-       
+        public async Task SendNotifications(Post post)
+        {
+            ChannelSettings ch = await Database.ChannelSettings.GetById(post.ChannelSettings.Id);
+            if (ch.Owner.SubscribedOnActivityOnMyChannel == true)
+            {
+                Notification notification = new Notification();
+                notification.Date = DateTime.Now;
+                notification.User = post.ChannelSettings.Owner;
+                notification.IsRead = false;
+                notification.Message = "A new vote to  your post: "+post.Text;
+                await Database.Notifications.Add(notification);
+            }
+            if (ch.Owner.EmailSubscribedOnActivityOnMyChannel == true)
+            {
+                Email email = await Database.Emails.GetByUserPrimary(ch.Owner.Clerk_Id);
+                ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(ch.Owner.Clerk_Id);
+                SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName, email.EmailAddress,
+                  "A new vote to  your post: " + post.Text);
+            }
+        }
+
     }
 }

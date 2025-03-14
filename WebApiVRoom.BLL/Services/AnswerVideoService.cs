@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebApiVRoom.BLL.DTO;
+using WebApiVRoom.BLL.Helpers;
 using WebApiVRoom.BLL.Interfaces;
 using WebApiVRoom.DAL.Entities;
 using WebApiVRoom.DAL.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApiVRoom.BLL.Services
 {
@@ -78,7 +80,7 @@ namespace WebApiVRoom.BLL.Services
                 answer.IsEdited = false;
 
                 await Database.AnswerVideos.Add(answer);
-
+                await SendNotificationsOfAnswers(comment,comment.Comment, a.Text);
                 IMapper mapper = InitializeMapper();
                 return mapper.Map<AnswerVideo, AnswerVideoDTO>(answer);
             }
@@ -157,6 +159,26 @@ namespace WebApiVRoom.BLL.Services
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+        public async Task SendNotificationsOfAnswers(CommentVideo comment,string mycomment, string text)
+        {
+            User user = await Database.Users.GetByClerk_Id(comment.clerkId);
+            if (user.SubscribedOnOnActivityOnMyComments == true)
+            {
+                Notification notification = new Notification();
+                notification.Date = DateTime.Now;
+                notification.User = user;
+                notification.IsRead = false;
+                notification.Message = "A new answer on your comment: "+ mycomment+" : answer :" + text;
+                await Database.Notifications.Add(notification);
+            }
+            if (user.EmailSubscribedOnOnActivityOnMyComments == true)
+            {
+                Email email = await Database.Emails.GetByUserPrimary(user.Clerk_Id);
+                ChannelSettings channelSettings = await Database.ChannelSettings.FindByOwner(user.Clerk_Id);
+                SendEmailHelper.SendEmailMessage(channelSettings.ChannelNikName, email.EmailAddress,
+                   "A new answer on your comment: " + mycomment + " : answer :" + text);
             }
         }
     }

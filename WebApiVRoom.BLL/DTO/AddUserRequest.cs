@@ -27,7 +27,7 @@ namespace WebApiVRoom.BLL.DTO
             public float? created_at { get; set; }
             public bool? delete_self_enabled { get; set; }
             public List<EmailAddress>? email_addresses { get; set; }
-            public List<string>? external_accounts { get; set; }
+            public List<ExternalAccount>? external_accounts { get; set; }
             public string? external_id { get; set; }
             public string? first_name { get; set; }
             public bool? has_image { get; set; }
@@ -68,6 +68,23 @@ namespace WebApiVRoom.BLL.DTO
         public bool reserved { get; set; }
         public float updated_at { get; set; }
         public Verification verification { get; set; }
+    }
+    
+    public class ExternalAccount
+    {
+        public string ApprovedScopes { get; set; }
+        public long CreatedAt { get; set; }
+        public string EmailAddress { get; set; }
+        public string FamilyName { get; set; }
+        public string GivenName { get; set; }
+        public string GoogleId { get; set; }
+        public string Id { get; set; }
+        public string Label { get; set; }
+        public string Object { get; set; }
+        public string Picture { get; set; }
+        public long UpdatedAt { get; set; }
+        public string Username { get; set; }
+        public Verification Verification { get; set; }
     }
 
     public class Verification { }

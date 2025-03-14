@@ -11,6 +11,6 @@ namespace WebApiVRoom.BLL.DTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<int> VideosId { get; set; } = new List<int>();
+        
     }
 }

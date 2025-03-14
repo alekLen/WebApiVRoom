@@ -29,7 +29,7 @@ namespace WebApiVRoom.BLL.Services
              .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
              .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date))
              .ForMember(dest => dest.Access, opt => opt.MapFrom(src => src.Access))
-             .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideos.Select(ch => ch.VideoId)));
+             .ForMember(dest => dest.VideosId, opt => opt.MapFrom(src => src.PlayListVideo.Select(ch => ch.VideoId)));
             });
 
 
@@ -145,7 +145,7 @@ namespace WebApiVRoom.BLL.Services
                 // Додаємо плейлист у базу
                 await Database.PlayLists.Add(playlist);
 
-                // Додаємо відео до таблиці зв'язків PlayListVideos
+                // Додаємо відео до таблиці зв'язків PlayListVideo
                 foreach (var videoId in pl.VideosId)
                 {
                     var playListVideo = new PlayListVideo
@@ -185,7 +185,7 @@ namespace WebApiVRoom.BLL.Services
                     playlist.Date = pl.Date;
                     playlist.Access = pl.Access;
 
-                    // Оновлення зв'язків PlayListVideos
+                    // Оновлення зв'язків PlayListVideo
                     var existingVideos = await Database.PlayListVideo.GetByPlayListIdAsync(pl.Id);
                     foreach (var video in existingVideos)
                     {

@@ -14,5 +14,6 @@ namespace WebApiVRoom.BLL.DTO
         public int VideoId { get; set; }
         public DateTime Date { get; set; }
         public int TimeCode { get; set; }
+        public int ChannelSettingsId { get; set; }
     }
 }

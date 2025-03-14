@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,18 +13,18 @@ namespace WebApiVRoom.DAL.EF
     public class VRoomContext : DbContext
     {
         public VRoomContext(DbContextOptions<VRoomContext> options)
-         : base(options)
+            : base(options)
         {
-            if (Database.EnsureCreated())
-            {
-
-
-            }
+           
         }
 
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Email> Emails { get; set; }
+        public DbSet<PinnedVideo> PinnedVideos { get; set; }
         public DbSet<ChannelSettings> ChannelSettings { get; set; }
+        public DbSet<ChannelSection> ChannelSections { get; set; }
+        public DbSet<ChSection> ChSections { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CommentPost> CommentPosts { get; set; }
         public DbSet<CommentVideo> CommentVideos { get; set; }
@@ -33,7 +34,7 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<Language> Languages { get; set; }
         public DbSet<HistoryOfBrowsing> HistoryOfBrowsings { get; set; }
         public DbSet<PlayList> PlayLists { get; set; }
-        public DbSet<PlayListVideo> PlayListVideos { get; set; }
+        public DbSet<PlayListVideo> PlayListVideo { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -46,9 +47,14 @@ namespace WebApiVRoom.DAL.EF
         public DbSet<LikesDislikesV> LikesV { get; set; }
         public DbSet<LikesDislikesP> LikesP { get; set; }
         public DbSet<OptionsForPost> Options { get; set; }
-        public DbSet<Vote> Voutes { get; set; }
+        public DbSet<Vote> Votes { get; set; }
         public DbSet<WebRTCSession> WebRTCSessions { get; set; }
         public DbSet<WebRTCConnection> WebRTCConnections { get; set; }
+        public DbSet<VideoView> VideoViews { get; set; }
+        public DbSet<ContentReport> ContentReports { get; set; }
+        public DbSet<Ad> Ads { get; set; }
+        public DbSet<AdminLog> AdminLogs { get; set; }
+        public DbSet<Subtitle> Subtitles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,7 +79,7 @@ namespace WebApiVRoom.DAL.EF
                 entity.Property(e => e.Id).UseIdentityColumn();
 
                 entity.HasOne(d => d.PlayList)
-                    .WithMany(p => p.PlayListVideos)
+                    .WithMany(p => p.PlayListVideo)
                     .HasForeignKey(d => d.PlayListId)
                     .OnDelete(DeleteBehavior.Cascade);
 

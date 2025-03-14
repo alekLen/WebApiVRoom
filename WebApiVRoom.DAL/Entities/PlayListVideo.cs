@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApiVRoom.DAL.Entities
 {
@@ -10,6 +11,8 @@ namespace WebApiVRoom.DAL.Entities
     {
         public int Id { get; set; } 
         public int PlayListId { get; set; }
+        
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public PlayList PlayList { get; set; }
 
         public int VideoId { get; set; }

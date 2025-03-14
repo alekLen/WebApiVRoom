@@ -54,7 +54,7 @@ namespace WebApiVRoom.Controllers
                 return BadRequest(ModelState);
             }
 
-            HistoryOfBrowsingDTO ans = await _hbService.Add(request);
+           HistoryOfBrowsingDTO ans = await _hbService.Add(request);
 
             return Ok(ans);
         }
@@ -78,6 +78,29 @@ namespace WebApiVRoom.Controllers
             return Ok(ans);
         }
 
+        [HttpDelete("deleteall/{clerk_id}")]
+        public async Task<ActionResult<HistoryOfBrowsingDTO>> DeleteAll(string clerk_id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            List<HistoryOfBrowsingDTO> ans = await _hbService.GetByUserId(clerk_id);
+            if (ans == null)
+            {
+                return NotFound();
+            }
+
+            foreach (var item in ans)
+            {
+                await _hbService.Delete(item.Id);
+            }
+            
+
+            return Ok(ans);
+        }
+
         [HttpGet("getbyuserid/{clerk_id}")]
         public async Task<ActionResult<List<HistoryOfBrowsingDTO>>> ByUserId(string clerk_id)
         {
@@ -89,11 +112,33 @@ namespace WebApiVRoom.Controllers
             }
             return new ObjectResult(list);
         }
+        [HttpGet("getallhistorybyclerkidgroupedbydate/{clerk_id}")]
+        public async Task<ActionResult<List<HistoryOfBrowsingGroupDateDTO>>> GetAllHistoryByClerkIdGroupedByDate(string clerk_id)
+        {
+
+            List<HistoryOfBrowsingGroupDateDTO> list = await _hbService.GetAllHistoryByIdGroupedByDate(clerk_id);
+            if (list == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(list);
+        }
         [HttpGet("getbyuseridpaginated/{pageNumber}/{pageSize}/{clerk_id}")]
         public async Task<ActionResult<List<HistoryOfBrowsingDTO>>> ByUserPaginated([FromRoute] int pageNumber, [FromRoute] int pageSize, [FromRoute] string clerk_id)
         {
 
             List<HistoryOfBrowsingDTO> list = await _hbService.GetByUserIdPaginated(pageNumber, pageSize,clerk_id);
+            if (list == null)
+            {
+                return NotFound();
+            }
+            return new ObjectResult(list);
+        }
+        [HttpGet("getlatestvideohistorybyuseridpaginated/{pageNumber}/{pageSize}/{clerk_id}")]
+        public async Task<ActionResult<List<VideoHistoryItem>>> GetLatestVideoHistoryByUserIdPaginated([FromRoute] int pageNumber, [FromRoute] int pageSize, [FromRoute] string clerk_id)
+        {
+
+            List<VideoHistoryItem> list = await _hbService.GetLatestVideoHistoryByUserIdPaginated(pageNumber, pageSize, clerk_id);
             if (list == null)
             {
                 return NotFound();

@@ -14,5 +14,6 @@ namespace WebApiVRoom.DAL.Interfaces
         Task<List<Subscription>> GetByUserPaginated(int pageNumber, int pageSize, string userId);
         Task<List<Subscription>> GetByIds(List<int> ids);
         Task<Subscription> GetByUserAndChannel(int channel_Id, string userid);
+        Task<List<DateTime>> GetSubscriptionsByDiapasonAndChannel(DateTime start, DateTime end, int chId);
     }
 }

@@ -77,5 +77,12 @@ namespace WebApiVRoom.DAL.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<DateTime>> GetUsersByDiapason(DateTime start, DateTime end)
+        {
+            return await db.ChannelSettings
+                .Where(u => u.DateJoined >= start &&u.DateJoined<=end)
+                .Select(u => u.DateJoined)
+                .ToListAsync();
+        }
     }    
 }

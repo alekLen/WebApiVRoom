@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Azure.Storage.Blobs;
 using Microsoft.Identity.Client;
 using System.Threading.Channels;
+using Azure;
 
 namespace WebApiVRoom.DAL.Repositories
 {
@@ -261,7 +262,7 @@ namespace WebApiVRoom.DAL.Repositories
             }
             catch
             {
-                _context.PlayListVideos.RemoveRange(video.PlayListVideos);
+                _context.PlayListVideo.RemoveRange(video.PlayListVideos);
             }
         }
 
@@ -458,7 +459,7 @@ namespace WebApiVRoom.DAL.Repositories
         //        .Include(v => v.Tags)
         //        .Include(v => v.CommentVideos)
         //         .Include(v => v.ChannelSettings)
-        //         .Include(v => v.PlayListVideos)
+        //         .Include(v => v.PlayListVideo)
         //        .Where(v => v.IsShort == false).Where(v => v.ChannelSettings.Id == channelId)
         //        .ToListAsync();
         //}
@@ -584,6 +585,18 @@ namespace WebApiVRoom.DAL.Repositories
             return video;
         }
 
-
+        public async Task<List<Video>> GetShortsOrVideosByChannelIdPaginated(int pageNumber, int pageSize, int channelId, bool isShorts)
+        {
+            return await _context.Videos
+                 .Include(v => v.Categories)
+                .Include(v => v.Tags)
+                .Include(v => v.CommentVideos)
+                 .Include(v => v.ChannelSettings)
+                 .Include(v => v.PlayListVideos)
+                .Where(v => v.ChannelSettings.Id == channelId).Where(v => v.IsShort == isShorts)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

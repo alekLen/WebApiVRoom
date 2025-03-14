@@ -12,6 +12,5 @@ namespace WebApiVRoom.BLL.DTO
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string CountryCode { get; set; } = string.Empty;
-        public List<int> ChannelSettingsId { get; set; } = new List<int>();
     }
 }

@@ -16,6 +16,7 @@ namespace WebApiVRoom.DAL.Repositories
         private VRoomContext db;
         private IConfiguration configuration;
 
+        private PinnedVideoRepository pinnedVideoRepository;
         private UserRepository userRepository;
         private CategoryRepository categoryRepository;
         private CommentPostRepository commentPostRepository;
@@ -25,6 +26,7 @@ namespace WebApiVRoom.DAL.Repositories
         private CountryRepository countryRepository;
         private LanguageRepository languageRepository;
         private ChannelSettingsRepository channelSettingsRepository;
+        private ChannelSectionsRepository channelSectionsRepository;
         private HistoryOfBrowsingRepository historyOfBrowsingRepository;
         private NotificationRepository notificationRepository;
         private PlayListRepository playListRepository;
@@ -41,12 +43,75 @@ namespace WebApiVRoom.DAL.Repositories
         private LikesDislikesPRepository likesDislikesRepositoryP;
         private OptionsForPostRepository optionsForPostRepository;
         private VoteRepository vouteRepository;
+        private EmailRepository emailRepository;
+        private VideoViewsRepository videoViewsRepository;
+        private ContentReportRepository contentReportsRepository;
+        private AdRepository adRepository;
+        private AdminLogRepository adminLogRepository; 
+        private SubtitleRepository subtitleRepository;
         private WebRTCConnectionRepository webRTCConnectionRepository;
         private WebRTCSessionRepository webRTCSessionRepository;
 
         public EFUnitOfWork(VRoomContext context)
         {
             db = context;
+        }
+        public IPinnedVideoRepository PinnedVideos
+        {
+            get
+            {
+                if (pinnedVideoRepository == null)
+                    pinnedVideoRepository = new PinnedVideoRepository(db);
+                return pinnedVideoRepository;
+            }
+        }
+        public ISubtitleRepository Subtitles
+        {
+            get
+            {
+                if (subtitleRepository == null)
+                    subtitleRepository = new SubtitleRepository(db);
+                return subtitleRepository;
+            }
+        }
+
+        public IEmailRepository Emails
+        {
+            get
+            {
+                if (emailRepository == null)
+                    emailRepository = new EmailRepository(db);
+                return emailRepository;
+            }
+        }
+        public IAdminLogRepository AdminLogs
+        {
+            get
+            {
+                if (adminLogRepository == null)
+                    adminLogRepository = new AdminLogRepository(db);
+                return adminLogRepository;
+            }
+        }
+
+        public IAdRepository Ads
+        {
+            get
+            {
+                if (adRepository == null)
+                    adRepository = new AdRepository(db);
+                return adRepository;
+            }
+        }
+
+        public IContentReportRepository ContentReports
+        {
+            get
+            {
+                if (contentReportsRepository == null)
+                    contentReportsRepository = new ContentReportRepository(db);
+                return contentReportsRepository;
+            }
         }
 
         public IVoteRepository Votes
@@ -204,6 +269,15 @@ namespace WebApiVRoom.DAL.Repositories
                 return channelSettingsRepository;
             }
         }
+        public IChannelSectionRepository ChannelSections
+        {
+            get
+            {
+                if (channelSectionsRepository == null)
+                    channelSectionsRepository = new ChannelSectionsRepository(db);
+                return channelSectionsRepository;
+            }
+        }
         public IHistoryOfBrowsingRepository HistoryOfBrowsings
         {
             get
@@ -300,5 +374,14 @@ namespace WebApiVRoom.DAL.Repositories
         }
 
   
+        public IVideoViewsRepository VideoViews
+        {
+            get
+            {
+                if (videoViewsRepository == null)
+                    videoViewsRepository = new VideoViewsRepository(db);
+                return videoViewsRepository;
+            }
+        }
     }
 }

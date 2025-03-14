@@ -21,10 +21,14 @@ namespace WebApiVRoom.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TagDTO>>> GetTags()
         {
-            return new ObjectResult(await _tagService.GetAllTags());
+            var tags = await _tagService.GetAllTags();
+            List<string> tagsList = new List<string>();
+            foreach (var tag in tags) { 
+                tagsList.Add(tag.Name);
+            }
+            return new ObjectResult(tagsList);
         }
 
-        // GET: CategoryController/GetCountry/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TagDTO>> GetTag(int id)
         {
@@ -36,7 +40,6 @@ namespace WebApiVRoom.Controllers
             return new ObjectResult(tag);
         }
 
-        // GET: CategoryController/GetByCountryName/5
         [HttpGet("getbytagname/{tagName}")]
         public async Task<ActionResult<TagDTO>> GetByPostText(string tagName)
         {
