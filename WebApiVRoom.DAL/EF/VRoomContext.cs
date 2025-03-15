@@ -17,6 +17,18 @@ namespace WebApiVRoom.DAL.EF
         {
             if (Database.EnsureCreated())
             {
+                     new Tag { Name = "Video" },
+                     new Tag { Name = "Comedy" },
+                     new Tag { Name = "Science" },
+                     new Tag { Name = "History" },
+                     new Tag { Name = "Wild animals" },
+                     new Tag { Name = "Travel" },
+                     new Tag { Name = "Nature" },
+                     new Tag { Name = "Films" },
+                     new Tag { Name = "Summer" },
+                     new Tag { Name = "News" },
+                };
+                Tags.AddRange(tags);
 
 
             }
